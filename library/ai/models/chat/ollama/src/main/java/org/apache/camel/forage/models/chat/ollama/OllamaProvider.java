@@ -10,10 +10,11 @@ import org.apache.camel.forage.core.ai.ModelProvider;
 public class OllamaProvider implements ModelProvider {
 
     private String baseUrl = "http://localhost:11434";
-    private String modelName = "llama2";
+    private String modelName = "llama3";
 
     @Override
     public ChatModel newModel() {
+        System.out.println("Creating ollama model");
         return OllamaChatModel.builder()
                 .baseUrl(baseUrl)
                 .modelName(modelName)

@@ -2,10 +2,10 @@ package org.apache.camel.forage.agent.simple;
 
 import dev.langchain4j.service.AiServices;
 import java.util.List;
-import org.apache.camel.component.langchain4j.agent.AiAgentBody;
 import org.apache.camel.component.langchain4j.agent.api.Agent;
 import dev.langchain4j.service.tool.ToolProvider;
 import org.apache.camel.component.langchain4j.agent.api.AgentConfiguration;
+import org.apache.camel.component.langchain4j.agent.api.AiAgentBody;
 import org.apache.camel.component.langchain4j.agent.api.AiAgentWithMemoryService;
 import org.apache.camel.forage.agent.factory.ConfigurationAware;
 
@@ -36,6 +36,7 @@ public class SimpleAgent implements Agent, ConfigurationAware {
      * Create AI service with a single universal tool that handles multiple Camel routes and Memory Provider
      */
     private AiAgentWithMemoryService createAiAgentService(ToolProvider toolProvider) {
+        System.out.println("Creating AiAgentWithMemoryService");
         var builder = AiServices.builder(AiAgentWithMemoryService.class)
                 .chatModel(configuration.getChatModel())
                 .chatMemoryProvider(configuration.getChatMemoryProvider());

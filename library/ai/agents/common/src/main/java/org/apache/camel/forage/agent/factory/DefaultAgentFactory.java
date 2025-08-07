@@ -14,6 +14,11 @@ import org.apache.camel.component.langchain4j.agent.api.AgentFactory;
 public class DefaultAgentFactory implements AgentFactory {
 
     private CamelContext camelContext;
+    private Agent agent;
+
+    public DefaultAgentFactory() {
+        System.out.println("Creating DefaultAgentFactory");
+    }
 
     @Override
     public void setCamelContext(CamelContext camelContext) {
@@ -45,13 +50,20 @@ public class DefaultAgentFactory implements AgentFactory {
 
     @Override
     public Agent createAgent() throws Exception {
-        ModelProvider modelProvider = newModelProvider();
+        if (agent != null) {
+            return agent;
+        }
 
-        Agent agent = newAgent();
+
+        agent = newAgent();
+
+
+        ModelProvider modelProvider = newModelProvider();
 
         ChatMemoryFactory chatMemoryFactory = newChatMemoryFactory();
 
         if (agent instanceof ConfigurationAware configurationAware) {
+            System.out.println("Creating Agent");
             AgentConfiguration agentConfiguration = new AgentConfiguration();
             agentConfiguration
                     .withChatModel(modelProvider.newModel())
