@@ -3,6 +3,7 @@ package org.apache.camel.forage.agent.factory;
 import java.util.ServiceLoader;
 import org.apache.camel.CamelContext;
 import org.apache.camel.component.langchain4j.agent.api.AgentConfiguration;
+import org.apache.camel.forage.core.ai.ChatMemoryFactory;
 import org.apache.camel.forage.core.ai.ModelProvider;
 import org.apache.camel.component.langchain4j.agent.api.Agent;
 import org.apache.camel.component.langchain4j.agent.api.AgentFactory;
@@ -36,16 +37,25 @@ public class DefaultAgentFactory implements AgentFactory {
         return serviceLoader.findFirst().orElseThrow(() -> new IllegalStateException("No Agent implementation found via ServiceLoader"));
     }
 
+    private ChatMemoryFactory newChatMemoryFactory() {
+        ServiceLoader<ChatMemoryFactory> serviceLoader = ServiceLoader.load(ChatMemoryFactory.class, camelContext.getApplicationContextClassLoader());
+
+        return serviceLoader.findFirst().orElseThrow(() -> new IllegalStateException("No ChatMemoryFactory implementation found via ServiceLoader"));
+    }
+
     @Override
     public Agent createAgent() throws Exception {
         ModelProvider modelProvider = newModelProvider();
 
         Agent agent = newAgent();
 
+        ChatMemoryFactory chatMemoryFactory = newChatMemoryFactory();
+
         if (agent instanceof ConfigurationAware configurationAware) {
             AgentConfiguration agentConfiguration = new AgentConfiguration();
             agentConfiguration
-                    .withChatModel(modelProvider.newModel());
+                    .withChatModel(modelProvider.newModel())
+                    .withChatMemoryProvider(chatMemoryFactory.newChatMemory());
 
             configurationAware.configure(agentConfiguration);
         }
