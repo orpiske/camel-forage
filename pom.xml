@@ -16,6 +16,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <camel.version>4.14.0-SNAPSHOT</camel.version>
         <langchain4j-version>1.2.0</langchain4j-version>
+        <slf4j.version>2.0.17</slf4j.version>
+        <log4j.version>2.21.1</log4j.version>
     </properties>
 
     <dependencyManagement>
@@ -36,9 +38,30 @@
             </dependency>
 
             <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-bom</artifactId>
+                <version>${slf4j.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
                 <groupId>dev.langchain4j</groupId>
                 <artifactId>langchain4j</artifactId>
                 <version>${langchain4j-version}</version>
+            </dependency>
+
+
+
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j2-impl</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
