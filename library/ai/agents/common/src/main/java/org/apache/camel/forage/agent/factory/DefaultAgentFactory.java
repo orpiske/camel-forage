@@ -7,17 +7,20 @@ import org.apache.camel.forage.core.ai.ChatMemoryFactory;
 import org.apache.camel.forage.core.ai.ModelProvider;
 import org.apache.camel.component.langchain4j.agent.api.Agent;
 import org.apache.camel.component.langchain4j.agent.api.AgentFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of AgentFactory that uses ServiceLoader to discover and create agents
  */
 public class DefaultAgentFactory implements AgentFactory {
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultAgentFactory.class);
 
     private CamelContext camelContext;
-    private Agent agent;
+    private static Agent agent;
 
     public DefaultAgentFactory() {
-        System.out.println("Creating DefaultAgentFactory");
+        LOG.trace("Creating DefaultAgentFactory");
     }
 
     @Override
@@ -49,21 +52,27 @@ public class DefaultAgentFactory implements AgentFactory {
     }
 
     @Override
-    public Agent createAgent() throws Exception {
+    public synchronized Agent createAgent() throws Exception {
         if (agent != null) {
             return agent;
         }
 
+        return doCreateAgent();
+    }
 
+    private synchronized Agent doCreateAgent() {
+        LOG.trace("Creating Agent");
         agent = newAgent();
 
 
-        ModelProvider modelProvider = newModelProvider();
-
-        ChatMemoryFactory chatMemoryFactory = newChatMemoryFactory();
-
         if (agent instanceof ConfigurationAware configurationAware) {
-            System.out.println("Creating Agent");
+            LOG.trace("Creating Agent (step 1)");
+            ModelProvider modelProvider = newModelProvider();
+
+            LOG.trace("Creating Agent (step 2)");
+            ChatMemoryFactory chatMemoryFactory = newChatMemoryFactory();
+
+            LOG.trace("Creating Agent (step 3)");
             AgentConfiguration agentConfiguration = new AgentConfiguration();
             agentConfiguration
                     .withChatModel(modelProvider.newModel())
