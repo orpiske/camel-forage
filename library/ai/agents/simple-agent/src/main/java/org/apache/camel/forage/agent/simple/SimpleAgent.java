@@ -8,11 +8,14 @@ import org.apache.camel.component.langchain4j.agent.api.AgentConfiguration;
 import org.apache.camel.component.langchain4j.agent.api.AiAgentBody;
 import org.apache.camel.component.langchain4j.agent.api.AiAgentWithMemoryService;
 import org.apache.camel.forage.agent.factory.ConfigurationAware;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Simple implementation of an AI agent that provides basic chat functionality
  */
 public class SimpleAgent implements Agent, ConfigurationAware {
+    private static final Logger LOG = LoggerFactory.getLogger(SimpleAgent.class);
 
     private AgentConfiguration configuration;
 
@@ -25,6 +28,7 @@ public class SimpleAgent implements Agent, ConfigurationAware {
 
     @Override
     public String chat(AiAgentBody aiAgentBody, ToolProvider toolProvider) {
+        LOG.trace("Chatting using AiAgentWithMemoryService {}", Thread.currentThread().getId());
         AiAgentWithMemoryService agentService = createAiAgentService(toolProvider);
 
         return aiAgentBody.getSystemMessage() != null
@@ -36,7 +40,7 @@ public class SimpleAgent implements Agent, ConfigurationAware {
      * Create AI service with a single universal tool that handles multiple Camel routes and Memory Provider
      */
     private AiAgentWithMemoryService createAiAgentService(ToolProvider toolProvider) {
-        System.out.println("Creating AiAgentWithMemoryService");
+        LOG.trace("Creating AiAgentWithMemoryService {}", Thread.currentThread().getId());
         var builder = AiServices.builder(AiAgentWithMemoryService.class)
                 .chatModel(configuration.getChatModel())
                 .chatMemoryProvider(configuration.getChatMemoryProvider());
