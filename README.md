@@ -24,19 +24,19 @@ Add the desired modules to your project. For example, to use the default agent f
 <!--This component provides support for the Google Gemini family of models-->
 <dependency>
     <groupId>org.apache.camel.forage</groupId>
-    <artifactId>google</artifactId>
+    <artifactId>forage-model-google-gemini</artifactId>
     <version>1.0-SNAPSHOT</version>
 </dependency>
 <!--This component provides support for the message window chat memory -->
 <dependency>
     <groupId>org.apache.camel.forage</groupId>
-    <artifactId>message-window</artifactId>
+    <artifactId>forage-memory-message-window</artifactId>
     <version>1.0-SNAPSHOT</version>
 </dependency>
 <!--This component adds a simple agent implementation -->
 <dependency>
     <groupId>org.apache.camel.forage</groupId>
-    <artifactId>simple-agent</artifactId>
+    <artifactId>forage-agent-simple</artifactId>
     <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
@@ -57,21 +57,21 @@ based on the dependencies available on the classpath.
 
 ### Core Modules
 
-- **core-ai** - Core interfaces and abstractions for AI components
-- **core-support** - Support utilities and base classes
+- **forage-core-ai** - Core interfaces and abstractions for AI components
+- **forage-core-agent** - Agent interfaces and base classes
 
 ### AI Modules
 
 #### Agents
-- **agents-common** - Default agent factory and common agent utilities
-- **simple-agent** - Basic agent implementation
+- **forage-agent-factory-default** - Default agent factory and common agent utilities
+- **forage-agent-simple** - Basic agent implementation
 
 #### Models
-- **google** - Google Gemini chat model provider
-- **ollama** - Ollama chat model provider
+- **forage-model-google-gemini** - Google Gemini chat model provider
+- **forage-model-ollama** - Ollama chat model provider
 
 #### Chat Memory
-- **message-window** - Message window chat memory with non-persistent
+- **forage-memory-message-window** - Message window chat memory with persistent storage
 
 #### Vector Databases
 - **vector-dbs** - Vector database integrations (coming soon)

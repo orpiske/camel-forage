@@ -10,7 +10,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>core-ai</artifactId>
+    <artifactId>forage-core-ai</artifactId>
     <name>Camel Forage :: Core :: AI</name>
 
     <dependencies>

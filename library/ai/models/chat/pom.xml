@@ -15,8 +15,8 @@
     <name>Camel Forage :: Library :: AI :: Models :: Chat</name>
 
     <modules>
-        <module>google</module>
-        <module>ollama</module>
+        <module>forage-model-google-gemini</module>
+        <module>forage-model-ollama</module>
     </modules>
 
 </project>

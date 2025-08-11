@@ -15,8 +15,8 @@
     <name>Camel Forage :: Core</name>
 
     <modules>
-        <module>core-support</module>
-        <module>core-ai</module>
+        <module>forage-core-agent</module>
+        <module>forage-core-ai</module>
     </modules>
 
 </project>

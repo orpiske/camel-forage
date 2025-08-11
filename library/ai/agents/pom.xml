@@ -15,8 +15,8 @@
     <name>Camel Forage :: Library :: AI :: Agents</name>
 
     <modules>
-        <module>common</module>
-        <module>simple-agent</module>
+        <module>forage-agent-factory-default</module>
+        <module>forage-agent-simple</module>
     </modules>
 
 </project>

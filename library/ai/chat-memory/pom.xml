@@ -15,7 +15,7 @@
     <name>Camel Forage :: Library :: AI :: Chat Memory</name>
 
     <modules>
-        <module>message-window</module>
+        <module>forage-memory-message-window</module>
     </modules>
 
 </project>

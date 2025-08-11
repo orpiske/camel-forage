@@ -6,22 +6,28 @@
 
     <parent>
         <groupId>org.apache.camel.forage</groupId>
-        <artifactId>chat</artifactId>
+        <artifactId>agents</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>ollama</artifactId>
-    <name>Camel Forage :: Library :: AI :: Models :: Chat :: Ollama</name>
+    <artifactId>forage-agent-factory-default</artifactId>
+    <name>Camel Forage :: Library :: AI :: Agents :: Default Factory</name>
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-core</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.camel.forage</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>forage-core-ai</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-ollama</artifactId>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-langchain4j-agent-api</artifactId>
         </dependency>
     </dependencies>
 
