@@ -81,9 +81,14 @@ based on the dependencies available on the classpath.
 
 ## Configuration
 
-### Environment Variables
+Camel Forage uses a flexible configuration system that supports multiple sources with a defined precedence hierarchy:
 
-Some providers use environment variables for configuration:
+1. **Environment variables** (highest precedence)
+2. **System properties** 
+3. **Configuration files** (e.g., `forage-model-*.properties`)
+4. **Default values** (where applicable)
+
+### Environment Variables
 
 #### Google Gemini
 ```bash
@@ -91,11 +96,72 @@ export GOOGLE_API_KEY="your-google-api-key"
 export GOOGLE_MODEL_NAME="gemini-1.5-flash"
 ```
 
-### Bean Configuration
+#### Ollama
+```bash
+# Basic Configuration (with defaults)
+export OLLAMA_BASE_URL="http://localhost:11434"    # Default: http://localhost:11434
+export OLLAMA_MODEL_NAME="llama3"                  # Default: llama3
 
-You can also configure providers programmatically:
+# Advanced Parameters (all optional)
+export OLLAMA_TEMPERATURE="0.7"                    # Range: 0.0-2.0, controls randomness
+export OLLAMA_TOP_K="40"                           # Positive integer, limits token choices
+export OLLAMA_TOP_P="0.9"                          # Range: 0.0-1.0, nucleus sampling
+export OLLAMA_MIN_P="0.05"                         # Range: 0.0-1.0, minimum probability threshold
+export OLLAMA_NUM_CTX="2048"                       # Positive integer, context window size
+export OLLAMA_LOG_REQUESTS="false"                 # true/false, enable request logging
+export OLLAMA_LOG_RESPONSES="false"                # true/false, enable response logging
+```
+
+### System Properties
+
+You can also use system properties as an alternative to environment variables:
+
+```bash
+# Google Gemini
+-Dgoogle.api.key=your-google-api-key
+-Dgoogle.model.name=gemini-1.5-flash
+
+# Ollama
+-Dollama.base.url=http://localhost:11434
+-Dollama.model.name=llama3
+-Dollama.temperature=0.7
+-Dollama.top.k=40
+-Dollama.top.p=0.9
+-Dollama.min.p=0.05
+-Dollama.num.ctx=2048
+-Dollama.log.requests=false
+-Dollama.log.responses=false
+```
+
+### Configuration Files
+
+Create a properties file in your classpath for each provider:
+
+**forage-model-google-gemini.properties:**
+```properties
+api-key=your-google-api-key
+model-name=gemini-1.5-flash
+```
+
+**forage-model-ollama.properties:**
+```properties
+base-url=http://localhost:11434
+model-name=llama3
+temperature=0.7
+top-k=40
+top-p=0.9
+min-p=0.05
+num-ctx=2048
+log-requests=false
+log-responses=false
+```
+
+### No Manual Bean Configuration Required
+
+The configuration system automatically handles all provider setup. The old programmatic approach using setters is no longer needed:
 
 ```java
+// ❌ OLD - No longer needed
 @Bean
 public ModelProvider customOllamaProvider() {
     OllamaProvider provider = new OllamaProvider();
@@ -103,10 +169,10 @@ public ModelProvider customOllamaProvider() {
     provider.setModelName("llama3");
     return provider;
 }
-```
 
-> [NOTE]
-> This is untested
+// ✅ NEW - Just set environment variables or properties
+// Configuration is handled automatically by OllamaConfig
+```
 
 ## Architecture
 
