@@ -224,6 +224,15 @@ This project follows standard Maven conventions. To build:
 mvn clean install
 ```
 
+### Integrating Apache Camel Components
+
+If you're developing Apache Camel components and want to integrate them with the Camel Forage library, or if you want to create new providers for AI models, vector databases, or other services, please refer to our comprehensive [Contributing Beans Guide](docs/contributing-beans.md).
+
+This guide is essential reading for:
+- **Component developers** who want to add factory-based configuration to their Apache Camel components
+- **Library contributors** who want to create new AI model providers, vector database integrations, or other service providers
+- **Maintainers** who need to understand the architecture and patterns used throughout the Forage library
+
 ## License
 
 This project is licensed under the Apache License 2.0.
