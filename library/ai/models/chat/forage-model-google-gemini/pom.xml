@@ -17,6 +17,13 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.camel.forage</groupId>
+            <artifactId>forage-core-common</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.camel.forage</groupId>
             <artifactId>forage-core-ai</artifactId>
             <version>${project.version}</version>
         </dependency>

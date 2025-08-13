@@ -19,6 +19,8 @@
         <slf4j.version>2.0.17</slf4j.version>
         <log4j.version>2.21.1</log4j.version>
         <spotless.version>2.43.0</spotless.version>
+        <junit-jupiter.version>5.10.1</junit-jupiter.version>
+        <assertj-core.version>3.24.2</assertj-core.version>
     </properties>
 
     <dependencyManagement>
@@ -52,8 +54,6 @@
                 <version>${langchain4j-version}</version>
             </dependency>
 
-
-
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-slf4j2-impl</artifactId>
@@ -63,6 +63,18 @@
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-core</artifactId>
                 <version>${log4j.version}</version>
+            </dependency>
+
+            <!-- Test dependencies -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${junit-jupiter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${assertj-core.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
