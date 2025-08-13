@@ -17,6 +17,13 @@ import org.slf4j.LoggerFactory;
  * <ul>
  *   <li>Base URL: Configured via OLLAMA_BASE_URL environment variable or defaults to "http://localhost:11434"</li>
  *   <li>Model Name: Configured via OLLAMA_MODEL_NAME environment variable or defaults to "llama3"</li>
+ *   <li>Temperature: Optionally configured via OLLAMA_TEMPERATURE environment variable (no default)</li>
+ *   <li>Top-K: Optionally configured via OLLAMA_TOP_K environment variable (no default)</li>
+ *   <li>Top-P: Optionally configured via OLLAMA_TOP_P environment variable (no default)</li>
+ *   <li>Min-P: Optionally configured via OLLAMA_MIN_P environment variable (no default)</li>
+ *   <li>Context Size: Optionally configured via OLLAMA_NUM_CTX environment variable (no default)</li>
+ *   <li>Request Logging: Optionally configured via OLLAMA_LOG_REQUESTS environment variable (no default)</li>
+ *   <li>Response Logging: Optionally configured via OLLAMA_LOG_RESPONSES environment variable (no default)</li>
  * </ul>
  *
  * <p><strong>Usage:</strong>
@@ -58,10 +65,59 @@ public class OllamaProvider implements ModelProvider {
     public ChatModel newModel() {
         String baseUrl = config.baseUrl();
         String modelName = config.modelName();
+        Double temperature = config.temperature();
+        Integer topK = config.topK();
+        Double topP = config.topP();
+        Double minP = config.minP();
+        Integer numCtx = config.numCtx();
+        Boolean logRequests = config.logRequests();
+        Boolean logResponses = config.logResponses();
 
-        LOG.trace("Creating Ollama model: {} at {}", modelName, baseUrl);
+        LOG.trace(
+                "Creating Ollama model: {} at {} with configuration: temperature={}, topK={}, topP={}, minP={}, numCtx={}, logRequests={}, logResponses={}",
+                modelName,
+                baseUrl,
+                temperature,
+                topK,
+                topP,
+                minP,
+                numCtx,
+                logRequests,
+                logResponses);
 
-        return OllamaChatModel.builder().baseUrl(baseUrl).modelName(modelName).build();
+        OllamaChatModel.OllamaChatModelBuilder builder =
+                OllamaChatModel.builder().baseUrl(baseUrl).modelName(modelName);
+
+        // Only set optional parameters if they are configured
+        if (temperature != null) {
+            builder.temperature(temperature);
+        }
+
+        if (topK != null) {
+            builder.topK(topK);
+        }
+
+        if (topP != null) {
+            builder.topP(topP);
+        }
+
+        if (minP != null) {
+            builder.minP(minP);
+        }
+
+        if (numCtx != null) {
+            builder.numCtx(numCtx);
+        }
+
+        if (logRequests != null) {
+            builder.logRequests(logRequests);
+        }
+
+        if (logResponses != null) {
+            builder.logResponses(logResponses);
+        }
+
+        return builder.build();
     }
 
     /**
@@ -80,5 +136,68 @@ public class OllamaProvider implements ModelProvider {
      */
     public String getModelName() {
         return config.modelName();
+    }
+
+    /**
+     * Returns the configured temperature setting.
+     *
+     * @return the temperature value, or null if not configured
+     */
+    public Double getTemperature() {
+        return config.temperature();
+    }
+
+    /**
+     * Returns the configured top-K sampling parameter.
+     *
+     * @return the top-K value, or null if not configured
+     */
+    public Integer getTopK() {
+        return config.topK();
+    }
+
+    /**
+     * Returns the configured top-P sampling parameter.
+     *
+     * @return the top-P value, or null if not configured
+     */
+    public Double getTopP() {
+        return config.topP();
+    }
+
+    /**
+     * Returns the configured minimum probability threshold.
+     *
+     * @return the min-P value, or null if not configured
+     */
+    public Double getMinP() {
+        return config.minP();
+    }
+
+    /**
+     * Returns the configured context window size.
+     *
+     * @return the context window size, or null if not configured
+     */
+    public Integer getNumCtx() {
+        return config.numCtx();
+    }
+
+    /**
+     * Returns whether request logging is enabled.
+     *
+     * @return true if enabled, false if disabled, null if not configured
+     */
+    public Boolean getLogRequests() {
+        return config.logRequests();
+    }
+
+    /**
+     * Returns whether response logging is enabled.
+     *
+     * @return true if enabled, false if disabled, null if not configured
+     */
+    public Boolean getLogResponses() {
+        return config.logResponses();
     }
 }
