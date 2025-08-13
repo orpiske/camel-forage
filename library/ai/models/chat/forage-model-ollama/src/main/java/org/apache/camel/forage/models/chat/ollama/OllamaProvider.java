@@ -15,10 +15,7 @@ public class OllamaProvider implements ModelProvider {
     @Override
     public ChatModel newModel() {
         System.out.println("Creating ollama model");
-        return OllamaChatModel.builder()
-                .baseUrl(baseUrl)
-                .modelName(modelName)
-                .build();
+        return OllamaChatModel.builder().baseUrl(baseUrl).modelName(modelName).build();
     }
 
     public String getBaseUrl() {

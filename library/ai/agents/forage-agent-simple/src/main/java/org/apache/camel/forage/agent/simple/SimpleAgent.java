@@ -1,9 +1,9 @@
 package org.apache.camel.forage.agent.simple;
 
 import dev.langchain4j.service.AiServices;
+import dev.langchain4j.service.tool.ToolProvider;
 import java.util.List;
 import org.apache.camel.component.langchain4j.agent.api.Agent;
-import dev.langchain4j.service.tool.ToolProvider;
 import org.apache.camel.component.langchain4j.agent.api.AgentConfiguration;
 import org.apache.camel.component.langchain4j.agent.api.AiAgentBody;
 import org.apache.camel.component.langchain4j.agent.api.AiAgentWithMemoryService;
@@ -28,11 +28,14 @@ public class SimpleAgent implements Agent, ConfigurationAware {
 
     @Override
     public String chat(AiAgentBody aiAgentBody, ToolProvider toolProvider) {
-        LOG.trace("Chatting using AiAgentWithMemoryService {}", Thread.currentThread().getId());
+        LOG.trace(
+                "Chatting using AiAgentWithMemoryService {}",
+                Thread.currentThread().getId());
         AiAgentWithMemoryService agentService = createAiAgentService(toolProvider);
 
         return aiAgentBody.getSystemMessage() != null
-                ? agentService.chat(aiAgentBody.getMemoryId(), aiAgentBody.getUserMessage(), aiAgentBody.getSystemMessage())
+                ? agentService.chat(
+                        aiAgentBody.getMemoryId(), aiAgentBody.getUserMessage(), aiAgentBody.getSystemMessage())
                 : agentService.chat(aiAgentBody.getMemoryId(), aiAgentBody.getUserMessage());
     }
 
@@ -56,12 +59,14 @@ public class SimpleAgent implements Agent, ConfigurationAware {
         }
 
         // Input Guardrails
-        if (configuration.getInputGuardrailClasses() != null && !configuration.getInputGuardrailClasses().isEmpty()) {
+        if (configuration.getInputGuardrailClasses() != null
+                && !configuration.getInputGuardrailClasses().isEmpty()) {
             builder.inputGuardrailClasses((List) configuration.getInputGuardrailClasses());
         }
 
         // Output Guardrails
-        if (configuration.getOutputGuardrailClasses() != null && !configuration.getOutputGuardrailClasses().isEmpty()) {
+        if (configuration.getOutputGuardrailClasses() != null
+                && !configuration.getOutputGuardrailClasses().isEmpty()) {
             builder.outputGuardrailClasses((List) configuration.getOutputGuardrailClasses());
         }
 

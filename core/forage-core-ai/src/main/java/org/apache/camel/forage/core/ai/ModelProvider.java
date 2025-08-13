@@ -12,5 +12,4 @@ public interface ModelProvider {
      * @return the created model
      */
     ChatModel newModel();
-
 }

@@ -2,11 +2,11 @@ package org.apache.camel.forage.agent.factory;
 
 import java.util.ServiceLoader;
 import org.apache.camel.CamelContext;
+import org.apache.camel.component.langchain4j.agent.api.Agent;
 import org.apache.camel.component.langchain4j.agent.api.AgentConfiguration;
+import org.apache.camel.component.langchain4j.agent.api.AgentFactory;
 import org.apache.camel.forage.core.ai.ChatMemoryFactory;
 import org.apache.camel.forage.core.ai.ModelProvider;
-import org.apache.camel.component.langchain4j.agent.api.Agent;
-import org.apache.camel.component.langchain4j.agent.api.AgentFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,21 +34,32 @@ public class DefaultAgentFactory implements AgentFactory {
     }
 
     private ModelProvider newModelProvider() {
-        ServiceLoader<ModelProvider> modelLoader = ServiceLoader.load(ModelProvider.class, camelContext.getApplicationContextClassLoader());
+        ServiceLoader<ModelProvider> modelLoader =
+                ServiceLoader.load(ModelProvider.class, camelContext.getApplicationContextClassLoader());
 
-        return modelLoader.findFirst().orElseThrow(() -> new IllegalStateException("No ModelProvider implementation found via ServiceLoader"));
+        return modelLoader
+                .findFirst()
+                .orElseThrow(
+                        () -> new IllegalStateException("No ModelProvider implementation found via ServiceLoader"));
     }
 
     private Agent newAgent() {
-        ServiceLoader<Agent> serviceLoader = ServiceLoader.load(Agent.class, camelContext.getApplicationContextClassLoader());
+        ServiceLoader<Agent> serviceLoader =
+                ServiceLoader.load(Agent.class, camelContext.getApplicationContextClassLoader());
 
-        return serviceLoader.findFirst().orElseThrow(() -> new IllegalStateException("No Agent implementation found via ServiceLoader"));
+        return serviceLoader
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No Agent implementation found via ServiceLoader"));
     }
 
     private ChatMemoryFactory newChatMemoryFactory() {
-        ServiceLoader<ChatMemoryFactory> serviceLoader = ServiceLoader.load(ChatMemoryFactory.class, camelContext.getApplicationContextClassLoader());
+        ServiceLoader<ChatMemoryFactory> serviceLoader =
+                ServiceLoader.load(ChatMemoryFactory.class, camelContext.getApplicationContextClassLoader());
 
-        return serviceLoader.findFirst().orElseThrow(() -> new IllegalStateException("No ChatMemoryFactory implementation found via ServiceLoader"));
+        return serviceLoader
+                .findFirst()
+                .orElseThrow(
+                        () -> new IllegalStateException("No ChatMemoryFactory implementation found via ServiceLoader"));
     }
 
     @Override
@@ -63,7 +74,6 @@ public class DefaultAgentFactory implements AgentFactory {
     private synchronized Agent doCreateAgent() {
         LOG.trace("Creating Agent");
         agent = newAgent();
-
 
         if (agent instanceof ConfigurationAware configurationAware) {
             LOG.trace("Creating Agent (step 1)");
