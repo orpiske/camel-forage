@@ -95,22 +95,6 @@ log-requests=false
 log-responses=false
 ```
 
-### Java Code Usage
-
-```java
-import org.apache.camel.forage.models.chat.ollama.OllamaProvider;
-import dev.langchain4j.model.chat.ChatModel;
-
-// Create provider (configuration is loaded automatically)
-OllamaProvider provider = new OllamaProvider();
-
-// Get configured chat model
-ChatModel model = provider.newModel();
-
-// Use the model for chat operations
-// (specific usage depends on your Camel Forage setup)
-```
-
 ## Supported Models
 
 Common Ollama models you can use:
