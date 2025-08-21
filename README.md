@@ -93,7 +93,7 @@ Camel Forage uses a flexible configuration system that supports multiple sources
 
 Each AI model provider has its own configuration requirements and options. For detailed configuration instructions, including environment variables, system properties, and configuration files, please refer to the respective model documentation:
 
-- **OpenAI**: See [OpenAI Configuration Guide](library/ai/models/chat/camel-forage-model-open-ai/README.md)
+- **OpenAI**: See [OpenAI Configuration Guide](library/ai/models/chat/forage-model-open-ai/README.md)
 - **Google Gemini**: See [Google Gemini Configuration Guide](library/ai/models/chat/forage-model-google-gemini/README.md)  
 - **Ollama**: See [Ollama Configuration Guide](library/ai/models/chat/forage-model-ollama/README.md)
 
