@@ -73,7 +73,7 @@ java -Dopenai.api.key="sk-..." -Dopenai.model.name="gpt-4" YourApplication
 ```
 
 #### Option 3: Configuration File
-Create a `camel-forage-model-open-ai.properties` file in your classpath:
+Create a `forage-model-open-ai.properties` file in your classpath:
 
 ```properties
 api-key=sk-...

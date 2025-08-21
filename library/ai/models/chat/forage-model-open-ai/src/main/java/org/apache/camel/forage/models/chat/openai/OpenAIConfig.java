@@ -127,7 +127,7 @@ public class OpenAIConfig implements Config {
      */
     @Override
     public String name() {
-        return "camel-forage-model-open-ai";
+        return "forage-model-open-ai";
     }
 
     /**
