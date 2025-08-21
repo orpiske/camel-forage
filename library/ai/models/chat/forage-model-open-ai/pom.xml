@@ -10,7 +10,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>camel-forage-model-open-ai</artifactId>
+    <artifactId>forage-model-open-ai</artifactId>
     <name>Camel Forage :: Library :: AI :: Models :: Chat :: OpenAI</name>
 
     <dependencies>
