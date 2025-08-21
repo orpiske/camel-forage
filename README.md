@@ -9,7 +9,7 @@ Camel Forage simplifies the configuration of Apache Camel components by providin
 ## Features
 
 - **Plug-and-play AI components** - Pre-configured beans for AI models, agents, and memory providers
-- **Multiple AI provider support** - Support for Google Gemini, Ollama, and extensible for other providers
+- **Multiple AI provider support** - Support for OpenAI, Google Gemini, Ollama, and extensible for other providers
 - **Chat memory management** - Built-in message window chat memory with persistent storage
 - **Agent factory patterns** - Default agent factory with ServiceLoader-based discovery
 - **Modular architecture** - Pick only the modules you need
@@ -18,13 +18,13 @@ Camel Forage simplifies the configuration of Apache Camel components by providin
 
 ### 1. Add Dependencies
 
-Add the desired modules to your project. For example, to use the default agent factory with Google Gemini:
+Add the desired modules to your project. For example, to use the default agent factory with OpenAI:
 
 ```xml
-<!--This component provides support for the Google Gemini family of models-->
+<!--This component provides support for OpenAI models (GPT-3.5, GPT-4, etc.)-->
 <dependency>
     <groupId>org.apache.camel.forage</groupId>
-    <artifactId>forage-model-google-gemini</artifactId>
+    <artifactId>camel-forage-model-open-ai</artifactId>
     <version>1.0-SNAPSHOT</version>
 </dependency>
 <!--This component provides support for the message window chat memory -->
@@ -67,8 +67,9 @@ based on the dependencies available on the classpath.
 - **forage-agent-simple** - Basic agent implementation
 
 #### Models
-- **forage-model-google-gemini** - Google Gemini chat model provider
-- **forage-model-ollama** - Ollama chat model provider
+- **camel-forage-model-open-ai** - OpenAI chat model provider ([Configuration Guide](library/ai/models/chat/camel-forage-model-open-ai/README.md))
+- **forage-model-google-gemini** - Google Gemini chat model provider ([Configuration Guide](library/ai/models/chat/forage-model-google-gemini/README.md))
+- **forage-model-ollama** - Ollama chat model provider ([Configuration Guide](library/ai/models/chat/forage-model-ollama/README.md))
 
 #### Chat Memory
 - **forage-memory-message-window** - Message window chat memory with persistent storage
@@ -88,90 +89,34 @@ Camel Forage uses a flexible configuration system that supports multiple sources
 3. **Configuration files** (e.g., `forage-model-*.properties`)
 4. **Default values** (where applicable)
 
-### Environment Variables
+### Model Configuration
+
+Each AI model provider has its own configuration requirements and options. For detailed configuration instructions, including environment variables, system properties, and configuration files, please refer to the respective model documentation:
+
+- **OpenAI**: See [OpenAI Configuration Guide](library/ai/models/chat/camel-forage-model-open-ai/README.md)
+- **Google Gemini**: See [Google Gemini Configuration Guide](library/ai/models/chat/forage-model-google-gemini/README.md)  
+- **Ollama**: See [Ollama Configuration Guide](library/ai/models/chat/forage-model-ollama/README.md)
+
+### Quick Configuration Examples
+
+For immediate setup, here are minimal configuration examples:
+
+#### OpenAI
+```bash
+export OPENAI_API_KEY="sk-your-api-key-here"
+export OPENAI_MODEL_NAME="gpt-4"  # Optional, defaults to gpt-3.5-turbo
+```
 
 #### Google Gemini
 ```bash
 export GOOGLE_API_KEY="your-google-api-key"
-export GOOGLE_MODEL_NAME="gemini-1.5-flash"
+export GOOGLE_MODEL_NAME="gemini-pro"
 ```
 
 #### Ollama
 ```bash
-# Basic Configuration (with defaults)
-export OLLAMA_BASE_URL="http://localhost:11434"    # Default: http://localhost:11434
-export OLLAMA_MODEL_NAME="llama3"                  # Default: llama3
-
-# Advanced Parameters (all optional)
-export OLLAMA_TEMPERATURE="0.7"                    # Range: 0.0-2.0, controls randomness
-export OLLAMA_TOP_K="40"                           # Positive integer, limits token choices
-export OLLAMA_TOP_P="0.9"                          # Range: 0.0-1.0, nucleus sampling
-export OLLAMA_MIN_P="0.05"                         # Range: 0.0-1.0, minimum probability threshold
-export OLLAMA_NUM_CTX="2048"                       # Positive integer, context window size
-export OLLAMA_LOG_REQUESTS="false"                 # true/false, enable request logging
-export OLLAMA_LOG_RESPONSES="false"                # true/false, enable response logging
-```
-
-### System Properties
-
-You can also use system properties as an alternative to environment variables:
-
-```bash
-# Google Gemini
--Dgoogle.api.key=your-google-api-key
--Dgoogle.model.name=gemini-1.5-flash
-
-# Ollama
--Dollama.base.url=http://localhost:11434
--Dollama.model.name=llama3
--Dollama.temperature=0.7
--Dollama.top.k=40
--Dollama.top.p=0.9
--Dollama.min.p=0.05
--Dollama.num.ctx=2048
--Dollama.log.requests=false
--Dollama.log.responses=false
-```
-
-### Configuration Files
-
-Create a properties file in your classpath for each provider:
-
-**forage-model-google-gemini.properties:**
-```properties
-api-key=your-google-api-key
-model-name=gemini-1.5-flash
-```
-
-**forage-model-ollama.properties:**
-```properties
-base-url=http://localhost:11434
-model-name=llama3
-temperature=0.7
-top-k=40
-top-p=0.9
-min-p=0.05
-num-ctx=2048
-log-requests=false
-log-responses=false
-```
-
-### No Manual Bean Configuration Required
-
-The configuration system automatically handles all provider setup. The old programmatic approach using setters is no longer needed:
-
-```java
-// ❌ OLD - No longer needed
-@Bean
-public ModelProvider customOllamaProvider() {
-    OllamaProvider provider = new OllamaProvider();
-    provider.setBaseUrl("http://your-ollama-server:11434");
-    provider.setModelName("llama3");
-    return provider;
-}
-
-// ✅ NEW - Just set environment variables or properties
-// Configuration is handled automatically by OllamaConfig
+export OLLAMA_BASE_URL="http://localhost:11434"  # Optional, this is the default
+export OLLAMA_MODEL_NAME="llama3"                # Optional, this is the default
 ```
 
 ## Architecture
