@@ -1,11 +1,18 @@
 package org.apache.camel.forage.core.util.config;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.function.BiConsumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Centralized configuration store for the Camel Forage framework that manages configuration values
@@ -49,9 +56,10 @@ import java.util.Properties;
  * @since 1.0
  */
 public final class ConfigStore {
+    private static final Logger LOG = LoggerFactory.getLogger(ConfigStore.class);
 
     private static ConfigStore INSTANCE;
-    Properties properties = new Properties();
+    private final Properties properties = new Properties();
 
     /**
      * Private constructor to enforce singleton pattern.
@@ -126,8 +134,29 @@ public final class ConfigStore {
      * @param instance the configuration instance
      * @param <T> the type of the configuration class
      */
-    public <T extends Config> void add(Class<T> clazz, T instance) {
-        add(clazz.getResource(instance.name()));
+    public <T extends Config> void add(Class<T> clazz, T instance, BiConsumer<String, String> registerFunction) {
+        LOG.info("Adding {} to {}", clazz, asProperties(instance));
+
+        File file = Paths.get("", asProperties(instance)).toAbsolutePath().toFile();
+        if (file.exists()) {
+            LOG.info("Found existing config file {}", file);
+
+            try (FileInputStream fis = new FileInputStream(file)) {
+                Properties props = new Properties();
+
+                props.load(fis);
+
+                props.forEach((k, v) -> registerFunction.accept((String) k, (String) v));
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private static <T extends Config> String asProperties(T instance) {
+        return "./" + instance.name() + ".properties";
     }
 
     /**
@@ -145,6 +174,7 @@ public final class ConfigStore {
      */
     public void add(URL url) {
         if (url == null) {
+            LOG.warn("URL is null");
             return;
         }
 
@@ -205,5 +235,58 @@ public final class ConfigStore {
      */
     public Optional<String> get(ConfigModule entry) {
         return Optional.ofNullable((String) properties.get(entry));
+    }
+
+    /**
+     * Sets a configuration value directly for the specified ConfigModule.
+     *
+     * <p>This method allows direct assignment of configuration values, bypassing the normal
+     * configuration source resolution process. It immediately stores the provided value in
+     * the internal properties store, overriding any previously stored value for the same
+     * ConfigModule.
+     *
+     * <p>This method is primarily used by:
+     * <ul>
+     *   <li>Dynamic configuration registration through {@link Config#register(String, String)}</li>
+     *   <li>Configuration loading from property files during startup</li>
+     *   <li>Runtime configuration updates in specific scenarios</li>
+     *   <li>Testing scenarios where configuration values need to be controlled directly</li>
+     * </ul>
+     *
+     * <p><strong>Usage Context:</strong>
+     * Unlike the {@link #add(ConfigModule, ConfigEntry)} method which resolves values from
+     * environment variables and system properties, this method directly sets the value without
+     * any source resolution. This makes it suitable for scenarios where the value has already
+     * been resolved or comes from a different source (like configuration files).
+     *
+     * <p><strong>Example Usage:</strong>
+     * <pre>{@code
+     * // Direct value assignment (typically from Config.register implementations)
+     * ConfigModule apiKey = ConfigModule.of(MyConfig.class, "api.key");
+     * ConfigStore.getInstance().set(apiKey, "resolved-api-key-value");
+     *
+     * // The value is immediately available for retrieval
+     * String value = ConfigStore.getInstance().get(apiKey).orElse("default");
+     * }</pre>
+     *
+     * <p><strong>Precedence Override:</strong>
+     * Values set through this method will override any values that might have been previously
+     * registered through environment variables or system properties for the same ConfigModule.
+     * Subsequent calls to {@link #get(ConfigModule)} will return the value set by this method.
+     *
+     * <p><strong>Thread Safety:</strong>
+     * This method is not thread-safe. If concurrent access is required, external synchronization
+     * should be used. In typical usage, configuration values are set during application startup
+     * before concurrent access begins.
+     *
+     * @param module the configuration module that serves as the key for storing the value
+     * @param value the configuration value to store; may be {@code null} to remove the configuration
+     * @see #add(ConfigModule, ConfigEntry)
+     * @see #get(ConfigModule)
+     * @see Config#register(String, String)
+     * @since 1.0
+     */
+    public void set(ConfigModule module, String value) {
+        properties.put(module, value);
     }
 }

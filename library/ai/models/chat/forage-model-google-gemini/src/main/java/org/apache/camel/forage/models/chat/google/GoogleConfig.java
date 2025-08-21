@@ -55,8 +55,8 @@ import org.apache.camel.forage.core.util.config.MissingConfigException;
  */
 public class GoogleConfig implements Config {
 
-    private static final ConfigModule API_KEY = ConfigModule.of(GoogleConfig.class, "api-key");
-    private static final ConfigModule MODEL_NAME = ConfigModule.of(GoogleConfig.class, "model-name");
+    private static final ConfigModule API_KEY = ConfigModule.of(GoogleConfig.class, "google.api.key");
+    private static final ConfigModule MODEL_NAME = ConfigModule.of(GoogleConfig.class, "google.model.name");
 
     /**
      * Constructs a new GoogleConfig and registers configuration parameters with the ConfigStore.
@@ -75,7 +75,25 @@ public class GoogleConfig implements Config {
     public GoogleConfig() {
         ConfigStore.getInstance().add(API_KEY, ConfigEntry.fromEnv("GOOGLE_API_KEY"));
         ConfigStore.getInstance().add(MODEL_NAME, ConfigEntry.fromEnv("GOOGLE_MODEL_NAME"));
-        ConfigStore.getInstance().add(GoogleConfig.class, this);
+        ConfigStore.getInstance().add(GoogleConfig.class, this, this::register);
+    }
+
+    private ConfigModule resolve(String name) {
+        if (API_KEY.name().equals(name)) {
+            return API_KEY;
+        }
+
+        if (MODEL_NAME.name().equals(name)) {
+            return MODEL_NAME;
+        }
+
+        throw new IllegalArgumentException("Unknown config entry: " + name);
+    }
+
+    public void register(String name, String value) {
+        ConfigModule config = resolve(name);
+
+        ConfigStore.getInstance().set(config, value);
     }
 
     /**

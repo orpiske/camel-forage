@@ -71,16 +71,17 @@ import org.apache.camel.forage.core.util.config.MissingConfigException;
  */
 public class OpenAIConfig implements Config {
 
-    private static final ConfigModule API_KEY = ConfigModule.of(OpenAIConfig.class, "api-key");
-    private static final ConfigModule MODEL_NAME = ConfigModule.of(OpenAIConfig.class, "model-name");
-    private static final ConfigModule BASE_URL = ConfigModule.of(OpenAIConfig.class, "base-url");
-    private static final ConfigModule TEMPERATURE = ConfigModule.of(OpenAIConfig.class, "temperature");
-    private static final ConfigModule MAX_TOKENS = ConfigModule.of(OpenAIConfig.class, "max-tokens");
-    private static final ConfigModule TOP_P = ConfigModule.of(OpenAIConfig.class, "top-p");
-    private static final ConfigModule FREQUENCY_PENALTY = ConfigModule.of(OpenAIConfig.class, "frequency-penalty");
-    private static final ConfigModule PRESENCE_PENALTY = ConfigModule.of(OpenAIConfig.class, "presence-penalty");
-    private static final ConfigModule LOG_REQUESTS = ConfigModule.of(OpenAIConfig.class, "log-requests");
-    private static final ConfigModule LOG_RESPONSES = ConfigModule.of(OpenAIConfig.class, "log-responses");
+    private static final ConfigModule API_KEY = ConfigModule.of(OpenAIConfig.class, "openai.api.key");
+    private static final ConfigModule MODEL_NAME = ConfigModule.of(OpenAIConfig.class, "openai.model.name");
+    private static final ConfigModule BASE_URL = ConfigModule.of(OpenAIConfig.class, "openai.base.url");
+    private static final ConfigModule TEMPERATURE = ConfigModule.of(OpenAIConfig.class, "openai.temperature");
+    private static final ConfigModule MAX_TOKENS = ConfigModule.of(OpenAIConfig.class, "openai.max.tokens");
+    private static final ConfigModule TOP_P = ConfigModule.of(OpenAIConfig.class, "openai.top.p");
+    private static final ConfigModule FREQUENCY_PENALTY =
+            ConfigModule.of(OpenAIConfig.class, "openai.frequency.penalty");
+    private static final ConfigModule PRESENCE_PENALTY = ConfigModule.of(OpenAIConfig.class, "openai.presence.penalty");
+    private static final ConfigModule LOG_REQUESTS = ConfigModule.of(OpenAIConfig.class, "openai.log.requests");
+    private static final ConfigModule LOG_RESPONSES = ConfigModule.of(OpenAIConfig.class, "openai.log.responses");
 
     private static final String DEFAULT_MODEL_NAME = "gpt-3.5-turbo";
 
@@ -110,7 +111,57 @@ public class OpenAIConfig implements Config {
         ConfigStore.getInstance().add(PRESENCE_PENALTY, ConfigEntry.fromEnv("OPENAI_PRESENCE_PENALTY"));
         ConfigStore.getInstance().add(LOG_REQUESTS, ConfigEntry.fromEnv("OPENAI_LOG_REQUESTS"));
         ConfigStore.getInstance().add(LOG_RESPONSES, ConfigEntry.fromEnv("OPENAI_LOG_RESPONSES"));
-        ConfigStore.getInstance().add(OpenAIConfig.class, this);
+        ConfigStore.getInstance().add(OpenAIConfig.class, this, this::register);
+    }
+
+    private ConfigModule resolve(String name) {
+        if (API_KEY.name().equals(name)) {
+            return API_KEY;
+        }
+
+        if (MODEL_NAME.name().equals(name)) {
+            return MODEL_NAME;
+        }
+
+        if (BASE_URL.name().equals(name)) {
+            return BASE_URL;
+        }
+
+        if (TEMPERATURE.name().equals(name)) {
+            return TEMPERATURE;
+        }
+
+        if (MAX_TOKENS.name().equals(name)) {
+            return MAX_TOKENS;
+        }
+
+        if (TOP_P.name().equals(name)) {
+            return TOP_P;
+        }
+
+        if (FREQUENCY_PENALTY.name().equals(name)) {
+            return FREQUENCY_PENALTY;
+        }
+
+        if (PRESENCE_PENALTY.name().equals(name)) {
+            return PRESENCE_PENALTY;
+        }
+
+        if (LOG_REQUESTS.name().equals(name)) {
+            return LOG_REQUESTS;
+        }
+
+        if (LOG_RESPONSES.name().equals(name)) {
+            return LOG_RESPONSES;
+        }
+
+        throw new IllegalArgumentException("Unknown config entry: " + name);
+    }
+
+    public void register(String name, String value) {
+        ConfigModule config = resolve(name);
+
+        ConfigStore.getInstance().set(config, value);
     }
 
     /**

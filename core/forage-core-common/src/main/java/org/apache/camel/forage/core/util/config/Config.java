@@ -66,4 +66,67 @@ public interface Config {
      * @return the unique name of this module configuration, never {@code null}
      */
     String name();
+
+    /**
+     * Registers a configuration value for the specified property name.
+     *
+     * <p>This method is called by the configuration system to dynamically register
+     * configuration values that have been loaded from configuration files or other
+     * external sources. It provides a mechanism for modules to receive and process
+     * configuration properties beyond the standard environment variables and system
+     * properties.
+     *
+     * <p>The method is typically invoked during the configuration loading process,
+     * where property files are parsed and individual key-value pairs are registered
+     * with the appropriate configuration modules. The implementation should:
+     * <ul>
+     *   <li>Resolve the property name to the corresponding {@link ConfigModule}</li>
+     *   <li>Create a {@link ConfigEntry} from the provided value</li>
+     *   <li>Register the entry with the {@link ConfigStore}</li>
+     *   <li>Handle unknown property names appropriately (typically by throwing an exception)</li>
+     * </ul>
+     *
+     * <p><strong>Example implementation:</strong>
+     * <pre>{@code
+     * public void register(String name, String value) {
+     *     ConfigModule config = resolve(name);  // Resolve property name to ConfigModule
+     *     ConfigStore.getInstance().add(config, ConfigEntry.fromProperty(value));
+     * }
+     *
+     * private ConfigModule resolve(String name) {
+     *     if (API_KEY.name().equals(name)) {
+     *         return API_KEY;
+     *     }
+     *     if (MODEL_NAME.name().equals(name)) {
+     *         return MODEL_NAME;
+     *     }
+     *     throw new IllegalArgumentException("Unknown config entry: " + name);
+     * }
+     * }</pre>
+     *
+     * <p><strong>Property Name Mapping:</strong>
+     * The property names passed to this method typically follow a dot-notation convention
+     * corresponding to system property names. For example:
+     * <ul>
+     *   <li>{@code "openai.api.key"} for OpenAI API key configuration</li>
+     *   <li>{@code "ollama.model.name"} for Ollama model name configuration</li>
+     *   <li>{@code "google.api.key"} for Google API key configuration</li>
+     * </ul>
+     *
+     * <p><strong>Error Handling:</strong>
+     * Implementations should throw appropriate exceptions for:
+     * <ul>
+     *   <li>Unknown property names - typically {@link IllegalArgumentException}</li>
+     *   <li>Invalid property values - depending on the validation requirements</li>
+     * </ul>
+     *
+     * @param name the configuration property name, typically in dot notation (e.g., "module.property.name")
+     * @param value the configuration value to register, may be {@code null} if the property allows it
+     * @throws IllegalArgumentException if the property name is not recognized by this configuration module
+     * @see ConfigStore#add(ConfigModule, ConfigEntry)
+     * @see ConfigEntry#fromProperty(String)
+     * @see ConfigModule
+     * @since 1.0
+     */
+    void register(String name, String value);
 }

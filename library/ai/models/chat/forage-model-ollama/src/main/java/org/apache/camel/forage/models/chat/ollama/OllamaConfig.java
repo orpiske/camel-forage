@@ -71,15 +71,15 @@ import org.apache.camel.forage.core.util.config.ConfigStore;
  */
 public class OllamaConfig implements Config {
 
-    private static final ConfigModule BASE_URL = ConfigModule.of(OllamaConfig.class, "base-url");
-    private static final ConfigModule MODEL_NAME = ConfigModule.of(OllamaConfig.class, "model-name");
-    private static final ConfigModule TEMPERATURE = ConfigModule.of(OllamaConfig.class, "temperature");
-    private static final ConfigModule TOP_K = ConfigModule.of(OllamaConfig.class, "top-k");
-    private static final ConfigModule TOP_P = ConfigModule.of(OllamaConfig.class, "top-p");
-    private static final ConfigModule MIN_P = ConfigModule.of(OllamaConfig.class, "min-p");
-    private static final ConfigModule NUM_CTX = ConfigModule.of(OllamaConfig.class, "num-ctx");
-    private static final ConfigModule LOG_REQUESTS = ConfigModule.of(OllamaConfig.class, "log-requests");
-    private static final ConfigModule LOG_RESPONSES = ConfigModule.of(OllamaConfig.class, "log-responses");
+    private static final ConfigModule BASE_URL = ConfigModule.of(OllamaConfig.class, "ollama.base.url");
+    private static final ConfigModule MODEL_NAME = ConfigModule.of(OllamaConfig.class, "ollama.model.name");
+    private static final ConfigModule TEMPERATURE = ConfigModule.of(OllamaConfig.class, "ollama.temperature");
+    private static final ConfigModule TOP_K = ConfigModule.of(OllamaConfig.class, "ollama.top.k");
+    private static final ConfigModule TOP_P = ConfigModule.of(OllamaConfig.class, "ollama.top.p");
+    private static final ConfigModule MIN_P = ConfigModule.of(OllamaConfig.class, "ollama.min.p");
+    private static final ConfigModule NUM_CTX = ConfigModule.of(OllamaConfig.class, "ollama.num.ctx");
+    private static final ConfigModule LOG_REQUESTS = ConfigModule.of(OllamaConfig.class, "ollama.log.requests");
+    private static final ConfigModule LOG_RESPONSES = ConfigModule.of(OllamaConfig.class, "ollama.log.responses");
 
     private static final String DEFAULT_BASE_URL = "http://localhost:11434";
     private static final String DEFAULT_MODEL_NAME = "llama3";
@@ -110,7 +110,53 @@ public class OllamaConfig implements Config {
         ConfigStore.getInstance().add(NUM_CTX, ConfigEntry.fromEnv("OLLAMA_NUM_CTX"));
         ConfigStore.getInstance().add(LOG_REQUESTS, ConfigEntry.fromEnv("OLLAMA_LOG_REQUESTS"));
         ConfigStore.getInstance().add(LOG_RESPONSES, ConfigEntry.fromEnv("OLLAMA_LOG_RESPONSES"));
-        ConfigStore.getInstance().add(OllamaConfig.class, this);
+        ConfigStore.getInstance().add(OllamaConfig.class, this, this::register);
+    }
+
+    private ConfigModule resolve(String name) {
+        if (BASE_URL.name().equals(name)) {
+            return BASE_URL;
+        }
+
+        if (MODEL_NAME.name().equals(name)) {
+            return MODEL_NAME;
+        }
+
+        if (TEMPERATURE.name().equals(name)) {
+            return TEMPERATURE;
+        }
+
+        if (TOP_K.name().equals(name)) {
+            return TOP_K;
+        }
+
+        if (TOP_P.name().equals(name)) {
+            return TOP_P;
+        }
+
+        if (MIN_P.name().equals(name)) {
+            return MIN_P;
+        }
+
+        if (NUM_CTX.name().equals(name)) {
+            return NUM_CTX;
+        }
+
+        if (LOG_REQUESTS.name().equals(name)) {
+            return LOG_REQUESTS;
+        }
+
+        if (LOG_RESPONSES.name().equals(name)) {
+            return LOG_RESPONSES;
+        }
+
+        throw new IllegalArgumentException("Unknown config entry: " + name);
+    }
+
+    public void register(String name, String value) {
+        ConfigModule config = resolve(name);
+
+        ConfigStore.getInstance().set(config, value);
     }
 
     /**
