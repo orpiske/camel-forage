@@ -15,11 +15,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.camel</groupId>
-            <artifactId>camel-langchain4j-embeddingstore</artifactId>
-            <version>${camel.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.camel.forage</groupId>
             <artifactId>forage-core-common</artifactId>
             <version>${project.version}</version>
