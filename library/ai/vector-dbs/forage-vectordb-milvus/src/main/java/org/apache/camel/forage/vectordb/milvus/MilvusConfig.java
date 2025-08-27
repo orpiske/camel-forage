@@ -52,7 +52,7 @@ public class MilvusConfig implements Config {
         ConfigStore.getInstance().add(VECTOR_FIELD_NAME, ConfigEntry.fromEnv("MILVUS_TEXT_FIELD_NAME"));
         ConfigStore.getInstance().add(VECTOR_FIELD_NAME, ConfigEntry.fromEnv("MILVUS_METADATA_FIELD_NAME"));
         ConfigStore.getInstance().add(VECTOR_FIELD_NAME, ConfigEntry.fromEnv("MILVUS_VECTOR_FIELD_NAME"));
-        ConfigStore.getInstance().add(MilvusConfig.class, this);
+        ConfigStore.getInstance().add(MilvusConfig.class, this, this::register);
     }
 
     @Override
@@ -168,5 +168,68 @@ public class MilvusConfig implements Config {
                 .get(AUTO_FLUSH_ON_INSERT)
                 .map(Boolean::parseBoolean)
                 .orElse(false);
+    }
+
+    private ConfigModule resolve(String name) {
+        if (HOST.name().equals(name)) {
+            return HOST;
+        }
+        if (PORT.name().equals(name)) {
+            return PORT;
+        }
+        if (COLLECTION_NAME.name().equals(name)) {
+            return COLLECTION_NAME;
+        }
+        if (DIMENSION.name().equals(name)) {
+            return DIMENSION;
+        }
+        if (INDEX_TYPE.name().equals(name)) {
+            return INDEX_TYPE;
+        }
+        if (METRIC_TYPE.name().equals(name)) {
+            return METRIC_TYPE;
+        }
+        if (URI.name().equals(name)) {
+            return URI;
+        }
+        if (TOKEN.name().equals(name)) {
+            return TOKEN;
+        }
+        if (USERNAME.name().equals(name)) {
+            return USERNAME;
+        }
+        if (PASSWORD.name().equals(name)) {
+            return PASSWORD;
+        }
+        if (CONSISTENCY_LEVEL.name().equals(name)) {
+            return CONSISTENCY_LEVEL;
+        }
+        if (RETRIEVE_EMBEDDINGS_ON_SEARCH.name().equals(name)) {
+            return RETRIEVE_EMBEDDINGS_ON_SEARCH;
+        }
+        if (AUTO_FLUSH_ON_INSERT.name().equals(name)) {
+            return AUTO_FLUSH_ON_INSERT;
+        }
+        if (DATABASE_NAME.name().equals(name)) {
+            return DATABASE_NAME;
+        }
+        if (ID_FIELD_NAME.name().equals(name)) {
+            return ID_FIELD_NAME;
+        }
+        if (TEXT_FIELD_NAME.name().equals(name)) {
+            return TEXT_FIELD_NAME;
+        }
+        if (METADATA_FIELD_NAME.name().equals(name)) {
+            return METADATA_FIELD_NAME;
+        }
+        if (VECTOR_FIELD_NAME.name().equals(name)) {
+            return VECTOR_FIELD_NAME;
+        }
+        throw new IllegalArgumentException("Unknown config entry: " + name);
+    }
+
+    public void register(String name, String value) {
+        ConfigModule config = resolve(name);
+        ConfigStore.getInstance().set(config, value);
     }
 }

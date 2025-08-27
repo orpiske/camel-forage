@@ -34,7 +34,7 @@ public class PineconeConfig implements Config {
         ConfigStore.getInstance().add(CLOUD, ConfigEntry.fromEnv("PINECONE_CLOUD"));
         ConfigStore.getInstance().add(REGION, ConfigEntry.fromEnv("PINECONE_REGION"));
         ConfigStore.getInstance().add(DELETION_PROTECTION, ConfigEntry.fromEnv("PINECONE_DELETION_PROTECTION"));
-        ConfigStore.getInstance().add(PineconeConfig.class, this);
+        ConfigStore.getInstance().add(PineconeConfig.class, this, this::register);
     }
 
     @Override
@@ -98,5 +98,47 @@ public class PineconeConfig implements Config {
                 .get(DELETION_PROTECTION)
                 .map(DeletionProtection::valueOf)
                 .orElse(DeletionProtection.ENABLED);
+    }
+
+    private ConfigModule resolve(String name) {
+        if (API_KEY.name().equals(name)) {
+            return API_KEY;
+        }
+        if (INDEX.name().equals(name)) {
+            return INDEX;
+        }
+        if (NAME_SPACE.name().equals(name)) {
+            return NAME_SPACE;
+        }
+        if (METADATA_TEXT_KEY.name().equals(name)) {
+            return METADATA_TEXT_KEY;
+        }
+        if (CREATE_INDEX.name().equals(name)) {
+            return CREATE_INDEX;
+        }
+        if (ENVIRONMENT.name().equals(name)) {
+            return ENVIRONMENT;
+        }
+        if (PROJECT_ID.name().equals(name)) {
+            return PROJECT_ID;
+        }
+        if (DIMENSION.name().equals(name)) {
+            return DIMENSION;
+        }
+        if (CLOUD.name().equals(name)) {
+            return CLOUD;
+        }
+        if (REGION.name().equals(name)) {
+            return REGION;
+        }
+        if (DELETION_PROTECTION.name().equals(name)) {
+            return DELETION_PROTECTION;
+        }
+        throw new IllegalArgumentException("Unknown config entry: " + name);
+    }
+
+    public void register(String name, String value) {
+        ConfigModule config = resolve(name);
+        ConfigStore.getInstance().set(config, value);
     }
 }

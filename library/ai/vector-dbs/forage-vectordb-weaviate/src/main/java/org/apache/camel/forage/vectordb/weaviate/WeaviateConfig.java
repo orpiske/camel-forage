@@ -41,7 +41,7 @@ public class WeaviateConfig implements Config {
         ConfigStore.getInstance().add(METADATA_KEYS, ConfigEntry.fromEnv("WEAVIATE_METADATA_KEYS"));
         ConfigStore.getInstance().add(TEXT_FIELD_NAME, ConfigEntry.fromEnv("WEAVIATE_TEXT_FIELD_NAME"));
         ConfigStore.getInstance().add(METADATA_FIELD_NAME, ConfigEntry.fromEnv("WEAVIATE_METADATA_FIELD_NAME"));
-        ConfigStore.getInstance().add(WeaviateConfig.class, this);
+        ConfigStore.getInstance().add(WeaviateConfig.class, this, this::register);
     }
 
     @Override
@@ -124,5 +124,53 @@ public class WeaviateConfig implements Config {
 
     public String metadataFieldName() {
         return ConfigStore.getInstance().get(METADATA_FIELD_NAME).orElse("_metadata");
+    }
+
+    private ConfigModule resolve(String name) {
+        if (API_KEY.name().equals(name)) {
+            return API_KEY;
+        }
+        if (SCHEME.name().equals(name)) {
+            return SCHEME;
+        }
+        if (HOST.name().equals(name)) {
+            return HOST;
+        }
+        if (PORT.name().equals(name)) {
+            return PORT;
+        }
+        if (USE_GRPC_FOR_INSERTS.name().equals(name)) {
+            return USE_GRPC_FOR_INSERTS;
+        }
+        if (SECURED_GRPC.name().equals(name)) {
+            return SECURED_GRPC;
+        }
+        if (GRPC_PORT.name().equals(name)) {
+            return GRPC_PORT;
+        }
+        if (OBJECT_CLASS.name().equals(name)) {
+            return OBJECT_CLASS;
+        }
+        if (AVOID_DUPS.name().equals(name)) {
+            return AVOID_DUPS;
+        }
+        if (CONSISTENCY_LEVEL.name().equals(name)) {
+            return CONSISTENCY_LEVEL;
+        }
+        if (METADATA_KEYS.name().equals(name)) {
+            return METADATA_KEYS;
+        }
+        if (TEXT_FIELD_NAME.name().equals(name)) {
+            return TEXT_FIELD_NAME;
+        }
+        if (METADATA_FIELD_NAME.name().equals(name)) {
+            return METADATA_FIELD_NAME;
+        }
+        throw new IllegalArgumentException("Unknown config entry: " + name);
+    }
+
+    public void register(String name, String value) {
+        ConfigModule config = resolve(name);
+        ConfigStore.getInstance().set(config, value);
     }
 }

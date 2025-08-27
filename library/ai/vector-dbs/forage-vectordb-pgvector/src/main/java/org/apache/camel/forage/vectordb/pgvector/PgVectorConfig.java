@@ -37,7 +37,7 @@ public class PgVectorConfig implements Config {
         ConfigStore.getInstance().add(CREATE_TABLE, ConfigEntry.fromEnv("PGVECTOR_CREATE_TABLE"));
         ConfigStore.getInstance().add(DROP_TABLE_FIRST, ConfigEntry.fromEnv("PGVECTOR_DROP_TABLE_FIRST"));
         ConfigStore.getInstance().add(METADATA_STORAGE_CONFIG, ConfigEntry.fromEnv("PGVECTOR_METADATA_STORAGE_CONFIG"));
-        ConfigStore.getInstance().add(PgVectorConfig.class, this);
+        ConfigStore.getInstance().add(PgVectorConfig.class, this, this::register);
     }
 
     @Override
@@ -119,5 +119,50 @@ public class PgVectorConfig implements Config {
 
     public MetadataStorageConfig metadataStorageConfig() {
         return DefaultMetadataStorageConfig.defaultConfig();
+    }
+
+    private ConfigModule resolve(String name) {
+        if (HOST.name().equals(name)) {
+            return HOST;
+        }
+        if (PORT.name().equals(name)) {
+            return PORT;
+        }
+        if (USER.name().equals(name)) {
+            return USER;
+        }
+        if (PASSWORD.name().equals(name)) {
+            return PASSWORD;
+        }
+        if (DATABASE.name().equals(name)) {
+            return DATABASE;
+        }
+        if (TABLE.name().equals(name)) {
+            return TABLE;
+        }
+        if (DIMENSION.name().equals(name)) {
+            return DIMENSION;
+        }
+        if (USE_INDEX.name().equals(name)) {
+            return USE_INDEX;
+        }
+        if (INDEX_LIST_SIZE.name().equals(name)) {
+            return INDEX_LIST_SIZE;
+        }
+        if (CREATE_TABLE.name().equals(name)) {
+            return CREATE_TABLE;
+        }
+        if (DROP_TABLE_FIRST.name().equals(name)) {
+            return DROP_TABLE_FIRST;
+        }
+        if (METADATA_STORAGE_CONFIG.name().equals(name)) {
+            return METADATA_STORAGE_CONFIG;
+        }
+        throw new IllegalArgumentException("Unknown config entry: " + name);
+    }
+
+    public void register(String name, String value) {
+        ConfigModule config = resolve(name);
+        ConfigStore.getInstance().set(config, value);
     }
 }

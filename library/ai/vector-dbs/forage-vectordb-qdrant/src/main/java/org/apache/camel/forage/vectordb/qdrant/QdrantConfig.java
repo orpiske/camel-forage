@@ -22,7 +22,7 @@ public class QdrantConfig implements Config {
         ConfigStore.getInstance().add(USE_TLS, ConfigEntry.fromEnv("QDRANT_USE_TLS"));
         ConfigStore.getInstance().add(PAYLOAD_TEXT_KEY, ConfigEntry.fromEnv("QDRANT_PAYLOAD_TEXT_KEY"));
         ConfigStore.getInstance().add(API_KEY, ConfigEntry.fromEnv("QDRANT_API_KEY"));
-        ConfigStore.getInstance().add(QdrantConfig.class, this);
+        ConfigStore.getInstance().add(QdrantConfig.class, this, this::register);
     }
 
     @Override
@@ -57,5 +57,32 @@ public class QdrantConfig implements Config {
 
     public String apiKey() {
         return ConfigStore.getInstance().get(API_KEY).orElse(null);
+    }
+
+    private ConfigModule resolve(String name) {
+        if (COLLECTION_NAME.name().equals(name)) {
+            return COLLECTION_NAME;
+        }
+        if (HOST.name().equals(name)) {
+            return HOST;
+        }
+        if (PORT.name().equals(name)) {
+            return PORT;
+        }
+        if (USE_TLS.name().equals(name)) {
+            return USE_TLS;
+        }
+        if (PAYLOAD_TEXT_KEY.name().equals(name)) {
+            return PAYLOAD_TEXT_KEY;
+        }
+        if (API_KEY.name().equals(name)) {
+            return API_KEY;
+        }
+        throw new IllegalArgumentException("Unknown config entry: " + name);
+    }
+
+    public void register(String name, String value) {
+        ConfigModule config = resolve(name);
+        ConfigStore.getInstance().set(config, value);
     }
 }
