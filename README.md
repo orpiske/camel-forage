@@ -33,10 +33,10 @@ Add the desired modules to your project. For example, to use the default agent f
     <artifactId>forage-memory-message-window</artifactId>
     <version>1.0-SNAPSHOT</version>
 </dependency>
-<!--This component adds a simple agent implementation -->
+<!--This component adds a memory-aware agent implementation -->
 <dependency>
     <groupId>org.apache.camel.forage</groupId>
-    <artifactId>forage-agent-simple</artifactId>
+    <artifactId>forage-agent-memory-aware</artifactId>
     <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
@@ -63,8 +63,11 @@ based on the dependencies available on the classpath.
 ### AI Modules
 
 #### Agents
-- **forage-agent-factory-default** - Default agent factory and common agent utilities
-- **forage-agent-simple** - Basic agent implementation
+- **forage-agent-factory-default** - Default agent factory and common agent utilities ([Documentation](library/ai/agents/forage-agent-factory-default/README.md))
+- **forage-agent-memory-aware** - Memory-aware agent implementation ([Documentation](library/ai/agents/forage-agent-memory-aware/README.md))
+- **forage-agent-memoryless** - Stateless agent implementation ([Documentation](library/ai/agents/forage-agent-memoryless/README.md))
+
+📋 **[Complete Agents Documentation](library/ai/agents/README.md)** - Comprehensive guide to all agent components
 
 #### Models
 - **camel-forage-model-open-ai** - OpenAI chat model provider ([Configuration Guide](library/ai/models/chat/camel-forage-model-open-ai/README.md))
@@ -133,6 +136,8 @@ The `DefaultAgentFactory` automatically discovers and combines these components 
 ## Examples
 
 ### Basic AI Agent Route
+
+Example for a memory-less agent.
 
 ```java
 from("timer:ai?period=30000")
