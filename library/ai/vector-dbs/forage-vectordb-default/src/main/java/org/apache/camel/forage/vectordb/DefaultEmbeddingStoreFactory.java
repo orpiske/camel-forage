@@ -3,10 +3,11 @@ package org.apache.camel.forage.vectordb;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import java.util.ServiceLoader;
 import org.apache.camel.CamelContext;
-import org.apache.camel.component.langchain4j.embeddingstore.EmbeddingStoreFactory;
+import org.apache.camel.CamelContextAware;
+import org.apache.camel.forage.core.vectordb.EmbeddingStoreFactory;
 import org.apache.camel.forage.core.vectordb.EmbeddingStoreProvider;
 
-public class DefaultEmbeddingStoreFactory implements EmbeddingStoreFactory {
+public class DefaultEmbeddingStoreFactory implements EmbeddingStoreFactory, CamelContextAware {
     private CamelContext camelContext;
 
     @Override
