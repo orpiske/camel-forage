@@ -17,6 +17,7 @@
     <modules>
         <module>forage-agent-factory-default</module>
         <module>forage-agent-memory-aware</module>
+        <module>forage-agent-memoryless</module>
     </modules>
 
 </project>
