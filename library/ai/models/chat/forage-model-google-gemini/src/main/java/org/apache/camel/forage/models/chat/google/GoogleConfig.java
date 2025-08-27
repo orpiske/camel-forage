@@ -90,6 +90,7 @@ public class GoogleConfig implements Config {
         throw new IllegalArgumentException("Unknown config entry: " + name);
     }
 
+    @Override
     public void register(String name, String value) {
         ConfigModule config = resolve(name);
 
