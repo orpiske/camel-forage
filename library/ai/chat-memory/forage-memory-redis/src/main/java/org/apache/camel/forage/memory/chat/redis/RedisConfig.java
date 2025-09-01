@@ -1,7 +1,20 @@
 package org.apache.camel.forage.memory.chat.redis;
 
+import static org.apache.camel.forage.memory.chat.redis.RedisConfigEntries.DATABASE;
+import static org.apache.camel.forage.memory.chat.redis.RedisConfigEntries.HOST;
+import static org.apache.camel.forage.memory.chat.redis.RedisConfigEntries.PASSWORD;
+import static org.apache.camel.forage.memory.chat.redis.RedisConfigEntries.POOL_MAX_IDLE;
+import static org.apache.camel.forage.memory.chat.redis.RedisConfigEntries.POOL_MAX_TOTAL;
+import static org.apache.camel.forage.memory.chat.redis.RedisConfigEntries.POOL_MAX_WAIT_MILLIS;
+import static org.apache.camel.forage.memory.chat.redis.RedisConfigEntries.POOL_MIN_IDLE;
+import static org.apache.camel.forage.memory.chat.redis.RedisConfigEntries.POOL_TEST_ON_BORROW;
+import static org.apache.camel.forage.memory.chat.redis.RedisConfigEntries.POOL_TEST_ON_RETURN;
+import static org.apache.camel.forage.memory.chat.redis.RedisConfigEntries.POOL_TEST_WHILE_IDLE;
+import static org.apache.camel.forage.memory.chat.redis.RedisConfigEntries.PORT;
+import static org.apache.camel.forage.memory.chat.redis.RedisConfigEntries.TIMEOUT;
+
+import java.util.Optional;
 import org.apache.camel.forage.core.util.config.Config;
-import org.apache.camel.forage.core.util.config.ConfigEntry;
 import org.apache.camel.forage.core.util.config.ConfigModule;
 import org.apache.camel.forage.core.util.config.ConfigStore;
 
@@ -77,24 +90,7 @@ import org.apache.camel.forage.core.util.config.ConfigStore;
  */
 public class RedisConfig implements Config {
 
-    private static final ConfigModule HOST = ConfigModule.of(RedisConfig.class, "redis.host");
-    private static final ConfigModule PORT = ConfigModule.of(RedisConfig.class, "redis.port");
-    private static final ConfigModule PASSWORD = ConfigModule.of(RedisConfig.class, "redis.password");
-    private static final ConfigModule DATABASE = ConfigModule.of(RedisConfig.class, "redis.database");
-    private static final ConfigModule TIMEOUT = ConfigModule.of(RedisConfig.class, "redis.timeout");
-
-    // Pool configuration
-    private static final ConfigModule POOL_MAX_TOTAL = ConfigModule.of(RedisConfig.class, "redis.pool.max-total");
-    private static final ConfigModule POOL_MAX_IDLE = ConfigModule.of(RedisConfig.class, "redis.pool.max-idle");
-    private static final ConfigModule POOL_MIN_IDLE = ConfigModule.of(RedisConfig.class, "redis.pool.min-idle");
-    private static final ConfigModule POOL_TEST_ON_BORROW =
-            ConfigModule.of(RedisConfig.class, "redis.pool.test-on-borrow");
-    private static final ConfigModule POOL_TEST_ON_RETURN =
-            ConfigModule.of(RedisConfig.class, "redis.pool.test-on-return");
-    private static final ConfigModule POOL_TEST_WHILE_IDLE =
-            ConfigModule.of(RedisConfig.class, "redis.pool.test-while-idle");
-    private static final ConfigModule POOL_MAX_WAIT_MILLIS =
-            ConfigModule.of(RedisConfig.class, "redis.pool.max-wait-millis");
+    private final String prefix;
 
     /**
      * Creates a new Redis configuration instance and registers configuration entries
@@ -105,26 +101,20 @@ public class RedisConfig implements Config {
      * configuration loader to process property files if they exist.
      */
     public RedisConfig() {
-        ConfigStore.getInstance().add(HOST, ConfigEntry.fromModule(HOST, "REDIS_HOST"));
-        ConfigStore.getInstance().add(PORT, ConfigEntry.fromModule(PORT, "REDIS_PORT"));
-        ConfigStore.getInstance().add(PASSWORD, ConfigEntry.fromModule(PASSWORD, "REDIS_PASSWORD"));
-        ConfigStore.getInstance().add(DATABASE, ConfigEntry.fromModule(DATABASE, "REDIS_DATABASE"));
-        ConfigStore.getInstance().add(TIMEOUT, ConfigEntry.fromModule(TIMEOUT, "REDIS_TIMEOUT"));
+        this(null);
+    }
 
-        // Pool configuration
-        ConfigStore.getInstance().add(POOL_MAX_TOTAL, ConfigEntry.fromModule(POOL_MAX_TOTAL, "REDIS_POOL_MAX_TOTAL"));
-        ConfigStore.getInstance().add(POOL_MAX_IDLE, ConfigEntry.fromModule(POOL_MAX_IDLE, "REDIS_POOL_MAX_IDLE"));
-        ConfigStore.getInstance().add(POOL_MIN_IDLE, ConfigEntry.fromModule(POOL_MIN_IDLE, "REDIS_POOL_MIN_IDLE"));
-        ConfigStore.getInstance()
-                .add(POOL_TEST_ON_BORROW, ConfigEntry.fromModule(POOL_TEST_ON_BORROW, "REDIS_POOL_TEST_ON_BORROW"));
-        ConfigStore.getInstance()
-                .add(POOL_TEST_ON_RETURN, ConfigEntry.fromModule(POOL_TEST_ON_RETURN, "REDIS_POOL_TEST_ON_RETURN"));
-        ConfigStore.getInstance()
-                .add(POOL_TEST_WHILE_IDLE, ConfigEntry.fromModule(POOL_TEST_WHILE_IDLE, "REDIS_POOL_TEST_WHILE_IDLE"));
-        ConfigStore.getInstance()
-                .add(POOL_MAX_WAIT_MILLIS, ConfigEntry.fromModule(POOL_MAX_WAIT_MILLIS, "REDIS_POOL_MAX_WAIT_MILLIS"));
+    public RedisConfig(String prefix) {
+        this.prefix = prefix;
 
-        ConfigStore.getInstance().add(RedisConfig.class, this, this::register);
+        // First register new configuration modules. This happens only if a prefix is provided
+        RedisConfigEntries.register(prefix);
+
+        // Then, loads the configurations from the properties file associated with this Config module
+        ConfigStore.getInstance().load(RedisConfig.class, this, this::register);
+
+        // Lastly, load the overrides defined in system properties and environment variables
+        RedisConfigEntries.loadOverrides(prefix);
     }
 
     /**
@@ -133,7 +123,7 @@ public class RedisConfig implements Config {
      * @return the Redis server hostname, defaults to "localhost" if not configured
      */
     public String host() {
-        return ConfigStore.getInstance().get(HOST).orElse("localhost");
+        return ConfigStore.getInstance().get(HOST.asNamed(prefix)).orElse("localhost");
     }
 
     /**
@@ -144,7 +134,7 @@ public class RedisConfig implements Config {
      */
     public int port() {
         return ConfigStore.getInstance()
-                .get(PORT)
+                .get(PORT.asNamed(prefix))
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -161,7 +151,7 @@ public class RedisConfig implements Config {
      * @return the Redis password, or {@code null} if no authentication is required
      */
     public String password() {
-        return ConfigStore.getInstance().get(PASSWORD).orElse(null);
+        return ConfigStore.getInstance().get(PASSWORD.asNamed(prefix)).orElse(null);
     }
 
     /**
@@ -172,7 +162,7 @@ public class RedisConfig implements Config {
      */
     public int database() {
         return ConfigStore.getInstance()
-                .get(DATABASE)
+                .get(DATABASE.asNamed(prefix))
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -191,7 +181,7 @@ public class RedisConfig implements Config {
      */
     public int timeout() {
         return ConfigStore.getInstance()
-                .get(TIMEOUT)
+                .get(TIMEOUT.asNamed(prefix))
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -210,7 +200,7 @@ public class RedisConfig implements Config {
      */
     public int poolMaxTotal() {
         return ConfigStore.getInstance()
-                .get(POOL_MAX_TOTAL)
+                .get(POOL_MAX_TOTAL.asNamed(prefix))
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -229,7 +219,7 @@ public class RedisConfig implements Config {
      */
     public int poolMaxIdle() {
         return ConfigStore.getInstance()
-                .get(POOL_MAX_IDLE)
+                .get(POOL_MAX_IDLE.asNamed(prefix))
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -248,7 +238,7 @@ public class RedisConfig implements Config {
      */
     public int poolMinIdle() {
         return ConfigStore.getInstance()
-                .get(POOL_MIN_IDLE)
+                .get(POOL_MIN_IDLE.asNamed(prefix))
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -267,7 +257,7 @@ public class RedisConfig implements Config {
      */
     public boolean poolTestOnBorrow() {
         return ConfigStore.getInstance()
-                .get(POOL_TEST_ON_BORROW)
+                .get(POOL_TEST_ON_BORROW.asNamed(prefix))
                 .map(value -> {
                     if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
                         return Boolean.parseBoolean(value);
@@ -286,7 +276,7 @@ public class RedisConfig implements Config {
      */
     public boolean poolTestOnReturn() {
         return ConfigStore.getInstance()
-                .get(POOL_TEST_ON_RETURN)
+                .get(POOL_TEST_ON_RETURN.asNamed(prefix))
                 .map(value -> {
                     if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
                         return Boolean.parseBoolean(value);
@@ -305,7 +295,7 @@ public class RedisConfig implements Config {
      */
     public boolean poolTestWhileIdle() {
         return ConfigStore.getInstance()
-                .get(POOL_TEST_WHILE_IDLE)
+                .get(POOL_TEST_WHILE_IDLE.asNamed(prefix))
                 .map(value -> {
                     if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
                         return Boolean.parseBoolean(value);
@@ -324,7 +314,7 @@ public class RedisConfig implements Config {
      */
     public int poolMaxWaitMillis() {
         return ConfigStore.getInstance()
-                .get(POOL_MAX_WAIT_MILLIS)
+                .get(POOL_MAX_WAIT_MILLIS.asNamed(prefix))
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -333,60 +323,6 @@ public class RedisConfig implements Config {
                     }
                 })
                 .orElse(2000);
-    }
-
-    /**
-     * Resolves a configuration property name to its corresponding {@link ConfigModule}.
-     *
-     * <p>This method is used during configuration loading to map property names from
-     * configuration files to their respective configuration modules.
-     *
-     * @param name the configuration property name to resolve
-     * @return the corresponding ConfigModule
-     * @throws IllegalArgumentException if the property name is not recognized
-     */
-    private ConfigModule resolve(String name) {
-        if (HOST.name().equals(name)) {
-            return HOST;
-        }
-        if (PORT.name().equals(name)) {
-            return PORT;
-        }
-        if (PASSWORD.name().equals(name)) {
-            return PASSWORD;
-        }
-        if (DATABASE.name().equals(name)) {
-            return DATABASE;
-        }
-        if (TIMEOUT.name().equals(name)) {
-            return TIMEOUT;
-        }
-        if (POOL_MAX_TOTAL.name().equals(name)) {
-            return POOL_MAX_TOTAL;
-        }
-        if (POOL_MAX_IDLE.name().equals(name)) {
-            return POOL_MAX_IDLE;
-        }
-        if (POOL_MIN_IDLE.name().equals(name)) {
-            return POOL_MIN_IDLE;
-        }
-        if (POOL_TEST_ON_BORROW.name().equals(name)) {
-            return POOL_TEST_ON_BORROW;
-        }
-        if (POOL_TEST_ON_RETURN.name().equals(name)) {
-            return POOL_TEST_ON_RETURN;
-        }
-        if (POOL_TEST_WHILE_IDLE.name().equals(name)) {
-            return POOL_TEST_WHILE_IDLE;
-        }
-        if (POOL_MAX_WAIT_MILLIS.name().equals(name)) {
-            return POOL_MAX_WAIT_MILLIS;
-        }
-
-        throw new IllegalArgumentException("Unknown Redis configuration property: " + name
-                + ". Supported properties: redis.host, redis.port, redis.password, redis.database, redis.timeout, "
-                + "redis.pool.max-total, redis.pool.max-idle, redis.pool.min-idle, redis.pool.test-on-borrow, "
-                + "redis.pool.test-on-return, redis.pool.test-while-idle, redis.pool.max-wait-millis");
     }
 
     /**
@@ -402,20 +338,10 @@ public class RedisConfig implements Config {
         return "forage-memory-redis";
     }
 
-    /**
-     * Registers a configuration property value that was loaded from a configuration file.
-     *
-     * <p>This method is called by the configuration loading system to dynamically
-     * register properties that were found in the module's properties file or other
-     * external configuration sources.
-     *
-     * @param name the configuration property name (e.g., "redis.host", "redis.port")
-     * @param value the configuration property value
-     * @throws IllegalArgumentException if the property name is not recognized by this module
-     */
     @Override
     public void register(String name, String value) {
-        ConfigModule config = resolve(name);
-        ConfigStore.getInstance().set(config, value);
+        Optional<ConfigModule> config = RedisConfigEntries.find(prefix, name);
+
+        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
     }
 }

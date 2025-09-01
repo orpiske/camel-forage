@@ -11,20 +11,20 @@ import org.slf4j.LoggerFactory;
 public class PineconeProvider implements EmbeddingStoreProvider {
     private static final Logger LOG = LoggerFactory.getLogger(PineconeProvider.class);
 
-    private static final PineconeConfig CONFIG = new PineconeConfig();
-
     @Override
-    public PineconeEmbeddingStore newEmbeddingStore() {
+    public PineconeEmbeddingStore create(String id) {
         LOG.trace("Creating pinecone embedding store");
 
+        PineconeConfig config = new PineconeConfig(id);
+
         return PineconeEmbeddingStore.builder()
-                .apiKey(CONFIG.apiKey())
-                .index(CONFIG.index())
-                .nameSpace(CONFIG.nameSpace())
+                .apiKey(config.apiKey())
+                .index(config.index())
+                .nameSpace(config.nameSpace())
                 .createIndex(null)
-                .metadataTextKey(CONFIG.metadataTextKey())
-                .environment(CONFIG.environment())
-                .projectId(CONFIG.projectId())
+                .metadataTextKey(config.metadataTextKey())
+                .environment(config.environment())
+                .projectId(config.projectId())
                 .build();
     }
 }

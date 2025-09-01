@@ -1,7 +1,17 @@
 package org.apache.camel.forage.models.chat.ollama;
 
+import static org.apache.camel.forage.models.chat.ollama.OllamaConfigEntries.BASE_URL;
+import static org.apache.camel.forage.models.chat.ollama.OllamaConfigEntries.LOG_REQUESTS;
+import static org.apache.camel.forage.models.chat.ollama.OllamaConfigEntries.LOG_RESPONSES;
+import static org.apache.camel.forage.models.chat.ollama.OllamaConfigEntries.MIN_P;
+import static org.apache.camel.forage.models.chat.ollama.OllamaConfigEntries.MODEL_NAME;
+import static org.apache.camel.forage.models.chat.ollama.OllamaConfigEntries.NUM_CTX;
+import static org.apache.camel.forage.models.chat.ollama.OllamaConfigEntries.TEMPERATURE;
+import static org.apache.camel.forage.models.chat.ollama.OllamaConfigEntries.TOP_K;
+import static org.apache.camel.forage.models.chat.ollama.OllamaConfigEntries.TOP_P;
+
+import java.util.Optional;
 import org.apache.camel.forage.core.util.config.Config;
-import org.apache.camel.forage.core.util.config.ConfigEntry;
 import org.apache.camel.forage.core.util.config.ConfigModule;
 import org.apache.camel.forage.core.util.config.ConfigStore;
 
@@ -71,18 +81,9 @@ import org.apache.camel.forage.core.util.config.ConfigStore;
  */
 public class OllamaConfig implements Config {
 
-    private static final ConfigModule BASE_URL = ConfigModule.of(OllamaConfig.class, "ollama.base.url");
-    private static final ConfigModule MODEL_NAME = ConfigModule.of(OllamaConfig.class, "ollama.model.name");
-    private static final ConfigModule TEMPERATURE = ConfigModule.of(OllamaConfig.class, "ollama.temperature");
-    private static final ConfigModule TOP_K = ConfigModule.of(OllamaConfig.class, "ollama.top.k");
-    private static final ConfigModule TOP_P = ConfigModule.of(OllamaConfig.class, "ollama.top.p");
-    private static final ConfigModule MIN_P = ConfigModule.of(OllamaConfig.class, "ollama.min.p");
-    private static final ConfigModule NUM_CTX = ConfigModule.of(OllamaConfig.class, "ollama.num.ctx");
-    private static final ConfigModule LOG_REQUESTS = ConfigModule.of(OllamaConfig.class, "ollama.log.requests");
-    private static final ConfigModule LOG_RESPONSES = ConfigModule.of(OllamaConfig.class, "ollama.log.responses");
-
     private static final String DEFAULT_BASE_URL = "http://localhost:11434";
     private static final String DEFAULT_MODEL_NAME = "llama3";
+    private final String prefix;
 
     /**
      * Constructs a new OllamaConfig and registers configuration parameters with the ConfigStore.
@@ -101,63 +102,27 @@ public class OllamaConfig implements Config {
      * or configuration files.
      */
     public OllamaConfig() {
-        ConfigStore.getInstance().add(BASE_URL, ConfigEntry.fromModule(BASE_URL, "OLLAMA_BASE_URL"));
-        ConfigStore.getInstance().add(MODEL_NAME, ConfigEntry.fromModule(MODEL_NAME, "OLLAMA_MODEL_NAME"));
-        ConfigStore.getInstance().add(TEMPERATURE, ConfigEntry.fromModule(TEMPERATURE, "OLLAMA_TEMPERATURE"));
-        ConfigStore.getInstance().add(TOP_K, ConfigEntry.fromModule(TOP_K, "OLLAMA_TOP_K"));
-        ConfigStore.getInstance().add(TOP_P, ConfigEntry.fromModule(TOP_P, "OLLAMA_TOP_P"));
-        ConfigStore.getInstance().add(MIN_P, ConfigEntry.fromModule(MIN_P, "OLLAMA_MIN_P"));
-        ConfigStore.getInstance().add(NUM_CTX, ConfigEntry.fromModule(NUM_CTX, "OLLAMA_NUM_CTX"));
-        ConfigStore.getInstance().add(LOG_REQUESTS, ConfigEntry.fromModule(LOG_REQUESTS, "OLLAMA_LOG_REQUESTS"));
-        ConfigStore.getInstance().add(LOG_RESPONSES, ConfigEntry.fromModule(LOG_RESPONSES, "OLLAMA_LOG_RESPONSES"));
-        ConfigStore.getInstance().add(OllamaConfig.class, this, this::register);
+        this(null);
     }
 
-    private ConfigModule resolve(String name) {
-        if (BASE_URL.name().equals(name)) {
-            return BASE_URL;
-        }
+    public OllamaConfig(String prefix) {
+        this.prefix = prefix;
 
-        if (MODEL_NAME.name().equals(name)) {
-            return MODEL_NAME;
-        }
+        // First register new configuration modules. This happens only if a prefix is provided
+        OllamaConfigEntries.register(prefix);
 
-        if (TEMPERATURE.name().equals(name)) {
-            return TEMPERATURE;
-        }
+        // Then, loads the configurations from the properties file associated with this Config module
+        ConfigStore.getInstance().load(OllamaConfig.class, this, this::register);
 
-        if (TOP_K.name().equals(name)) {
-            return TOP_K;
-        }
-
-        if (TOP_P.name().equals(name)) {
-            return TOP_P;
-        }
-
-        if (MIN_P.name().equals(name)) {
-            return MIN_P;
-        }
-
-        if (NUM_CTX.name().equals(name)) {
-            return NUM_CTX;
-        }
-
-        if (LOG_REQUESTS.name().equals(name)) {
-            return LOG_REQUESTS;
-        }
-
-        if (LOG_RESPONSES.name().equals(name)) {
-            return LOG_RESPONSES;
-        }
-
-        throw new IllegalArgumentException("Unknown config entry: " + name);
+        // Lastly, load the overrides defined in system properties and environment variables
+        OllamaConfigEntries.loadOverrides(prefix);
     }
 
     @Override
     public void register(String name, String value) {
-        ConfigModule config = resolve(name);
+        Optional<ConfigModule> config = OllamaConfigEntries.find(prefix, name);
 
-        ConfigStore.getInstance().set(config, value);
+        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
     }
 
     /**
@@ -202,7 +167,7 @@ public class OllamaConfig implements Config {
      * @return the Ollama server base URL, never null
      */
     public String baseUrl() {
-        return ConfigStore.getInstance().get(BASE_URL).orElse(DEFAULT_BASE_URL);
+        return ConfigStore.getInstance().get(BASE_URL.asNamed(prefix)).orElse(DEFAULT_BASE_URL);
     }
 
     /**
@@ -232,7 +197,7 @@ public class OllamaConfig implements Config {
      * @return the Ollama model name, never null
      */
     public String modelName() {
-        return ConfigStore.getInstance().get(MODEL_NAME).orElse(DEFAULT_MODEL_NAME);
+        return ConfigStore.getInstance().get(MODEL_NAME.asNamed(prefix)).orElse(DEFAULT_MODEL_NAME);
     }
 
     /**
@@ -256,7 +221,7 @@ public class OllamaConfig implements Config {
      */
     public Double temperature() {
         return ConfigStore.getInstance()
-                .get(TEMPERATURE)
+                .get(TEMPERATURE.asNamed(prefix))
                 .map(Double::parseDouble)
                 .orElse(null);
     }
@@ -280,7 +245,10 @@ public class OllamaConfig implements Config {
      * @return the top-K value, or null if not configured
      */
     public Integer topK() {
-        return ConfigStore.getInstance().get(TOP_K).map(Integer::parseInt).orElse(null);
+        return ConfigStore.getInstance()
+                .get(TOP_K.asNamed(prefix))
+                .map(Integer::parseInt)
+                .orElse(null);
     }
 
     /**
@@ -303,7 +271,10 @@ public class OllamaConfig implements Config {
      * @return the top-P value, or null if not configured
      */
     public Double topP() {
-        return ConfigStore.getInstance().get(TOP_P).map(Double::parseDouble).orElse(null);
+        return ConfigStore.getInstance()
+                .get(TOP_P.asNamed(prefix))
+                .map(Double::parseDouble)
+                .orElse(null);
     }
 
     /**
@@ -326,7 +297,10 @@ public class OllamaConfig implements Config {
      * @return the min-P value, or null if not configured
      */
     public Double minP() {
-        return ConfigStore.getInstance().get(MIN_P).map(Double::parseDouble).orElse(null);
+        return ConfigStore.getInstance()
+                .get(MIN_P.asNamed(prefix))
+                .map(Double::parseDouble)
+                .orElse(null);
     }
 
     /**
@@ -349,7 +323,10 @@ public class OllamaConfig implements Config {
      * @return the context window size, or null if not configured
      */
     public Integer numCtx() {
-        return ConfigStore.getInstance().get(NUM_CTX).map(Integer::parseInt).orElse(null);
+        return ConfigStore.getInstance()
+                .get(NUM_CTX.asNamed(prefix))
+                .map(Integer::parseInt)
+                .orElse(null);
     }
 
     /**
@@ -373,7 +350,7 @@ public class OllamaConfig implements Config {
      */
     public Boolean logRequests() {
         return ConfigStore.getInstance()
-                .get(LOG_REQUESTS)
+                .get(LOG_REQUESTS.asNamed(prefix))
                 .map(Boolean::parseBoolean)
                 .orElse(null);
     }
@@ -399,7 +376,7 @@ public class OllamaConfig implements Config {
      */
     public Boolean logResponses() {
         return ConfigStore.getInstance()
-                .get(LOG_RESPONSES)
+                .get(LOG_RESPONSES.asNamed(prefix))
                 .map(Boolean::parseBoolean)
                 .orElse(null);
     }

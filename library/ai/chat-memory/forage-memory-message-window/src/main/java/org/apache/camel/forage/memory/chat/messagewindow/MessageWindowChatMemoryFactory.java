@@ -17,8 +17,14 @@ public class MessageWindowChatMemoryFactory implements ChatMemoryFactory {
     }
 
     @Override
-    public synchronized ChatMemoryProvider newChatMemory() {
+    public synchronized ChatMemoryProvider create() {
         return chatMemoryProvider;
+    }
+
+    @Override
+    public ChatMemoryProvider create(String id) {
+        throw new UnsupportedOperationException(
+                "Named chat memory stores are not yet supported for the memory chat window");
     }
 
     private static ChatMemoryProvider getChatMemoryProvider() {

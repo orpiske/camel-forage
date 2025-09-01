@@ -8,6 +8,7 @@ import org.apache.camel.component.langchain4j.agent.api.AgentConfiguration;
 import org.apache.camel.component.langchain4j.agent.api.AgentFactory;
 import org.apache.camel.forage.core.ai.ChatMemoryFactory;
 import org.apache.camel.forage.core.ai.ModelProvider;
+import org.apache.camel.forage.core.util.config.ConfigStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +28,8 @@ public class DefaultAgentFactory implements AgentFactory {
     @Override
     public void setCamelContext(CamelContext camelContext) {
         this.camelContext = camelContext;
+
+        ConfigStore.getInstance().setClassLoader(camelContext.getApplicationContextClassLoader());
     }
 
     @Override
@@ -81,11 +84,10 @@ public class DefaultAgentFactory implements AgentFactory {
             ChatMemoryFactory chatMemoryFactory = newChatMemoryFactory();
 
             LOG.trace("Creating Agent (step 3)");
-            final ChatMemoryProvider chatMemoryProvider =
-                    chatMemoryFactory != null ? chatMemoryFactory.newChatMemory() : null;
+            final ChatMemoryProvider chatMemoryProvider = chatMemoryFactory != null ? chatMemoryFactory.create() : null;
 
             AgentConfiguration agentConfiguration = new AgentConfiguration();
-            agentConfiguration.withChatModel(modelProvider.newModel()).withChatMemoryProvider(chatMemoryProvider);
+            agentConfiguration.withChatModel(modelProvider.create()).withChatMemoryProvider(chatMemoryProvider);
 
             configurationAware.configure(agentConfiguration);
         }

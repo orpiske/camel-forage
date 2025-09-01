@@ -11,25 +11,25 @@ import org.slf4j.LoggerFactory;
 public class PgVectorProvider implements EmbeddingStoreProvider {
     private static final Logger LOG = LoggerFactory.getLogger(PgVectorProvider.class);
 
-    private static final PgVectorConfig CONFIG = new PgVectorConfig();
-
     @Override
-    public PgVectorEmbeddingStore newEmbeddingStore() {
+    public PgVectorEmbeddingStore create(String id) {
         LOG.trace("Creating PgVector Embedding Store");
 
+        PgVectorConfig config = new PgVectorConfig(id);
+
         return PgVectorEmbeddingStore.builder()
-                .host(CONFIG.host())
-                .port(CONFIG.port())
-                .user(CONFIG.user())
-                .password(CONFIG.password())
-                .database(CONFIG.database())
-                .table(CONFIG.table())
-                .dimension(CONFIG.dimension())
-                .useIndex(CONFIG.useIndex())
-                .indexListSize(CONFIG.indexListSize())
-                .createTable(CONFIG.createTable())
-                .dropTableFirst(CONFIG.dropTableFirst())
-                .metadataStorageConfig(CONFIG.metadataStorageConfig())
+                .host(config.host())
+                .port(config.port())
+                .user(config.user())
+                .password(config.password())
+                .database(config.database())
+                .table(config.table())
+                .dimension(config.dimension())
+                .useIndex(config.useIndex())
+                .indexListSize(config.indexListSize())
+                .createTable(config.createTable())
+                .dropTableFirst(config.dropTableFirst())
+                .metadataStorageConfig(config.metadataStorageConfig())
                 .build();
     }
 }

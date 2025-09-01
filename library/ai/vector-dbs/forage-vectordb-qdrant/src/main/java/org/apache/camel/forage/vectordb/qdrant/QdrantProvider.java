@@ -11,19 +11,19 @@ import org.slf4j.LoggerFactory;
 public class QdrantProvider implements EmbeddingStoreProvider {
     private static final Logger LOG = LoggerFactory.getLogger(QdrantProvider.class);
 
-    private static final QdrantConfig CONFIG = new QdrantConfig();
-
     @Override
-    public QdrantEmbeddingStore newEmbeddingStore() {
+    public QdrantEmbeddingStore create(String id) {
         LOG.trace("Creating qdrant embedding store");
 
+        final QdrantConfig config = new QdrantConfig(id);
+
         return QdrantEmbeddingStore.builder()
-                .collectionName(CONFIG.collectionName())
-                .apiKey(CONFIG.apiKey())
-                .host(CONFIG.host())
-                .port(CONFIG.port())
-                .useTls(CONFIG.useTls())
-                .payloadTextKey(CONFIG.payloadTextKey())
+                .collectionName(config.collectionName())
+                .apiKey(config.apiKey())
+                .host(config.host())
+                .port(config.port())
+                .useTls(config.useTls())
+                .payloadTextKey(config.payloadTextKey())
                 .build();
     }
 }

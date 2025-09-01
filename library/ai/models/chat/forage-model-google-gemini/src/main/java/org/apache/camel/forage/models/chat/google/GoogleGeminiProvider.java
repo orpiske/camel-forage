@@ -14,15 +14,14 @@ import org.slf4j.LoggerFactory;
 public class GoogleGeminiProvider implements ModelProvider {
     private static final Logger LOG = LoggerFactory.getLogger(GoogleGeminiProvider.class);
 
-    private static final GoogleConfig CONFIG = new GoogleConfig();
-
     @Override
-    public ChatModel newModel() {
+    public ChatModel create(String id) {
+        final GoogleConfig config = new GoogleConfig(id);
         LOG.trace("Creating google chat model");
 
         return GoogleAiGeminiChatModel.builder()
-                .apiKey(CONFIG.apiKey())
-                .modelName(CONFIG.modelName())
+                .apiKey(config.apiKey())
+                .modelName(config.modelName())
                 .temperature(1.0)
                 .timeout(ofSeconds(60))
                 .logRequestsAndResponses(true)

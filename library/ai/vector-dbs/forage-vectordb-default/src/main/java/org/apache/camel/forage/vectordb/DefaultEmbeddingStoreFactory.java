@@ -25,6 +25,6 @@ public class DefaultEmbeddingStoreFactory implements EmbeddingStoreFactory, Came
         ServiceLoader<EmbeddingStoreProvider> providers = ServiceLoader.load(EmbeddingStoreProvider.class);
         EmbeddingStoreProvider provider =
                 providers.findFirst().orElseThrow(() -> new IllegalStateException("No EmbeddingStoreProvider found"));
-        return provider.newEmbeddingStore();
+        return provider.create();
     }
 }

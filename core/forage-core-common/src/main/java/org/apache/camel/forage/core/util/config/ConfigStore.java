@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.BiConsumer;
@@ -60,6 +59,7 @@ public final class ConfigStore {
 
     private static ConfigStore INSTANCE;
     private final Properties properties = new Properties();
+    private ClassLoader classLoader;
 
     /**
      * Private constructor to enforce singleton pattern.
@@ -84,25 +84,7 @@ public final class ConfigStore {
     }
 
     /**
-     * Adds multiple configuration entries and properties to the store.
-     *
-     * <p>This method provides a bulk operation for registering multiple configuration entries
-     * at once. The provided properties are merged with the existing properties, and each
-     * ConfigModule-ConfigEntry pair is processed to resolve values from their respective sources.
-     *
-     * @param entries a map of ConfigModule to ConfigEntry pairs to register
-     * @param properties additional properties to add to the store
-     */
-    public void add(Map<ConfigModule, ConfigEntry> entries, Properties properties) {
-        this.properties.putAll(properties);
-
-        for (Map.Entry<ConfigModule, ConfigEntry> entry : entries.entrySet()) {
-            add(entry.getKey(), entry.getValue());
-        }
-    }
-
-    /**
-     * Registers a configuration module with its corresponding configuration entry.
+     * Loads the configuration from the given module
      *
      * <p>This method attempts to resolve a value for the given ConfigEntry by checking
      * environment variables and system properties in order of precedence. If a value
@@ -112,16 +94,15 @@ public final class ConfigStore {
      * to {@link #get(ConfigModule)} will return an empty Optional.
      *
      * @param module the configuration module that serves as the key
-     * @param entry the configuration entry that defines where to look for values
      */
-    public void add(ConfigModule module, ConfigEntry entry) {
-        final Optional<String> read = read(entry);
+    public void load(ConfigModule module) {
+        final Optional<String> read = tryRead(module);
 
         read.ifPresent(s -> properties.put(module, s));
     }
 
     /**
-     * Registers a configuration instance and attempts to load its associated properties file.
+     * Loads the configuration from the class' associated properties file.
      *
      * <p>This method looks for a properties file named after the configuration instance's
      * {@link Config#name()} method in the same package as the configuration class. If found,
@@ -134,19 +115,37 @@ public final class ConfigStore {
      * @param instance the configuration instance
      * @param <T> the type of the configuration class
      */
-    public <T extends Config> void add(Class<T> clazz, T instance, BiConsumer<String, String> registerFunction) {
-        LOG.info("Adding {} to {}", clazz, asProperties(instance));
+    public <T extends Config> void load(Class<T> clazz, T instance, BiConsumer<String, String> registerFunction) {
+        final String fileName = asProperties(instance);
+        LOG.info("Adding {} to {}", clazz, fileName);
 
-        File file = Paths.get("", asProperties(instance)).toAbsolutePath().toFile();
+        File file = Paths.get("", fileName).toAbsolutePath().toFile();
+        if (!file.exists()) {
+            final String property = System.getProperty("forage.config.dir");
+            if (property != null) {
+                file = Paths.get(property, fileName).toAbsolutePath().toFile();
+            } else {
+                final String environment = System.getenv("FORAGE_CONFIG_DIR");
+                if (environment != null) {
+                    file = Paths.get(environment, fileName).toAbsolutePath().toFile();
+                }
+            }
+        }
+
         if (file.exists()) {
-            LOG.info("Found existing config file {}", file);
+            loadProperties(registerFunction, file);
 
-            try (FileInputStream fis = new FileInputStream(file)) {
-                Properties props = new Properties();
+            return;
+        }
 
-                props.load(fis);
-
-                props.forEach((k, v) -> registerFunction.accept((String) k, (String) v));
+        if (classLoader != null) {
+            LOG.info("Trying to use the classloader to read {}", file);
+            final URL resource = classLoader.getResource(asClasspathPath(instance));
+            if (resource == null) {
+                return;
+            }
+            try (InputStream fis = resource.openStream()) {
+                loadProperties(registerFunction, fis);
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             } catch (IOException e) {
@@ -155,34 +154,33 @@ public final class ConfigStore {
         }
     }
 
-    private static <T extends Config> String asProperties(T instance) {
-        return "./" + instance.name() + ".properties";
-    }
+    private static void loadProperties(BiConsumer<String, String> registerFunction, File file) {
+        LOG.info("Found existing config file {}", file);
 
-    /**
-     * Loads properties from the specified URL and adds them to the store.
-     *
-     * <p>This method provides a way to load configuration from external sources such as
-     * files, classpath resources, or network locations. The properties are loaded using
-     * standard Java Properties format and merged with existing properties in the store.
-     *
-     * <p>If the URL is null, this method does nothing. If an I/O error occurs while
-     * reading from the URL, a RuntimeException is thrown.
-     *
-     * @param url the URL to load properties from, may be null
-     * @throws RuntimeException if an I/O error occurs while loading properties
-     */
-    public void add(URL url) {
-        if (url == null) {
-            LOG.warn("URL is null");
-            return;
-        }
-
-        try (InputStream is = url.openStream()) {
-            properties.load(is);
+        try (FileInputStream fis = new FileInputStream(file)) {
+            loadProperties(registerFunction, fis);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static void loadProperties(BiConsumer<String, String> registerFunction, InputStream inputStream)
+            throws IOException {
+        Properties props = new Properties();
+
+        props.load(inputStream);
+
+        props.forEach((k, v) -> registerFunction.accept((String) k, (String) v));
+    }
+
+    private static <T extends Config> String asClasspathPath(T instance) {
+        return instance.getClass().getPackageName().replace(".", "/") + "/" + instance.name() + ".properties";
+    }
+
+    private static <T extends Config> String asProperties(T instance) {
+        return "./" + instance.name() + ".properties";
     }
 
     /**
@@ -197,24 +195,17 @@ public final class ConfigStore {
      * <p>The first non-null value found is returned. If no value is found from any source,
      * an empty Optional is returned.
      *
-     * @param entry the configuration entry defining where to look for values
      * @return an Optional containing the configuration value, or empty if not found
      */
-    private Optional<String> read(ConfigEntry entry) {
-        if (entry != null) {
-            if (entry.envName() != null && !entry.envName().isEmpty()) {
-                final String environmentValue = System.getenv(entry.envName());
-                if (environmentValue != null) {
-                    return Optional.of(environmentValue);
-                }
-            }
+    private Optional<String> tryRead(ConfigModule module) {
+        final String environmentValue = System.getenv(module.envName());
+        if (environmentValue != null) {
+            return Optional.of(environmentValue);
+        }
 
-            if (entry.propertyName() != null && !entry.propertyName().isEmpty()) {
-                final String propertyValue = System.getProperty(entry.propertyName());
-                if (propertyValue != null) {
-                    return Optional.of(propertyValue);
-                }
-            }
+        final String propertyValue = System.getProperty(module.propertyName());
+        if (propertyValue != null) {
+            return Optional.of(propertyValue);
         }
 
         return Optional.empty();
@@ -224,7 +215,7 @@ public final class ConfigStore {
      * Retrieves a configuration value for the specified ConfigModule.
      *
      * <p>This method returns the configuration value that was previously stored for the
-     * given ConfigModule, either through direct registration via {@link #add(ConfigModule, ConfigEntry)}
+     * given ConfigModule, either through direct registration via {@link #load(ConfigModule)}
      * or through properties loaded from files.
      *
      * <p>If no value was found during registration or if the ConfigModule was never registered,
@@ -254,7 +245,7 @@ public final class ConfigStore {
      * </ul>
      *
      * <p><strong>Usage Context:</strong>
-     * Unlike the {@link #add(ConfigModule, ConfigEntry)} method which resolves values from
+     * Unlike the {@link #load(ConfigModule)} method which resolves values from
      * environment variables and system properties, this method directly sets the value without
      * any source resolution. This makes it suitable for scenarios where the value has already
      * been resolved or comes from a different source (like configuration files).
@@ -281,12 +272,20 @@ public final class ConfigStore {
      *
      * @param module the configuration module that serves as the key for storing the value
      * @param value the configuration value to store; may be {@code null} to remove the configuration
-     * @see #add(ConfigModule, ConfigEntry)
+     * @see #load(ConfigModule)
      * @see #get(ConfigModule)
      * @see Config#register(String, String)
      * @since 1.0
      */
     public void set(ConfigModule module, String value) {
         properties.put(module, value);
+    }
+
+    public ClassLoader getClassLoader() {
+        return classLoader;
+    }
+
+    public void setClassLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
     }
 }

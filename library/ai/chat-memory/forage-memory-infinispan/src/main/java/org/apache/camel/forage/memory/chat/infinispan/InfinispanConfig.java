@@ -1,9 +1,25 @@
 package org.apache.camel.forage.memory.chat.infinispan;
 
+import static org.apache.camel.forage.memory.chat.infinispan.InfinispanConfigEntries.CACHE_NAME;
+import static org.apache.camel.forage.memory.chat.infinispan.InfinispanConfigEntries.CONNECTION_TIMEOUT;
+import static org.apache.camel.forage.memory.chat.infinispan.InfinispanConfigEntries.MAX_RETRIES;
+import static org.apache.camel.forage.memory.chat.infinispan.InfinispanConfigEntries.PASSWORD;
+import static org.apache.camel.forage.memory.chat.infinispan.InfinispanConfigEntries.POOL_MAX_ACTIVE;
+import static org.apache.camel.forage.memory.chat.infinispan.InfinispanConfigEntries.POOL_MAX_WAIT;
+import static org.apache.camel.forage.memory.chat.infinispan.InfinispanConfigEntries.POOL_MIN_IDLE;
+import static org.apache.camel.forage.memory.chat.infinispan.InfinispanConfigEntries.REALM;
+import static org.apache.camel.forage.memory.chat.infinispan.InfinispanConfigEntries.SASL_MECHANISM;
+import static org.apache.camel.forage.memory.chat.infinispan.InfinispanConfigEntries.SERVER_LIST;
+import static org.apache.camel.forage.memory.chat.infinispan.InfinispanConfigEntries.SOCKET_TIMEOUT;
+import static org.apache.camel.forage.memory.chat.infinispan.InfinispanConfigEntries.USERNAME;
+
+import java.util.Optional;
 import org.apache.camel.forage.core.util.config.Config;
-import org.apache.camel.forage.core.util.config.ConfigEntry;
 import org.apache.camel.forage.core.util.config.ConfigModule;
 import org.apache.camel.forage.core.util.config.ConfigStore;
+import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configuration class for Infinispan-based chat memory storage in the Camel Forage framework.
@@ -77,27 +93,9 @@ import org.apache.camel.forage.core.util.config.ConfigStore;
  * @since 1.0
  */
 public class InfinispanConfig implements Config {
+    private static final Logger LOG = LoggerFactory.getLogger(InfinispanConfig.class);
 
-    private static final ConfigModule SERVER_LIST = ConfigModule.of(InfinispanConfig.class, "infinispan.server-list");
-    private static final ConfigModule CACHE_NAME = ConfigModule.of(InfinispanConfig.class, "infinispan.cache-name");
-    private static final ConfigModule USERNAME = ConfigModule.of(InfinispanConfig.class, "infinispan.username");
-    private static final ConfigModule PASSWORD = ConfigModule.of(InfinispanConfig.class, "infinispan.password");
-    private static final ConfigModule REALM = ConfigModule.of(InfinispanConfig.class, "infinispan.realm");
-    private static final ConfigModule SASL_MECHANISM =
-            ConfigModule.of(InfinispanConfig.class, "infinispan.sasl-mechanism");
-    private static final ConfigModule CONNECTION_TIMEOUT =
-            ConfigModule.of(InfinispanConfig.class, "infinispan.connection-timeout");
-    private static final ConfigModule SOCKET_TIMEOUT =
-            ConfigModule.of(InfinispanConfig.class, "infinispan.socket-timeout");
-    private static final ConfigModule MAX_RETRIES = ConfigModule.of(InfinispanConfig.class, "infinispan.max-retries");
-
-    // Pool configuration
-    private static final ConfigModule POOL_MAX_ACTIVE =
-            ConfigModule.of(InfinispanConfig.class, "infinispan.pool.max-active");
-    private static final ConfigModule POOL_MIN_IDLE =
-            ConfigModule.of(InfinispanConfig.class, "infinispan.pool.min-idle");
-    private static final ConfigModule POOL_MAX_WAIT =
-            ConfigModule.of(InfinispanConfig.class, "infinispan.pool.max-wait");
+    private final String prefix;
 
     /**
      * Creates a new Infinispan configuration instance and registers configuration entries
@@ -108,26 +106,20 @@ public class InfinispanConfig implements Config {
      * configuration loader to process property files if they exist.
      */
     public InfinispanConfig() {
-        ConfigStore.getInstance().add(SERVER_LIST, ConfigEntry.fromModule(SERVER_LIST, "INFINISPAN_SERVER_LIST"));
-        ConfigStore.getInstance().add(CACHE_NAME, ConfigEntry.fromModule(CACHE_NAME, "INFINISPAN_CACHE_NAME"));
-        ConfigStore.getInstance().add(USERNAME, ConfigEntry.fromModule(USERNAME, "INFINISPAN_USERNAME"));
-        ConfigStore.getInstance().add(PASSWORD, ConfigEntry.fromModule(PASSWORD, "INFINISPAN_PASSWORD"));
-        ConfigStore.getInstance().add(REALM, ConfigEntry.fromModule(REALM, "INFINISPAN_REALM"));
-        ConfigStore.getInstance()
-                .add(SASL_MECHANISM, ConfigEntry.fromModule(SASL_MECHANISM, "INFINISPAN_SASL_MECHANISM"));
-        ConfigStore.getInstance()
-                .add(CONNECTION_TIMEOUT, ConfigEntry.fromModule(CONNECTION_TIMEOUT, "INFINISPAN_CONNECTION_TIMEOUT"));
-        ConfigStore.getInstance()
-                .add(SOCKET_TIMEOUT, ConfigEntry.fromModule(SOCKET_TIMEOUT, "INFINISPAN_SOCKET_TIMEOUT"));
-        ConfigStore.getInstance().add(MAX_RETRIES, ConfigEntry.fromModule(MAX_RETRIES, "INFINISPAN_MAX_RETRIES"));
+        this(null);
+    }
 
-        // Pool configuration
-        ConfigStore.getInstance()
-                .add(POOL_MAX_ACTIVE, ConfigEntry.fromModule(POOL_MAX_ACTIVE, "INFINISPAN_POOL_MAX_ACTIVE"));
-        ConfigStore.getInstance().add(POOL_MIN_IDLE, ConfigEntry.fromModule(POOL_MIN_IDLE, "INFINISPAN_POOL_MIN_IDLE"));
-        ConfigStore.getInstance().add(POOL_MAX_WAIT, ConfigEntry.fromModule(POOL_MAX_WAIT, "INFINISPAN_POOL_MAX_WAIT"));
+    public InfinispanConfig(String prefix) {
+        this.prefix = prefix;
 
-        ConfigStore.getInstance().add(InfinispanConfig.class, this, this::register);
+        // First register new configuration modules. This happens only if a prefix is provided
+        InfinispanConfigEntries.register(prefix);
+
+        // Then, loads the configurations from the properties file associated with this Config module
+        ConfigStore.getInstance().load(InfinispanConfig.class, this, this::register);
+
+        // Lastly, load the overrides defined in system properties and environment variables
+        InfinispanConfigEntries.loadOverrides(prefix);
     }
 
     /**
@@ -136,7 +128,7 @@ public class InfinispanConfig implements Config {
      * @return the server list in format "host1:port1,host2:port2", defaults to "localhost:11222" if not configured
      */
     public String serverList() {
-        return ConfigStore.getInstance().get(SERVER_LIST).orElse("localhost:11222");
+        return ConfigStore.getInstance().get(SERVER_LIST.asNamed(prefix)).orElse("localhost:11222");
     }
 
     /**
@@ -145,7 +137,7 @@ public class InfinispanConfig implements Config {
      * @return the cache name, defaults to "chat-memory" if not configured
      */
     public String cacheName() {
-        return ConfigStore.getInstance().get(CACHE_NAME).orElse("chat-memory");
+        return ConfigStore.getInstance().get(CACHE_NAME.asNamed(prefix)).orElse("chat-memory");
     }
 
     /**
@@ -154,7 +146,7 @@ public class InfinispanConfig implements Config {
      * @return the username, or {@code null} if no authentication is required
      */
     public String username() {
-        return ConfigStore.getInstance().get(USERNAME).orElse(null);
+        return ConfigStore.getInstance().get(USERNAME.asNamed(prefix)).orElse(null);
     }
 
     /**
@@ -163,7 +155,7 @@ public class InfinispanConfig implements Config {
      * @return the password, or {@code null} if no authentication is required
      */
     public String password() {
-        return ConfigStore.getInstance().get(PASSWORD).orElse(null);
+        return ConfigStore.getInstance().get(PASSWORD.asNamed(prefix)).orElse(null);
     }
 
     /**
@@ -172,7 +164,7 @@ public class InfinispanConfig implements Config {
      * @return the realm, defaults to "default" if not configured
      */
     public String realm() {
-        return ConfigStore.getInstance().get(REALM).orElse("default");
+        return ConfigStore.getInstance().get(REALM.asNamed(prefix)).orElse("default");
     }
 
     /**
@@ -181,7 +173,7 @@ public class InfinispanConfig implements Config {
      * @return the SASL mechanism, defaults to "DIGEST-MD5" if not configured
      */
     public String saslMechanism() {
-        return ConfigStore.getInstance().get(SASL_MECHANISM).orElse("DIGEST-MD5");
+        return ConfigStore.getInstance().get(SASL_MECHANISM.asNamed(prefix)).orElse("DIGEST-MD5");
     }
 
     /**
@@ -192,7 +184,7 @@ public class InfinispanConfig implements Config {
      */
     public int connectionTimeout() {
         return ConfigStore.getInstance()
-                .get(CONNECTION_TIMEOUT)
+                .get(CONNECTION_TIMEOUT.asNamed(prefix))
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -211,7 +203,7 @@ public class InfinispanConfig implements Config {
      */
     public int socketTimeout() {
         return ConfigStore.getInstance()
-                .get(SOCKET_TIMEOUT)
+                .get(SOCKET_TIMEOUT.asNamed(prefix))
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -230,7 +222,7 @@ public class InfinispanConfig implements Config {
      */
     public int maxRetries() {
         return ConfigStore.getInstance()
-                .get(MAX_RETRIES)
+                .get(MAX_RETRIES.asNamed(prefix))
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -249,7 +241,7 @@ public class InfinispanConfig implements Config {
      */
     public int poolMaxActive() {
         return ConfigStore.getInstance()
-                .get(POOL_MAX_ACTIVE)
+                .get(POOL_MAX_ACTIVE.asNamed(prefix))
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -268,7 +260,7 @@ public class InfinispanConfig implements Config {
      */
     public int poolMinIdle() {
         return ConfigStore.getInstance()
-                .get(POOL_MIN_IDLE)
+                .get(POOL_MIN_IDLE.asNamed(prefix))
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -287,7 +279,7 @@ public class InfinispanConfig implements Config {
      */
     public int poolMaxWait() {
         return ConfigStore.getInstance()
-                .get(POOL_MAX_WAIT)
+                .get(POOL_MAX_WAIT.asNamed(prefix))
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -296,61 +288,6 @@ public class InfinispanConfig implements Config {
                     }
                 })
                 .orElse(3000);
-    }
-
-    /**
-     * Resolves a configuration property name to its corresponding {@link ConfigModule}.
-     *
-     * <p>This method is used during configuration loading to map property names from
-     * configuration files to their respective configuration modules.
-     *
-     * @param name the configuration property name to resolve
-     * @return the corresponding ConfigModule
-     * @throws IllegalArgumentException if the property name is not recognized
-     */
-    private ConfigModule resolve(String name) {
-        if (SERVER_LIST.name().equals(name)) {
-            return SERVER_LIST;
-        }
-        if (CACHE_NAME.name().equals(name)) {
-            return CACHE_NAME;
-        }
-        if (USERNAME.name().equals(name)) {
-            return USERNAME;
-        }
-        if (PASSWORD.name().equals(name)) {
-            return PASSWORD;
-        }
-        if (REALM.name().equals(name)) {
-            return REALM;
-        }
-        if (SASL_MECHANISM.name().equals(name)) {
-            return SASL_MECHANISM;
-        }
-        if (CONNECTION_TIMEOUT.name().equals(name)) {
-            return CONNECTION_TIMEOUT;
-        }
-        if (SOCKET_TIMEOUT.name().equals(name)) {
-            return SOCKET_TIMEOUT;
-        }
-        if (MAX_RETRIES.name().equals(name)) {
-            return MAX_RETRIES;
-        }
-        if (POOL_MAX_ACTIVE.name().equals(name)) {
-            return POOL_MAX_ACTIVE;
-        }
-        if (POOL_MIN_IDLE.name().equals(name)) {
-            return POOL_MIN_IDLE;
-        }
-        if (POOL_MAX_WAIT.name().equals(name)) {
-            return POOL_MAX_WAIT;
-        }
-
-        throw new IllegalArgumentException("Unknown Infinispan configuration property: " + name
-                + ". Supported properties: infinispan.server-list, infinispan.cache-name, infinispan.username, "
-                + "infinispan.password, infinispan.realm, infinispan.sasl-mechanism, infinispan.connection-timeout, "
-                + "infinispan.socket-timeout, infinispan.max-retries, infinispan.pool.max-active, "
-                + "infinispan.pool.min-idle, infinispan.pool.max-wait");
     }
 
     /**
@@ -366,20 +303,42 @@ public class InfinispanConfig implements Config {
         return "forage-memory-infinispan";
     }
 
-    /**
-     * Registers a configuration property value that was loaded from a configuration file.
-     *
-     * <p>This method is called by the configuration loading system to dynamically
-     * register properties that were found in the module's properties file or other
-     * external configuration sources.
-     *
-     * @param name the configuration property name (e.g., "infinispan.server-list", "infinispan.cache-name")
-     * @param value the configuration property value
-     * @throws IllegalArgumentException if the property name is not recognized by this module
-     */
     @Override
     public void register(String name, String value) {
-        ConfigModule config = resolve(name);
-        ConfigStore.getInstance().set(config, value);
+        Optional<ConfigModule> config = InfinispanConfigEntries.find(prefix, name);
+
+        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+    }
+
+    public ConfigurationBuilder toConfigurationBuilder() {
+        ConfigurationBuilder builder = new ConfigurationBuilder();
+        builder.addServers(serverList());
+        builder.connectionTimeout(connectionTimeout());
+        builder.socketTimeout(socketTimeout());
+        builder.maxRetries(maxRetries());
+
+        // Configure connection pool settings
+        LOG.debug(
+                "Configuring Infinispan connection pool: maxActive={}, maxIdle={}, maxTotal={}, minIdle={}, maxWait={}ms",
+                poolMaxActive(),
+                poolMinIdle(),
+                poolMaxWait());
+        builder.connectionPool()
+                .maxActive(poolMaxActive())
+                .minIdle(poolMinIdle())
+                .maxWait(poolMaxWait());
+
+        // Configure authentication if credentials are provided
+        if (username() != null && password() != null) {
+            LOG.debug("Configuring SASL authentication with mechanism: {}", saslMechanism());
+            builder.security()
+                    .authentication()
+                    .enable()
+                    .username(username())
+                    .password(password())
+                    .realm(realm())
+                    .saslMechanism(saslMechanism());
+        }
+        return builder;
     }
 }

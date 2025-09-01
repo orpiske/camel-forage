@@ -94,8 +94,10 @@ public interface VectorDBFactory {
 ```java
 package org.apache.camel.forage.core.vector.db;
 
-public interface VectorDBProvider {
-    VectorDatabase newVectorDB();
+import org.apache.camel.forage.core.common.BeanProvider;
+
+public interface VectorDBProvider extends BeanProvider<VectorDatabase> {
+    // Inherits create() and create(String id) methods from BeanProvider
 }
 ```
 
@@ -163,14 +165,11 @@ package org.apache.camel.forage.vector.db.milvus;
 import org.apache.camel.forage.core.vector.db.VectorDBProvider;
 
 public class MilvusProvider implements VectorDBProvider {
-    private final MilvusConfig config;
-    
-    public MilvusProvider() {
-        this.config = new MilvusConfig();
-    }
     
     @Override
-    public VectorDatabase newVectorDB() {
+    public VectorDatabase create(String id) {
+        MilvusConfig config = new MilvusConfig(id);
+        
         return MilvusClient.builder()
             .host(config.host())
             .port(config.port())
@@ -181,19 +180,67 @@ public class MilvusProvider implements VectorDBProvider {
 }
 ```
 
-#### Configuration Class
+#### Configuration Classes
+
+Configuration in Camel Forage uses a two-class pattern supporting named/prefixed configurations:
+
+**MilvusConfigEntries.java:**
+```java
+package org.apache.camel.forage.vector.db.milvus;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.camel.forage.core.util.config.ConfigEntries;
+import org.apache.camel.forage.core.util.config.ConfigEntry;
+import org.apache.camel.forage.core.util.config.ConfigModule;
+
+public final class MilvusConfigEntries extends ConfigEntries {
+    public static final ConfigModule HOST = ConfigModule.of(MilvusConfig.class, "milvus.host");
+    public static final ConfigModule PORT = ConfigModule.of(MilvusConfig.class, "milvus.port");
+    public static final ConfigModule USERNAME = ConfigModule.of(MilvusConfig.class, "milvus.username");
+    public static final ConfigModule PASSWORD = ConfigModule.of(MilvusConfig.class, "milvus.password");
+
+    private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new HashMap<>();
+
+    static {
+        CONFIG_MODULES.put(HOST, ConfigEntry.fromModule(HOST, "MILVUS_HOST"));
+        CONFIG_MODULES.put(PORT, ConfigEntry.fromModule(PORT, "MILVUS_PORT"));
+        CONFIG_MODULES.put(USERNAME, ConfigEntry.fromModule(USERNAME, "MILVUS_USERNAME"));
+        CONFIG_MODULES.put(PASSWORD, ConfigEntry.fromModule(PASSWORD, "MILVUS_PASSWORD"));
+    }
+
+    public static Map<ConfigModule, ConfigEntry> entries() {
+        return Collections.unmodifiableMap(CONFIG_MODULES);
+    }
+
+    public static ConfigModule find(String prefix, String name) {
+        return find(CONFIG_MODULES, prefix, name);
+    }
+
+    public static void register(String prefix) {
+        register(CONFIG_MODULES, prefix);
+    }
+}
+```
 
 **MilvusConfig.java:**
 ```java
 package org.apache.camel.forage.vector.db.milvus;
 
+import static org.apache.camel.forage.vector.db.milvus.MilvusConfigEntries.HOST;
+import static org.apache.camel.forage.vector.db.milvus.MilvusConfigEntries.PORT;
+import static org.apache.camel.forage.vector.db.milvus.MilvusConfigEntries.USERNAME;
+import static org.apache.camel.forage.vector.db.milvus.MilvusConfigEntries.PASSWORD;
+
 import org.apache.camel.forage.core.util.config.Config;
-import org.apache.camel.forage.core.util.config.ConfigEntry;
 import org.apache.camel.forage.core.util.config.ConfigModule;
 import org.apache.camel.forage.core.util.config.ConfigStore;
 
 /**
  * Configuration class for Milvus vector database integration.
+ * 
+ * <p>Supports both default and named configurations for multi-instance setups.
  * 
  * <p><strong>Configuration Parameters:</strong>
  * <ul>
@@ -202,23 +249,42 @@ import org.apache.camel.forage.core.util.config.ConfigStore;
  *   <li><strong>MILVUS_USERNAME</strong> - Username for authentication (optional)</li>
  *   <li><strong>MILVUS_PASSWORD</strong> - Password for authentication (optional)</li>
  * </ul>
+ * 
+ * <p><strong>Named Configuration Example:</strong>
+ * <pre>{@code
+ * // Default configuration
+ * MilvusConfig defaultConfig = new MilvusConfig();
+ * 
+ * // Named configurations
+ * MilvusConfig vectorStoreConfig = new MilvusConfig("vectorstore");
+ * MilvusConfig embeddingsConfig = new MilvusConfig("embeddings");
+ * }</pre>
  */
 public class MilvusConfig implements Config {
     
-    private static final ConfigModule HOST = ConfigModule.of(MilvusConfig.class, "host");
-    private static final ConfigModule PORT = ConfigModule.of(MilvusConfig.class, "port");
-    private static final ConfigModule USERNAME = ConfigModule.of(MilvusConfig.class, "username");
-    private static final ConfigModule PASSWORD = ConfigModule.of(MilvusConfig.class, "password");
-    
     private static final String DEFAULT_HOST = "localhost";
     private static final Integer DEFAULT_PORT = 19530;
+    private final String prefix;
     
     public MilvusConfig() {
-        ConfigStore.getInstance().add(HOST, ConfigEntry.fromEnv("MILVUS_HOST"));
-        ConfigStore.getInstance().add(PORT, ConfigEntry.fromEnv("MILVUS_PORT"));
-        ConfigStore.getInstance().add(USERNAME, ConfigEntry.fromEnv("MILVUS_USERNAME"));
-        ConfigStore.getInstance().add(PASSWORD, ConfigEntry.fromEnv("MILVUS_PASSWORD"));
-        ConfigStore.getInstance().add(MilvusConfig.class, this);
+        this(null);
+    }
+    
+    public MilvusConfig(String prefix) {
+        this.prefix = prefix;
+        
+        MilvusConfigEntries.register(prefix);
+        ConfigStore.getInstance().add(MilvusConfig.class, this, this::register);
+    }
+    
+    private ConfigModule resolve(String name) {
+        return MilvusConfigEntries.find(prefix, name);
+    }
+    
+    @Override
+    public void register(String name, String value) {
+        ConfigModule config = resolve(name);
+        ConfigStore.getInstance().set(config, value);
     }
     
     @Override
@@ -227,21 +293,21 @@ public class MilvusConfig implements Config {
     }
     
     public String host() {
-        return ConfigStore.getInstance().get(HOST).orElse(DEFAULT_HOST);
+        return ConfigStore.getInstance().get(HOST.asNamed(prefix)).orElse(DEFAULT_HOST);
     }
     
     public Integer port() {
-        return ConfigStore.getInstance().get(PORT)
+        return ConfigStore.getInstance().get(PORT.asNamed(prefix))
             .map(Integer::parseInt)
             .orElse(DEFAULT_PORT);
     }
     
     public String username() {
-        return ConfigStore.getInstance().get(USERNAME).orElse(null);
+        return ConfigStore.getInstance().get(USERNAME.asNamed(prefix)).orElse(null);
     }
     
     public String password() {
-        return ConfigStore.getInstance().get(PASSWORD).orElse(null);
+        return ConfigStore.getInstance().get(PASSWORD.asNamed(prefix)).orElse(null);
     }
 }
 ```
@@ -319,6 +385,7 @@ Make sure to include the specific provider on your classpath:
 
 ### 3.3 Configuration
 
+#### Default Configuration
 Configure using environment variables:
 
 ```bash
@@ -346,13 +413,52 @@ username=admin
 password=password123
 ```
 
+#### Named/Prefixed Configuration
+For multi-instance setups using named configurations:
+
+```bash
+# Environment variables (prefix becomes uppercase)
+export MILVUS_HOST="default.milvus.com"           # Default config
+export vectorstore.milvus.host="vs.milvus.com"   # "vectorstore" config
+export embeddings.milvus.host="emb.milvus.com"   # "embeddings" config
+
+# System properties
+-Dmilvus.host=default.milvus.com                  # Default config
+-Dvectorstore.milvus.host=vs.milvus.com          # "vectorstore" config
+-Dembeddings.milvus.host=emb.milvus.com          # "embeddings" config
+```
+
+In your provider code:
+```java
+public class MultiInstanceMilvusProvider implements VectorDBProvider {
+    @Override
+    public VectorDatabase create(String id) {
+        // Use named configuration with the provided id
+        MilvusConfig config = new MilvusConfig(id);
+        return MilvusClient.builder()
+            .host(config.host())
+            .port(config.port())
+            .build();
+    }
+}
+```
+
 ## Best Practices
 
-### 1. Configuration Guidelines
-- Always follow the Forage configuration pattern with `Config` classes
-- Use meaningful environment variable names with a consistent prefix
+### 1. Configuration and Provider Guidelines
+- Always follow the Forage two-class configuration pattern with `Config` and `ConfigEntries` classes
+- Create a `*ConfigEntries` class extending `ConfigEntries` with static fields and maps
+- Support both default and named/prefixed configurations in the main `Config` class
+- Use meaningful environment variable names with a consistent prefix (e.g., `MILVUS_*`)
+- Use dot-notation for ConfigModule names (e.g., `milvus.host`, `milvus.port`)
 - Provide sensible defaults where appropriate
-- Document all configuration parameters comprehensively
+- Document all configuration parameters comprehensively including named configuration examples
+
+**BeanProvider Pattern:**
+- All provider interfaces must extend `BeanProvider<T>` for consistency
+- Implement the `create(String id)` method to support named configurations
+- Use the provided `id` parameter to create named configurations: `new Config(id)`
+- The `create()` method is provided automatically and calls `create(null)` for default configuration
 
 ### 2. ServiceLoader Registration
 - Don't forget to create the ServiceLoader resource file

@@ -70,7 +70,7 @@ public abstract class ChatMemoryFactoryTCK {
     void shouldCreateChatMemoryProvider() {
         ChatMemoryFactory factory = createChatMemoryFactory();
 
-        ChatMemoryProvider provider = factory.newChatMemory();
+        ChatMemoryProvider provider = factory.create();
 
         assertThat(provider).isNotNull();
     }
@@ -79,8 +79,8 @@ public abstract class ChatMemoryFactoryTCK {
     void shouldCreateMultipleChatMemoryProviders() {
         ChatMemoryFactory factory = createChatMemoryFactory();
 
-        ChatMemoryProvider provider1 = factory.newChatMemory();
-        ChatMemoryProvider provider2 = factory.newChatMemory();
+        ChatMemoryProvider provider1 = factory.create();
+        ChatMemoryProvider provider2 = factory.create();
 
         assertThat(provider1).isNotNull();
         assertThat(provider2).isNotNull();
@@ -91,7 +91,7 @@ public abstract class ChatMemoryFactoryTCK {
     @Test
     void shouldCreateChatMemoryFromProvider() {
         ChatMemoryFactory factory = createChatMemoryFactory();
-        ChatMemoryProvider provider = factory.newChatMemory();
+        ChatMemoryProvider provider = factory.create();
 
         ChatMemory memory = provider.get("test-memory-id");
 
@@ -101,7 +101,7 @@ public abstract class ChatMemoryFactoryTCK {
     @Test
     void shouldStoreAndRetrieveMessages() {
         ChatMemoryFactory factory = createChatMemoryFactory();
-        ChatMemoryProvider provider = factory.newChatMemory();
+        ChatMemoryProvider provider = factory.create();
         ChatMemory memory = provider.get("test-memory-id");
 
         UserMessage userMessage = UserMessage.from("Hello, how are you?");
@@ -120,7 +120,7 @@ public abstract class ChatMemoryFactoryTCK {
     @Test
     void shouldIsolateMemoryBetweenDifferentIds() {
         ChatMemoryFactory factory = createChatMemoryFactory();
-        ChatMemoryProvider provider = factory.newChatMemory();
+        ChatMemoryProvider provider = factory.create();
 
         ChatMemory memory1 = provider.get("memory-1");
         ChatMemory memory2 = provider.get("memory-2");
@@ -141,7 +141,7 @@ public abstract class ChatMemoryFactoryTCK {
     @Test
     void shouldReturnSameMemoryForSameId() {
         ChatMemoryFactory factory = createChatMemoryFactory();
-        ChatMemoryProvider provider = factory.newChatMemory();
+        ChatMemoryProvider provider = factory.create();
 
         ChatMemory memory1 = provider.get("same-id");
         ChatMemory memory2 = provider.get("same-id");
@@ -161,7 +161,7 @@ public abstract class ChatMemoryFactoryTCK {
     @Test
     void shouldHandleEmptyMemory() {
         ChatMemoryFactory factory = createChatMemoryFactory();
-        ChatMemoryProvider provider = factory.newChatMemory();
+        ChatMemoryProvider provider = factory.create();
         ChatMemory memory = provider.get("empty-memory");
 
         List<ChatMessage> messages = memory.messages();
@@ -172,7 +172,7 @@ public abstract class ChatMemoryFactoryTCK {
     @Test
     void shouldClearMemory() {
         ChatMemoryFactory factory = createChatMemoryFactory();
-        ChatMemoryProvider provider = factory.newChatMemory();
+        ChatMemoryProvider provider = factory.create();
         ChatMemory memory = provider.get("clear-test");
 
         memory.add(UserMessage.from("First message"));
@@ -188,7 +188,7 @@ public abstract class ChatMemoryFactoryTCK {
     @Test
     void shouldHandleMultipleMessageTypes() {
         ChatMemoryFactory factory = createChatMemoryFactory();
-        ChatMemoryProvider provider = factory.newChatMemory();
+        ChatMemoryProvider provider = factory.create();
         ChatMemory memory = provider.get("multi-type-test");
 
         UserMessage userMessage = UserMessage.from("User question");

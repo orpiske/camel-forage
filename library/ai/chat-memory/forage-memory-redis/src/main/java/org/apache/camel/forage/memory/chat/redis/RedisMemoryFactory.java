@@ -129,7 +129,7 @@ public class RedisMemoryFactory implements ChatMemoryFactory {
      * @throws RuntimeException if Redis connection cannot be established or configured
      */
     @Override
-    public ChatMemoryProvider newChatMemory() {
+    public ChatMemoryProvider create() {
         return memoryId -> {
             LOG.debug("Creating message window chat memory for ID: {}", memoryId);
             return MessageWindowChatMemory.builder()
@@ -138,6 +138,11 @@ public class RedisMemoryFactory implements ChatMemoryFactory {
                     .chatMemoryStore(REDIS_STORE)
                     .build();
         };
+    }
+
+    @Override
+    public ChatMemoryProvider create(String id) {
+        throw new UnsupportedOperationException("Named chat memory stores are not yet supported for Redis");
     }
 
     /**

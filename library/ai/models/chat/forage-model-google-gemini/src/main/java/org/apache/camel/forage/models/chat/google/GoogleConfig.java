@@ -1,7 +1,10 @@
 package org.apache.camel.forage.models.chat.google;
 
+import static org.apache.camel.forage.models.chat.google.GoogleConfigEntries.API_KEY;
+import static org.apache.camel.forage.models.chat.google.GoogleConfigEntries.MODEL_NAME;
+
+import java.util.Optional;
 import org.apache.camel.forage.core.util.config.Config;
-import org.apache.camel.forage.core.util.config.ConfigEntry;
 import org.apache.camel.forage.core.util.config.ConfigModule;
 import org.apache.camel.forage.core.util.config.ConfigStore;
 import org.apache.camel.forage.core.util.config.MissingConfigException;
@@ -55,8 +58,7 @@ import org.apache.camel.forage.core.util.config.MissingConfigException;
  */
 public class GoogleConfig implements Config {
 
-    private static final ConfigModule API_KEY = ConfigModule.of(GoogleConfig.class, "google.api.key");
-    private static final ConfigModule MODEL_NAME = ConfigModule.of(GoogleConfig.class, "google.model.name");
+    private final String prefix;
 
     /**
      * Constructs a new GoogleConfig and registers configuration parameters with the ConfigStore.
@@ -73,28 +75,27 @@ public class GoogleConfig implements Config {
      * when the getter methods are called, not during construction.
      */
     public GoogleConfig() {
-        ConfigStore.getInstance().add(API_KEY, ConfigEntry.fromModule(API_KEY, "GOOGLE_API_KEY"));
-        ConfigStore.getInstance().add(MODEL_NAME, ConfigEntry.fromModule(MODEL_NAME, "GOOGLE_MODEL_NAME"));
-        ConfigStore.getInstance().add(GoogleConfig.class, this, this::register);
+        this(null);
     }
 
-    private ConfigModule resolve(String name) {
-        if (API_KEY.name().equals(name)) {
-            return API_KEY;
-        }
+    public GoogleConfig(String prefix) {
+        this.prefix = prefix;
 
-        if (MODEL_NAME.name().equals(name)) {
-            return MODEL_NAME;
-        }
+        // First register new configuration modules. This happens only if a prefix is provided
+        GoogleConfigEntries.register(prefix);
 
-        throw new IllegalArgumentException("Unknown config entry: " + name);
+        // Then, loads the configurations from the properties file associated with this Config module
+        ConfigStore.getInstance().load(GoogleConfig.class, this, this::register);
+
+        // Lastly, load the overrides defined in system properties and environment variables
+        GoogleConfigEntries.loadOverrides(prefix);
     }
 
     @Override
     public void register(String name, String value) {
-        ConfigModule config = resolve(name);
+        Optional<ConfigModule> config = GoogleConfigEntries.find(prefix, name);
 
-        ConfigStore.getInstance().set(config, value);
+        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
     }
 
     /**
@@ -133,7 +134,7 @@ public class GoogleConfig implements Config {
      */
     public String apiKey() {
         return ConfigStore.getInstance()
-                .get(API_KEY)
+                .get(API_KEY.asNamed(prefix))
                 .orElseThrow(() -> new MissingConfigException("Missing Google API key"));
     }
 
@@ -163,7 +164,7 @@ public class GoogleConfig implements Config {
      */
     public String modelName() {
         return ConfigStore.getInstance()
-                .get(MODEL_NAME)
+                .get(MODEL_NAME.asNamed(prefix))
                 .orElseThrow(() -> new MissingConfigException("Missing Google model name"));
     }
 }

@@ -58,13 +58,29 @@ The project heavily uses Java's ServiceLoader mechanism for component discovery:
 - **Memory Factories**: `org.apache.camel.forage.core.ai.ChatMemoryFactory`
 - **Vector DB Providers**: `org.apache.camel.forage.core.vectordb.EmbeddingStoreProvider`
 
-### 2. Factory Pattern
+### 2. Bean Provider Pattern
 
-Core interfaces define factory contracts:
+All bean creation follows a consistent pattern through the `BeanProvider<T>` interface:
+
+#### Core BeanProvider Interface
+```java
+public interface BeanProvider<T> {
+    default T create() { return create(null); }
+    T create(String id);
+}
+```
+
+#### Specialized Provider Interfaces
+Core interfaces extend `BeanProvider` for type safety:
 - `AgentFactory` - Creates AI agents
-- `ModelProvider` - Creates chat models
-- `ChatMemoryFactory` - Creates memory providers
-- `EmbeddingStoreProvider` - Creates vector databases
+- `ModelProvider extends BeanProvider<ChatModel>` - Creates chat models with optional prefix support
+- `ChatMemoryFactory extends BeanProvider<ChatMemoryProvider>` - Creates memory providers with optional prefix support
+- `EmbeddingStoreProvider extends BeanProvider<EmbeddingStore<TextSegment>>` - Creates vector databases with optional prefix support
+
+#### Provider Method Pattern
+All providers implement both methods:
+- `create()` - Creates bean with default configuration
+- `create(String id)` - Creates bean with named/prefixed configuration
 
 ### 3. Configuration System
 
@@ -75,24 +91,52 @@ All configuration classes implement `org.apache.camel.forage.core.util.config.Co
 - `String name()` - Unique module identifier
 - `void register(String name, String value)` - Property registration method
 
-#### Configuration Pattern
+#### Configuration Pattern (Current Implementation)
+Starting with version 1.0, configuration classes use a two-class pattern supporting named/prefixed configurations:
+
+**1. ConfigEntries Class:**
+```java
+public final class ExampleConfigEntries extends ConfigEntries {
+    public static final ConfigModule API_KEY = ConfigModule.of(ExampleConfig.class, "example.api.key");
+    
+    private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new HashMap<>();
+    
+    static {
+        CONFIG_MODULES.put(API_KEY, ConfigEntry.fromModule(API_KEY, "EXAMPLE_API_KEY"));
+    }
+    
+    public static Map<ConfigModule, ConfigEntry> entries() {
+        return Collections.unmodifiableMap(CONFIG_MODULES);
+    }
+    
+    public static ConfigModule find(String prefix, String name) {
+        return find(CONFIG_MODULES, prefix, name);
+    }
+    
+    public static void register(String prefix) {
+        register(CONFIG_MODULES, prefix);
+    }
+}
+```
+
+**2. Main Config Class:**
 ```java
 public class ExampleConfig implements Config {
-    private static final ConfigModule API_KEY = ConfigModule.of(ExampleConfig.class, "api-key");
+    private final String prefix;
     
     public ExampleConfig() {
-        ConfigStore.getInstance().add(API_KEY, ConfigEntry.fromEnv("EXAMPLE_API_KEY"));
+        this(null);
+    }
+    
+    public ExampleConfig(String prefix) {
+        this.prefix = prefix;
+        
+        ExampleConfigEntries.register(prefix);
         ConfigStore.getInstance().add(ExampleConfig.class, this, this::register);
     }
     
-    @Override
-    public String name() {
-        return "forage-module-example";
-    }
-    
     private ConfigModule resolve(String name) {
-        if (API_KEY.name().equals(name)) return API_KEY;
-        throw new IllegalArgumentException("Unknown config entry: " + name);
+        return ExampleConfigEntries.find(prefix, name);
     }
     
     @Override
@@ -100,7 +144,43 @@ public class ExampleConfig implements Config {
         ConfigModule config = resolve(name);
         ConfigStore.getInstance().set(config, value);
     }
+    
+    @Override
+    public String name() {
+        return "forage-module-example";
+    }
+    
+    public String apiKey() {
+        return ConfigStore.getInstance()
+                .get(ExampleConfigEntries.API_KEY.asNamed(prefix))
+                .orElseThrow(() -> new MissingConfigException("Missing API key"));
+    }
 }
+```
+
+#### Named/Prefixed Configuration Support
+All configuration classes now support prefixed configurations for multi-instance setups:
+
+```java
+// Default configuration
+ExampleConfig defaultConfig = new ExampleConfig();
+
+// Named configurations
+ExampleConfig agent1Config = new ExampleConfig("agent1");
+ExampleConfig agent2Config = new ExampleConfig("agent2");
+```
+
+This allows different configurations:
+```bash
+# Environment variables
+export EXAMPLE_API_KEY="default-key"              # Used by default config
+export agent1.example.api.key="agent1-key"       # Used by "agent1" config
+export agent2.example.api.key="agent2-key"       # Used by "agent2" config
+
+# System properties
+-Dexample.api.key=default-key                     # Default config
+-Dagent1.example.api.key=agent1-key              # "agent1" config
+-Dagent2.example.api.key=agent2-key              # "agent2" config
 ```
 
 #### Configuration Sources (in precedence order)
@@ -175,14 +255,11 @@ Contains vector database interfaces:
 1. **Create provider class**:
 ```java
 public class NewModelProvider implements ModelProvider {
-    private final NewModelConfig config;
-    
-    public NewModelProvider() {
-        this.config = new NewModelConfig();
-    }
     
     @Override
-    public ChatModel newModel() {
+    public ChatModel create(String id) {
+        NewModelConfig config = new NewModelConfig(id);
+        
         return NewModelClient.builder()
             .apiKey(config.apiKey())
             .modelName(config.modelName())
@@ -191,7 +268,7 @@ public class NewModelProvider implements ModelProvider {
 }
 ```
 
-2. **Create configuration class** (following the pattern above)
+2. **Create configuration classes** (following the two-class pattern above)
 
 3. **Register with ServiceLoader**:
    - File: `META-INF/services/org.apache.camel.forage.core.ai.ModelProvider`
@@ -202,14 +279,11 @@ public class NewModelProvider implements ModelProvider {
 1. **Create provider class**:
 ```java
 public class NewVectorDbProvider implements EmbeddingStoreProvider {
-    private final NewVectorDbConfig config;
-    
-    public NewVectorDbProvider() {
-        this.config = new NewVectorDbConfig();
-    }
     
     @Override
-    public EmbeddingStore<TextSegment> newEmbeddingStore() {
+    public EmbeddingStore<TextSegment> create(String id) {
+        NewVectorDbConfig config = new NewVectorDbConfig(id);
+        
         return NewVectorDb.builder()
             .host(config.host())
             .port(config.port())
@@ -218,7 +292,7 @@ public class NewVectorDbProvider implements EmbeddingStoreProvider {
 }
 ```
 
-2. **Create configuration class** (following the pattern above)
+2. **Create configuration classes** (following the two-class pattern above)
 
 3. **Register with ServiceLoader**:
    - File: `META-INF/services/org.apache.camel.forage.core.vectordb.EmbeddingStoreProvider`
@@ -298,9 +372,19 @@ mvn clean install
 - No additional comments should be added unless explicitly requested
 
 ### Configuration Classes Must Include
-1. `resolve(String name)` method mapping property names to ConfigModules
-2. `register(String name, String value)` method implementing the Config interface
-3. Constructor registration: `ConfigStore.getInstance().add(ConfigClass.class, this, this::register)`
+**For ConfigEntries classes:**
+1. `ConfigModule` static fields for each configuration parameter
+2. Static `CONFIG_MODULES` map with `ConfigEntry` mappings
+3. Static `entries()`, `find(prefix, name)`, and `register(prefix)` methods
+4. Extend `ConfigEntries` abstract class
+
+**For main Config classes:**
+1. `prefix` field to support named configurations
+2. Default constructor calling `this(null)` and prefixed constructor
+3. `resolve(String name)` method delegating to `ConfigEntries.find(prefix, name)`
+4. `register(String name, String value)` method implementing the Config interface
+5. Constructor registration: `ConfigStore.getInstance().add(ConfigClass.class, this, this::register)`
+6. All getter methods using `configModule.asNamed(prefix)` when accessing ConfigStore
 
 ### ServiceLoader Registration
 - Always create `META-INF/services/<interface-name>` files
