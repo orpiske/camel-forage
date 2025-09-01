@@ -38,6 +38,16 @@ Lightweight, stateless agent implementation for single-turn interactions.
 - **Use Case**: API endpoints, batch processing, simple queries
 - **Dependencies**: Factory default, langchain4j
 
+### [forage-agent-multi-module](forage-agent-multi-module/README.md)
+**Multi-Module Agent**
+
+Sophisticated agent that coordinates multiple AI agents for complex collaborative tasks.
+
+- **Purpose**: Multi-agent coordination and collaboration
+- **Key Features**: configurable agent count, thread pool management
+- **Use Case**: Complex analysis, decision making, multi-perspective problem solving
+- **Dependencies**: Factory default, langchain4j, core common
+
 ## Quick Start
 
 ### 1. Choose Your Agent Type
@@ -110,17 +120,18 @@ To check how it can be used in Camel routes, please read the specific agent docu
 
 ## Agent Comparison
 
-| Feature | Memory Aware | Memoryless | Factory Default |
-|---------|--------------|------------|-----------------|
-| **Type** | Agent Implementation | Agent Implementation | Agent Factory |
-| **Memory Support** | ✅ Full memory support | ❌ No memory | 🔧 Configures agents |
-| **Use Case** | Multi-turn conversations | Single interactions | Component discovery |
-| **Resource Usage** | Higher (stores history) | Lower (stateless) | Minimal (factory only) |
-| **Memory ID** | ✅ Required | ❌ Ignored | 🔧 Passes through |
-| **Conversation History** | ✅ Maintained | ❌ None | 🔧 Depends on agent |
-| **Thread Safety** | ✅ Yes | ✅ Yes | ✅ Yes |
-| **RAG Support** | ✅ Yes | ✅ Yes | 🔧 Configures |
-| **Guardrails** | ✅ Yes | ✅ Yes | 🔧 Configures |
+| Feature | Memory Aware | Memoryless | Multi-Module | Factory Default |
+|---------|--------------|------------|--------------|-----------------|
+| **Type** | Agent Implementation | Agent Implementation | Agent Implementation | Agent Factory |
+| **Memory Support** | ✅ Full memory support | ❌ No memory | ❌ No memory | 🔧 Configures agents |
+| **Multi-Agent Coordination** | ❌ Single agent | ❌ Single agent | ✅ Multiple agents | 🔧 Manages agents |
+| **Use Case** | Multi-turn conversations | Single interactions | Complex collaborative tasks | Component discovery |
+| **Resource Usage** | Higher (stores history) | Lower (stateless) | Highest (multiple agents) | Minimal (factory only) |
+| **Memory ID** | ✅ Required | ❌ Ignored | ❌ Ignored | 🔧 Passes through |
+| **Conversation History** | ✅ Maintained | ❌ None | ❌ None | 🔧 Depends on agent |
+| **Thread Safety** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
+| **RAG Support** | ✅ Yes | ✅ Yes | ✅ Yes | 🔧 Configures |
+| **Guardrails** | ✅ Yes | ✅ Yes | ✅ Yes | 🔧 Configures |
 
 ## Architecture
 
@@ -311,6 +322,7 @@ The agents provide comprehensive error handling:
 
 ## See Also
 
+- [Multi-Agent Development Guide](../../../docs/multi-agent-guide.md) - Complete guide for creating multi-agent systems with Camel and Kaoto
 - [Model Providers](../models/chat/README.md) - Available AI model integrations
 - [Memory Providers](../chat-memory/README.md) - Chat memory implementations
 - [Contributing Beans Guide](../../../docs/contributing-beans.md) - Creating custom components

@@ -66,6 +66,7 @@ based on the dependencies available on the classpath.
 - **forage-agent-factory-default** - Default agent factory and common agent utilities ([Documentation](library/ai/agents/forage-agent-factory-default/README.md))
 - **forage-agent-memory-aware** - Memory-aware agent implementation ([Documentation](library/ai/agents/forage-agent-memory-aware/README.md))
 - **forage-agent-memoryless** - Stateless agent implementation ([Documentation](library/ai/agents/forage-agent-memoryless/README.md))
+- **forage-agent-multi-module** - Multi-agent coordination system ([Documentation](library/ai/agents/forage-agent-multi-module/README.md))
 
 📋 **[Complete Agents Documentation](library/ai/agents/README.md)** - Comprehensive guide to all agent components
 
