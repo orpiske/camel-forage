@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  *
  * <p><strong>Thread Safety:</strong>
  * This factory is thread-safe and can be safely used in concurrent environments.
- * Each call to {@link #newChatMemory()} returns a provider that can handle multiple
+ * Each call to {@link #create()} ()} returns a provider that can handle multiple
  * concurrent memory operations.
  *
  * @see ChatMemoryFactory
@@ -58,34 +58,7 @@ public class InfinispanMemoryFactory implements ChatMemoryFactory {
 
         try {
             // Initialize Infinispan cache manager with configuration from InfinispanConfig
-            ConfigurationBuilder builder = new ConfigurationBuilder();
-            builder.addServers(CONFIG.serverList());
-            builder.connectionTimeout(CONFIG.connectionTimeout());
-            builder.socketTimeout(CONFIG.socketTimeout());
-            builder.maxRetries(CONFIG.maxRetries());
-
-            // Configure connection pool settings
-            LOG.debug(
-                    "Configuring Infinispan connection pool: maxActive={}, maxIdle={}, maxTotal={}, minIdle={}, maxWait={}ms",
-                    CONFIG.poolMaxActive(),
-                    CONFIG.poolMinIdle(),
-                    CONFIG.poolMaxWait());
-            builder.connectionPool()
-                    .maxActive(CONFIG.poolMaxActive())
-                    .minIdle(CONFIG.poolMinIdle())
-                    .maxWait(CONFIG.poolMaxWait());
-
-            // Configure authentication if credentials are provided
-            if (CONFIG.username() != null && CONFIG.password() != null) {
-                LOG.debug("Configuring SASL authentication with mechanism: {}", CONFIG.saslMechanism());
-                builder.security()
-                        .authentication()
-                        .enable()
-                        .username(CONFIG.username())
-                        .password(CONFIG.password())
-                        .realm(CONFIG.realm())
-                        .saslMechanism(CONFIG.saslMechanism());
-            }
+            final ConfigurationBuilder builder = CONFIG.toConfigurationBuilder();
 
             CACHE_MANAGER = new RemoteCacheManager(builder.build());
 
@@ -154,7 +127,7 @@ public class InfinispanMemoryFactory implements ChatMemoryFactory {
      * @throws RuntimeException if Infinispan connection cannot be established or configured
      */
     @Override
-    public ChatMemoryProvider newChatMemory() {
+    public ChatMemoryProvider create() {
         return memoryId -> {
             LOG.debug("Creating message window chat memory for ID: {}", memoryId);
             return MessageWindowChatMemory.builder()
@@ -163,6 +136,11 @@ public class InfinispanMemoryFactory implements ChatMemoryFactory {
                     .chatMemoryStore(INFINISPAN_STORE)
                     .build();
         };
+    }
+
+    @Override
+    public ChatMemoryProvider create(String id) {
+        throw new UnsupportedOperationException("Named chat memory stores are not yet supported for Infinispan");
     }
 
     /**

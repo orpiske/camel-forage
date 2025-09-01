@@ -1,0 +1,74 @@
+package org.apache.camel.forage.vectordb.pinecone;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import org.apache.camel.forage.core.util.config.ConfigEntries;
+import org.apache.camel.forage.core.util.config.ConfigEntry;
+import org.apache.camel.forage.core.util.config.ConfigModule;
+
+public final class PineconeConfigEntries extends ConfigEntries {
+    public static final ConfigModule API_KEY = ConfigModule.of(PineconeConfig.class, "pinecone.api.key");
+    public static final ConfigModule INDEX = ConfigModule.of(PineconeConfig.class, "pinecone.index");
+    public static final ConfigModule NAME_SPACE = ConfigModule.of(PineconeConfig.class, "pinecone.name.space");
+    public static final ConfigModule METADATA_TEXT_KEY =
+            ConfigModule.of(PineconeConfig.class, "pinecone.metadata.text.key");
+    public static final ConfigModule CREATE_INDEX = ConfigModule.of(PineconeConfig.class, "pinecone.create.index");
+    public static final ConfigModule ENVIRONMENT = ConfigModule.of(PineconeConfig.class, "pinecone.environment");
+    public static final ConfigModule PROJECT_ID = ConfigModule.of(PineconeConfig.class, "pinecone.project.id");
+    public static final ConfigModule DIMENSION = ConfigModule.of(PineconeConfig.class, "pinecone.dimension");
+    public static final ConfigModule CLOUD = ConfigModule.of(PineconeConfig.class, "pinecone.cloud");
+    public static final ConfigModule REGION = ConfigModule.of(PineconeConfig.class, "pinecone.region");
+    public static final ConfigModule DELETION_PROTECTION =
+            ConfigModule.of(PineconeConfig.class, "pinecone.deletion.protection");
+
+    private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
+
+    static {
+        init();
+    }
+
+    static void init() {
+        CONFIG_MODULES.put(API_KEY, ConfigEntry.fromModule());
+        CONFIG_MODULES.put(INDEX, ConfigEntry.fromModule());
+        CONFIG_MODULES.put(NAME_SPACE, ConfigEntry.fromModule());
+        CONFIG_MODULES.put(METADATA_TEXT_KEY, ConfigEntry.fromModule());
+        CONFIG_MODULES.put(CREATE_INDEX, ConfigEntry.fromModule());
+        CONFIG_MODULES.put(ENVIRONMENT, ConfigEntry.fromModule());
+        CONFIG_MODULES.put(PROJECT_ID, ConfigEntry.fromModule());
+        CONFIG_MODULES.put(DIMENSION, ConfigEntry.fromModule());
+        CONFIG_MODULES.put(CLOUD, ConfigEntry.fromModule());
+        CONFIG_MODULES.put(REGION, ConfigEntry.fromModule());
+        CONFIG_MODULES.put(DELETION_PROTECTION, ConfigEntry.fromModule());
+    }
+
+    public static Map<ConfigModule, ConfigEntry> entries() {
+        return Collections.unmodifiableMap(CONFIG_MODULES);
+    }
+
+    public static Optional<ConfigModule> find(String prefix, String name) {
+        return find(CONFIG_MODULES, prefix, name);
+    }
+
+    /**
+     * Registers new known configuration if a prefix is provided (otherwise is ignored)
+     * @param prefix the prefix to register
+     */
+    public static void register(String prefix) {
+        if (prefix != null) {
+            for (Map.Entry<ConfigModule, ConfigEntry> entry : entries().entrySet()) {
+                ConfigModule configModule = entry.getKey().asNamed(prefix);
+                CONFIG_MODULES.put(configModule, ConfigEntry.fromModule());
+            }
+        }
+    }
+
+    /**
+     * Load override configurations (which are defined via environment variables and/or system properties)
+     * @param prefix and optional prefix to use
+     */
+    public static void loadOverrides(String prefix) {
+        load(CONFIG_MODULES, prefix);
+    }
+}

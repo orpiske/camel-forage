@@ -41,18 +41,6 @@ import org.slf4j.LoggerFactory;
 public class OpenAIProvider implements ModelProvider {
     private static final Logger LOG = LoggerFactory.getLogger(OpenAIProvider.class);
 
-    private final OpenAIConfig config;
-
-    /**
-     * Constructs a new OpenAIProvider with default configuration.
-     *
-     * <p>The configuration is automatically loaded from environment variables,
-     * system properties, or configuration files during construction.
-     */
-    public OpenAIProvider() {
-        this.config = new OpenAIConfig();
-    }
-
     /**
      * Creates a new OpenAI chat model instance with the configured parameters.
      *
@@ -63,7 +51,9 @@ public class OpenAIProvider implements ModelProvider {
      * @return a new configured OpenAI chat model instance
      */
     @Override
-    public ChatModel newModel() {
+    public ChatModel create(String id) {
+        OpenAIConfig config = new OpenAIConfig(id);
+
         String apiKey = config.apiKey();
         String modelName = config.modelName();
         String baseUrl = config.baseUrl();
@@ -124,95 +114,5 @@ public class OpenAIProvider implements ModelProvider {
         }
 
         return builder.build();
-    }
-
-    /**
-     * Returns the configured API key for OpenAI.
-     *
-     * @return the API key, never null
-     */
-    public String getApiKey() {
-        return config.apiKey();
-    }
-
-    /**
-     * Returns the configured model name.
-     *
-     * @return the model name, never null
-     */
-    public String getModelName() {
-        return config.modelName();
-    }
-
-    /**
-     * Returns the configured base URL.
-     *
-     * @return the base URL, or null if not configured
-     */
-    public String getBaseUrl() {
-        return config.baseUrl();
-    }
-
-    /**
-     * Returns the configured temperature setting.
-     *
-     * @return the temperature value, or null if not configured
-     */
-    public Double getTemperature() {
-        return config.temperature();
-    }
-
-    /**
-     * Returns the configured maximum tokens setting.
-     *
-     * @return the max tokens value, or null if not configured
-     */
-    public Integer getMaxTokens() {
-        return config.maxTokens();
-    }
-
-    /**
-     * Returns the configured top-P sampling parameter.
-     *
-     * @return the top-P value, or null if not configured
-     */
-    public Double getTopP() {
-        return config.topP();
-    }
-
-    /**
-     * Returns the configured frequency penalty parameter.
-     *
-     * @return the frequency penalty value, or null if not configured
-     */
-    public Double getFrequencyPenalty() {
-        return config.frequencyPenalty();
-    }
-
-    /**
-     * Returns the configured presence penalty parameter.
-     *
-     * @return the presence penalty value, or null if not configured
-     */
-    public Double getPresencePenalty() {
-        return config.presencePenalty();
-    }
-
-    /**
-     * Returns whether request logging is enabled.
-     *
-     * @return true if enabled, false if disabled, null if not configured
-     */
-    public Boolean getLogRequests() {
-        return config.logRequests();
-    }
-
-    /**
-     * Returns whether response logging is enabled.
-     *
-     * @return true if enabled, false if disabled, null if not configured
-     */
-    public Boolean getLogResponses() {
-        return config.logResponses();
     }
 }

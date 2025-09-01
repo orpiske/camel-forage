@@ -123,7 +123,7 @@ public interface Config {
      * @param name the configuration property name, typically in dot notation (e.g., "module.property.name")
      * @param value the configuration value to register, may be {@code null} if the property allows it
      * @throws IllegalArgumentException if the property name is not recognized by this configuration module
-     * @see ConfigStore#add(ConfigModule, ConfigEntry)
+     * @see #add(ConfigModule)
      * @see ConfigEntry#fromProperty(String)
      * @see ConfigModule
      * @since 1.0

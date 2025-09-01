@@ -154,6 +154,31 @@ All agents support automatic configuration through the `DefaultAgentFactory`:
 - **RAG**: Configured through agent implementation
 - **Guardrails**: Configured through agent implementation
 
+### Named/Prefixed Configuration
+Starting with version 1.0, all configuration classes support named/prefixed configurations for multi-instance setups:
+
+```java
+// Default configuration (uses standard environment variables)
+OpenAIConfig defaultConfig = new OpenAIConfig();
+
+// Named configuration (uses prefixed environment variables and properties)
+OpenAIConfig agentConfig = new OpenAIConfig("agent1");
+OpenAIConfig apiConfig = new OpenAIConfig("api");
+```
+
+This enables scenarios like:
+```bash
+# Environment variables for different configurations
+export OPENAI_API_KEY="default-key"           # Used by default config
+export agent1.openai.api.key="agent-key"     # Used by "agent1" config
+export api.openai.api.key="api-key"          # Used by "api" config
+
+# System properties
+-Dopenai.api.key=default-key                 # Default config
+-Dagent1.openai.api.key=agent-key           # "agent1" config
+-Dapi.openai.api.key=api-key                # "api" config
+```
+
 ### Manual Configuration
 For advanced scenarios, you can create custom agent factories or configure agents directly.
 

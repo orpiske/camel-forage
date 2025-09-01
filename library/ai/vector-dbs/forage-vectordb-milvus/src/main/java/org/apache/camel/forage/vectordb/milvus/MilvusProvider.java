@@ -11,26 +11,26 @@ import org.slf4j.LoggerFactory;
 public class MilvusProvider implements EmbeddingStoreProvider {
     private static final Logger LOG = LoggerFactory.getLogger(MilvusProvider.class);
 
-    private static final MilvusConfig CONFIG = new MilvusConfig();
-
     @Override
-    public MilvusEmbeddingStore newEmbeddingStore() {
+    public MilvusEmbeddingStore create(String id) {
+        MilvusConfig config = new MilvusConfig(id);
+
         LOG.trace("Creating Milvus Embedding Store");
 
         return MilvusEmbeddingStore.builder()
-                .host(CONFIG.host())
-                .port(CONFIG.port())
-                .collectionName(CONFIG.collectionName())
-                .dimension(CONFIG.dimension())
-                .indexType(CONFIG.indexType())
-                .metricType(CONFIG.metricType())
-                .uri(CONFIG.uri())
-                .token(CONFIG.token())
-                .username(CONFIG.username())
-                .password(CONFIG.password())
-                .consistencyLevel(CONFIG.consistencyLevel())
-                .retrieveEmbeddingsOnSearch(CONFIG.retrieveEmbeddingsOnSearch())
-                .autoFlushOnInsert(CONFIG.autoFlushOnInsert())
+                .host(config.host())
+                .port(config.port())
+                .collectionName(config.collectionName())
+                .dimension(config.dimension())
+                .indexType(config.indexType())
+                .metricType(config.metricType())
+                .uri(config.uri())
+                .token(config.token())
+                .username(config.username())
+                .password(config.password())
+                .consistencyLevel(config.consistencyLevel())
+                .retrieveEmbeddingsOnSearch(config.retrieveEmbeddingsOnSearch())
+                .autoFlushOnInsert(config.autoFlushOnInsert())
                 .build();
     }
 }

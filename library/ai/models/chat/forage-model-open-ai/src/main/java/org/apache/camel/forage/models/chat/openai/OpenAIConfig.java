@@ -1,7 +1,18 @@
 package org.apache.camel.forage.models.chat.openai;
 
+import static org.apache.camel.forage.models.chat.openai.OpenAIConfigEntries.API_KEY;
+import static org.apache.camel.forage.models.chat.openai.OpenAIConfigEntries.BASE_URL;
+import static org.apache.camel.forage.models.chat.openai.OpenAIConfigEntries.FREQUENCY_PENALTY;
+import static org.apache.camel.forage.models.chat.openai.OpenAIConfigEntries.LOG_REQUESTS;
+import static org.apache.camel.forage.models.chat.openai.OpenAIConfigEntries.LOG_RESPONSES;
+import static org.apache.camel.forage.models.chat.openai.OpenAIConfigEntries.MAX_TOKENS;
+import static org.apache.camel.forage.models.chat.openai.OpenAIConfigEntries.MODEL_NAME;
+import static org.apache.camel.forage.models.chat.openai.OpenAIConfigEntries.PRESENCE_PENALTY;
+import static org.apache.camel.forage.models.chat.openai.OpenAIConfigEntries.TEMPERATURE;
+import static org.apache.camel.forage.models.chat.openai.OpenAIConfigEntries.TOP_P;
+
+import java.util.Optional;
 import org.apache.camel.forage.core.util.config.Config;
-import org.apache.camel.forage.core.util.config.ConfigEntry;
 import org.apache.camel.forage.core.util.config.ConfigModule;
 import org.apache.camel.forage.core.util.config.ConfigStore;
 import org.apache.camel.forage.core.util.config.MissingConfigException;
@@ -71,19 +82,8 @@ import org.apache.camel.forage.core.util.config.MissingConfigException;
  */
 public class OpenAIConfig implements Config {
 
-    private static final ConfigModule API_KEY = ConfigModule.of(OpenAIConfig.class, "openai.api.key");
-    private static final ConfigModule MODEL_NAME = ConfigModule.of(OpenAIConfig.class, "openai.model.name");
-    private static final ConfigModule BASE_URL = ConfigModule.of(OpenAIConfig.class, "openai.base.url");
-    private static final ConfigModule TEMPERATURE = ConfigModule.of(OpenAIConfig.class, "openai.temperature");
-    private static final ConfigModule MAX_TOKENS = ConfigModule.of(OpenAIConfig.class, "openai.max.tokens");
-    private static final ConfigModule TOP_P = ConfigModule.of(OpenAIConfig.class, "openai.top.p");
-    private static final ConfigModule FREQUENCY_PENALTY =
-            ConfigModule.of(OpenAIConfig.class, "openai.frequency.penalty");
-    private static final ConfigModule PRESENCE_PENALTY = ConfigModule.of(OpenAIConfig.class, "openai.presence.penalty");
-    private static final ConfigModule LOG_REQUESTS = ConfigModule.of(OpenAIConfig.class, "openai.log.requests");
-    private static final ConfigModule LOG_RESPONSES = ConfigModule.of(OpenAIConfig.class, "openai.log.responses");
-
     private static final String DEFAULT_MODEL_NAME = "gpt-3.5-turbo";
+    private final String prefix;
 
     /**
      * Constructs a new OpenAIConfig and registers configuration parameters with the ConfigStore.
@@ -101,70 +101,27 @@ public class OpenAIConfig implements Config {
      * or configuration files (only for model name).
      */
     public OpenAIConfig() {
-        ConfigStore.getInstance().add(API_KEY, ConfigEntry.fromModule(API_KEY, "OPENAI_API_KEY"));
-        ConfigStore.getInstance().add(MODEL_NAME, ConfigEntry.fromModule(MODEL_NAME, "OPENAI_MODEL_NAME"));
-        ConfigStore.getInstance().add(BASE_URL, ConfigEntry.fromModule(BASE_URL, "OPENAI_BASE_URL"));
-        ConfigStore.getInstance().add(TEMPERATURE, ConfigEntry.fromModule(TEMPERATURE, "OPENAI_TEMPERATURE"));
-        ConfigStore.getInstance().add(MAX_TOKENS, ConfigEntry.fromModule(MAX_TOKENS, "OPENAI_MAX_TOKENS"));
-        ConfigStore.getInstance().add(TOP_P, ConfigEntry.fromModule(TOP_P, "OPENAI_TOP_P"));
-        ConfigStore.getInstance()
-                .add(FREQUENCY_PENALTY, ConfigEntry.fromModule(FREQUENCY_PENALTY, "OPENAI_FREQUENCY_PENALTY"));
-        ConfigStore.getInstance()
-                .add(PRESENCE_PENALTY, ConfigEntry.fromModule(PRESENCE_PENALTY, "OPENAI_PRESENCE_PENALTY"));
-        ConfigStore.getInstance().add(LOG_REQUESTS, ConfigEntry.fromModule(LOG_REQUESTS, "OPENAI_LOG_REQUESTS"));
-        ConfigStore.getInstance().add(LOG_RESPONSES, ConfigEntry.fromModule(LOG_RESPONSES, "OPENAI_LOG_RESPONSES"));
-        ConfigStore.getInstance().add(OpenAIConfig.class, this, this::register);
+        this(null);
     }
 
-    private ConfigModule resolve(String name) {
-        if (API_KEY.name().equals(name)) {
-            return API_KEY;
-        }
+    public OpenAIConfig(String prefix) {
+        this.prefix = prefix;
 
-        if (MODEL_NAME.name().equals(name)) {
-            return MODEL_NAME;
-        }
+        // First register new configuration modules. This happens only if a prefix is provided
+        OpenAIConfigEntries.register(prefix);
 
-        if (BASE_URL.name().equals(name)) {
-            return BASE_URL;
-        }
+        // Then, loads the configurations from the properties file associated with this Config module
+        ConfigStore.getInstance().load(OpenAIConfig.class, this, this::register);
 
-        if (TEMPERATURE.name().equals(name)) {
-            return TEMPERATURE;
-        }
-
-        if (MAX_TOKENS.name().equals(name)) {
-            return MAX_TOKENS;
-        }
-
-        if (TOP_P.name().equals(name)) {
-            return TOP_P;
-        }
-
-        if (FREQUENCY_PENALTY.name().equals(name)) {
-            return FREQUENCY_PENALTY;
-        }
-
-        if (PRESENCE_PENALTY.name().equals(name)) {
-            return PRESENCE_PENALTY;
-        }
-
-        if (LOG_REQUESTS.name().equals(name)) {
-            return LOG_REQUESTS;
-        }
-
-        if (LOG_RESPONSES.name().equals(name)) {
-            return LOG_RESPONSES;
-        }
-
-        throw new IllegalArgumentException("Unknown config entry: " + name);
+        // Lastly, load the overrides defined in system properties and environment variables
+        OpenAIConfigEntries.loadOverrides(prefix);
     }
 
     @Override
     public void register(String name, String value) {
-        ConfigModule config = resolve(name);
+        Optional<ConfigModule> config = OpenAIConfigEntries.find(prefix, name);
 
-        ConfigStore.getInstance().set(config, value);
+        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
     }
 
     /**
@@ -203,7 +160,7 @@ public class OpenAIConfig implements Config {
      */
     public String apiKey() {
         return ConfigStore.getInstance()
-                .get(API_KEY)
+                .get(API_KEY.asNamed(prefix))
                 .orElseThrow(() -> new MissingConfigException("Missing OpenAI API key"));
     }
 
@@ -233,7 +190,7 @@ public class OpenAIConfig implements Config {
      * @return the OpenAI model name, never null
      */
     public String modelName() {
-        return ConfigStore.getInstance().get(MODEL_NAME).orElse(DEFAULT_MODEL_NAME);
+        return ConfigStore.getInstance().get(MODEL_NAME.asNamed(prefix)).orElse(DEFAULT_MODEL_NAME);
     }
 
     /**
@@ -253,7 +210,7 @@ public class OpenAIConfig implements Config {
      * @return the base URL, or null if not configured (uses OpenAI's default)
      */
     public String baseUrl() {
-        return ConfigStore.getInstance().get(BASE_URL).orElse(null);
+        return ConfigStore.getInstance().get(BASE_URL.asNamed(prefix)).orElse(null);
     }
 
     /**
@@ -277,7 +234,7 @@ public class OpenAIConfig implements Config {
      */
     public Double temperature() {
         return ConfigStore.getInstance()
-                .get(TEMPERATURE)
+                .get(TEMPERATURE.asNamed(prefix))
                 .map(Double::parseDouble)
                 .orElse(null);
     }
@@ -302,7 +259,10 @@ public class OpenAIConfig implements Config {
      * @return the maximum tokens value, or null if not configured
      */
     public Integer maxTokens() {
-        return ConfigStore.getInstance().get(MAX_TOKENS).map(Integer::parseInt).orElse(null);
+        return ConfigStore.getInstance()
+                .get(MAX_TOKENS.asNamed(prefix))
+                .map(Integer::parseInt)
+                .orElse(null);
     }
 
     /**
@@ -325,7 +285,10 @@ public class OpenAIConfig implements Config {
      * @return the top-P value, or null if not configured
      */
     public Double topP() {
-        return ConfigStore.getInstance().get(TOP_P).map(Double::parseDouble).orElse(null);
+        return ConfigStore.getInstance()
+                .get(TOP_P.asNamed(prefix))
+                .map(Double::parseDouble)
+                .orElse(null);
     }
 
     /**
@@ -348,7 +311,7 @@ public class OpenAIConfig implements Config {
      */
     public Double frequencyPenalty() {
         return ConfigStore.getInstance()
-                .get(FREQUENCY_PENALTY)
+                .get(FREQUENCY_PENALTY.asNamed(prefix))
                 .map(Double::parseDouble)
                 .orElse(null);
     }
@@ -373,7 +336,7 @@ public class OpenAIConfig implements Config {
      */
     public Double presencePenalty() {
         return ConfigStore.getInstance()
-                .get(PRESENCE_PENALTY)
+                .get(PRESENCE_PENALTY.asNamed(prefix))
                 .map(Double::parseDouble)
                 .orElse(null);
     }
@@ -399,7 +362,7 @@ public class OpenAIConfig implements Config {
      */
     public Boolean logRequests() {
         return ConfigStore.getInstance()
-                .get(LOG_REQUESTS)
+                .get(LOG_REQUESTS.asNamed(prefix))
                 .map(Boolean::parseBoolean)
                 .orElse(null);
     }
@@ -425,7 +388,7 @@ public class OpenAIConfig implements Config {
      */
     public Boolean logResponses() {
         return ConfigStore.getInstance()
-                .get(LOG_RESPONSES)
+                .get(LOG_RESPONSES.asNamed(prefix))
                 .map(Boolean::parseBoolean)
                 .orElse(null);
     }

@@ -11,26 +11,26 @@ import org.slf4j.LoggerFactory;
 public class WeaviateProvider implements EmbeddingStoreProvider {
     private static final Logger LOG = LoggerFactory.getLogger(WeaviateProvider.class);
 
-    private static final WeaviateConfig CONFIG = new WeaviateConfig();
-
     @Override
-    public WeaviateEmbeddingStore newEmbeddingStore() {
+    public WeaviateEmbeddingStore create(String id) {
         LOG.trace("Creating weaviate embedding store");
 
+        WeaviateConfig config = new WeaviateConfig(id);
+
         return WeaviateEmbeddingStore.builder()
-                .apiKey(CONFIG.apiKey())
-                .scheme(CONFIG.scheme())
-                .host(CONFIG.host())
-                .port(CONFIG.port())
-                .useGrpcForInserts(CONFIG.useGrpcForInserts())
-                .securedGrpc(CONFIG.securedGrpc())
-                .grpcPort(CONFIG.grpcPort())
-                .objectClass(CONFIG.objectClass())
-                .avoidDups(CONFIG.avoidDups())
-                .consistencyLevel(CONFIG.consistencyLevel())
-                .metadataKeys(CONFIG.metadataKeys())
-                .textFieldName(CONFIG.textFieldName())
-                .metadataFieldName(CONFIG.metadataFieldName())
+                .apiKey(config.apiKey())
+                .scheme(config.scheme())
+                .host(config.host())
+                .port(config.port())
+                .useGrpcForInserts(config.useGrpcForInserts())
+                .securedGrpc(config.securedGrpc())
+                .grpcPort(config.grpcPort())
+                .objectClass(config.objectClass())
+                .avoidDups(config.avoidDups())
+                .consistencyLevel(config.consistencyLevel())
+                .metadataKeys(config.metadataKeys())
+                .textFieldName(config.textFieldName())
+                .metadataFieldName(config.metadataFieldName())
                 .build();
     }
 }

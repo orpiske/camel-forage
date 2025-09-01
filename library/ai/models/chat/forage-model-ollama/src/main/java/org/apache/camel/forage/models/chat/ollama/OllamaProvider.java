@@ -40,18 +40,6 @@ import org.slf4j.LoggerFactory;
 public class OllamaProvider implements ModelProvider {
     private static final Logger LOG = LoggerFactory.getLogger(OllamaProvider.class);
 
-    private final OllamaConfig config;
-
-    /**
-     * Constructs a new OllamaProvider with default configuration.
-     *
-     * <p>The configuration is automatically loaded from environment variables,
-     * system properties, or configuration files during construction.
-     */
-    public OllamaProvider() {
-        this.config = new OllamaConfig();
-    }
-
     /**
      * Creates a new Ollama chat model instance with the configured parameters.
      *
@@ -62,7 +50,9 @@ public class OllamaProvider implements ModelProvider {
      * @return a new configured Ollama chat model instance
      */
     @Override
-    public ChatModel newModel() {
+    public ChatModel create(String id) {
+        final OllamaConfig config = new OllamaConfig(id);
+
         String baseUrl = config.baseUrl();
         String modelName = config.modelName();
         Double temperature = config.temperature();
@@ -118,86 +108,5 @@ public class OllamaProvider implements ModelProvider {
         }
 
         return builder.build();
-    }
-
-    /**
-     * Returns the configured base URL for the Ollama server.
-     *
-     * @return the base URL, never null
-     */
-    public String getBaseUrl() {
-        return config.baseUrl();
-    }
-
-    /**
-     * Returns the configured model name.
-     *
-     * @return the model name, never null
-     */
-    public String getModelName() {
-        return config.modelName();
-    }
-
-    /**
-     * Returns the configured temperature setting.
-     *
-     * @return the temperature value, or null if not configured
-     */
-    public Double getTemperature() {
-        return config.temperature();
-    }
-
-    /**
-     * Returns the configured top-K sampling parameter.
-     *
-     * @return the top-K value, or null if not configured
-     */
-    public Integer getTopK() {
-        return config.topK();
-    }
-
-    /**
-     * Returns the configured top-P sampling parameter.
-     *
-     * @return the top-P value, or null if not configured
-     */
-    public Double getTopP() {
-        return config.topP();
-    }
-
-    /**
-     * Returns the configured minimum probability threshold.
-     *
-     * @return the min-P value, or null if not configured
-     */
-    public Double getMinP() {
-        return config.minP();
-    }
-
-    /**
-     * Returns the configured context window size.
-     *
-     * @return the context window size, or null if not configured
-     */
-    public Integer getNumCtx() {
-        return config.numCtx();
-    }
-
-    /**
-     * Returns whether request logging is enabled.
-     *
-     * @return true if enabled, false if disabled, null if not configured
-     */
-    public Boolean getLogRequests() {
-        return config.logRequests();
-    }
-
-    /**
-     * Returns whether response logging is enabled.
-     *
-     * @return true if enabled, false if disabled, null if not configured
-     */
-    public Boolean getLogResponses() {
-        return config.logResponses();
     }
 }
