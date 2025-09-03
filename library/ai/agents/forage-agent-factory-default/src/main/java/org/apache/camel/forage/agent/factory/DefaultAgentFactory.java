@@ -3,6 +3,7 @@ package org.apache.camel.forage.agent.factory;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import java.util.ServiceLoader;
 import org.apache.camel.CamelContext;
+import org.apache.camel.Exchange;
 import org.apache.camel.component.langchain4j.agent.api.Agent;
 import org.apache.camel.component.langchain4j.agent.api.AgentConfiguration;
 import org.apache.camel.component.langchain4j.agent.api.AgentFactory;
@@ -65,6 +66,10 @@ public class DefaultAgentFactory implements AgentFactory {
 
     @Override
     public synchronized Agent createAgent() throws Exception {
+        return createAgent(null);
+    }
+
+    public synchronized Agent createAgent(Exchange exchange) throws Exception {
         if (agent != null) {
             return agent;
         }
