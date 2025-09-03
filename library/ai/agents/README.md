@@ -161,22 +161,65 @@ Starting with version 1.0, all configuration classes support named/prefixed conf
 // Default configuration (uses standard environment variables)
 OpenAIConfig defaultConfig = new OpenAIConfig();
 
-// Named configuration (uses prefixed environment variables and properties)
+// Named configurations (use prefixed environment variables and properties)
 OpenAIConfig agentConfig = new OpenAIConfig("agent1");
 OpenAIConfig apiConfig = new OpenAIConfig("api");
+MilvusConfig vectorDbConfig = new MilvusConfig("rag-system");
 ```
 
-This enables scenarios like:
+#### Configuration Sources and Precedence
+
+All configuration classes follow the same precedence order:
+
+1. **Environment variables** (highest precedence)
+2. **System properties** 
+3. **Configuration files** (`<module-name>.properties`)
+4. **Default values** (where applicable)
+
+#### Multi-Instance Configuration Examples
+
 ```bash
 # Environment variables for different configurations
-export OPENAI_API_KEY="default-key"           # Used by default config
-export agent1.openai.api.key="agent-key"     # Used by "agent1" config
-export api.openai.api.key="api-key"          # Used by "api" config
+export OPENAI_API_KEY="default-key"              # Default config
+export agent1.openai.api.key="agent-key"        # "agent1" config  
+export api.openai.api.key="api-key"             # "api" config
 
-# System properties
--Dopenai.api.key=default-key                 # Default config
--Dagent1.openai.api.key=agent-key           # "agent1" config
--Dapi.openai.api.key=api-key                # "api" config
+export MILVUS_HOST="localhost"                   # Default config
+export rag-system.milvus.host="vector-db.internal"  # "rag-system" config
+
+# System properties (alternative to environment variables)
+-Dopenai.api.key=default-key                    # Default config
+-Dagent1.openai.api.key=agent-key              # "agent1" config
+-Dapi.openai.api.key=api-key                   # "api" config
+-Dmilvus.host=localhost                         # Default config
+-Drag-system.milvus.host=vector-db.internal     # "rag-system" config
+```
+
+#### Configuration Files
+
+Each module can also be configured via properties files:
+
+```properties
+# forage-model-openai.properties (default config)
+api-key=default-key
+model-name=gpt-4
+
+# agent1.forage-model-openai.properties (prefixed config)  
+api-key=agent-key
+model-name=gpt-3.5-turbo
+```
+
+#### Provider Factory Integration
+
+The agent factories automatically use prefixed configurations when creating providers:
+
+```java
+// In DefaultAgentFactory
+ModelProvider provider = new OpenAIProvider();
+ChatModel model = provider.create("agent1");  // Uses OpenAIConfig("agent1")
+
+ChatMemoryFactory memoryFactory = new RedisMemoryFactory();  
+ChatMemoryProvider memory = memoryFactory.create("agent1");  // Uses RedisConfig("agent1")
 ```
 
 ### Manual Configuration
