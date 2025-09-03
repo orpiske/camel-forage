@@ -99,22 +99,43 @@ Starting with version 1.0, configuration classes use a two-class pattern support
 public final class ExampleConfigEntries extends ConfigEntries {
     public static final ConfigModule API_KEY = ConfigModule.of(ExampleConfig.class, "example.api.key");
     
-    private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new HashMap<>();
+    private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
     
     static {
-        CONFIG_MODULES.put(API_KEY, ConfigEntry.fromModule(API_KEY, "EXAMPLE_API_KEY"));
+        init();
+    }
+    
+    static void init() {
+        CONFIG_MODULES.put(API_KEY, ConfigEntry.fromModule());
     }
     
     public static Map<ConfigModule, ConfigEntry> entries() {
         return Collections.unmodifiableMap(CONFIG_MODULES);
     }
     
-    public static ConfigModule find(String prefix, String name) {
+    public static Optional<ConfigModule> find(String prefix, String name) {
         return find(CONFIG_MODULES, prefix, name);
     }
     
+    /**
+     * Registers new known configuration if a prefix is provided (otherwise is ignored)
+     * @param prefix the prefix to register
+     */
     public static void register(String prefix) {
-        register(CONFIG_MODULES, prefix);
+        if (prefix != null) {
+            for (Map.Entry<ConfigModule, ConfigEntry> entry : entries().entrySet()) {
+                ConfigModule configModule = entry.getKey().asNamed(prefix);
+                CONFIG_MODULES.put(configModule, ConfigEntry.fromModule());
+            }
+        }
+    }
+    
+    /**
+     * Load override configurations (which are defined via environment variables and/or system properties)
+     * @param prefix and optional prefix to use
+     */
+    public static void loadOverrides(String prefix) {
+        load(CONFIG_MODULES, prefix);
     }
 }
 ```
@@ -131,18 +152,21 @@ public class ExampleConfig implements Config {
     public ExampleConfig(String prefix) {
         this.prefix = prefix;
         
+        // First register new configuration modules. This happens only if a prefix is provided
         ExampleConfigEntries.register(prefix);
-        ConfigStore.getInstance().add(ExampleConfig.class, this, this::register);
-    }
-    
-    private ConfigModule resolve(String name) {
-        return ExampleConfigEntries.find(prefix, name);
+
+        // Then, loads the configurations from the properties file associated with this Config module
+        ConfigStore.getInstance().load(ExampleConfig.class, this, this::register);
+
+        // Lastly, load the overrides defined in system properties and environment variables
+        ExampleConfigEntries.loadOverrides(prefix);
     }
     
     @Override
     public void register(String name, String value) {
-        ConfigModule config = resolve(name);
-        ConfigStore.getInstance().set(config, value);
+        Optional<ConfigModule> config = ExampleConfigEntries.find(prefix, name);
+        
+        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
     }
     
     @Override
@@ -224,6 +248,8 @@ Contains vector database interfaces:
 
 #### Chat Memory
 - **forage-memory-message-window**: Message window memory with persistence
+- **forage-memory-infinispan**: Infinispan-based distributed memory storage
+- **forage-memory-redis**: Redis-based memory storage for scalability
 
 #### Vector Databases
 - **forage-vectordb-milvus**: Milvus integration
@@ -374,17 +400,21 @@ mvn clean install
 ### Configuration Classes Must Include
 **For ConfigEntries classes:**
 1. `ConfigModule` static fields for each configuration parameter
-2. Static `CONFIG_MODULES` map with `ConfigEntry` mappings
-3. Static `entries()`, `find(prefix, name)`, and `register(prefix)` methods
-4. Extend `ConfigEntries` abstract class
+2. Static `CONFIG_MODULES` map using `ConcurrentHashMap` with `ConfigEntry` mappings
+3. Static `init()` method called from static block for initialization
+4. Static `entries()`, `find(prefix, name)`, `register(prefix)`, and `loadOverrides(prefix)` methods
+5. Extend `ConfigEntries` abstract class
+6. Proper prefix handling in `register()` method with null check and loop-based registration
 
 **For main Config classes:**
 1. `prefix` field to support named configurations
 2. Default constructor calling `this(null)` and prefixed constructor
-3. `resolve(String name)` method delegating to `ConfigEntries.find(prefix, name)`
-4. `register(String name, String value)` method implementing the Config interface
-5. Constructor registration: `ConfigStore.getInstance().add(ConfigClass.class, this, this::register)`
-6. All getter methods using `configModule.asNamed(prefix)` when accessing ConfigStore
+3. Three-step constructor initialization:
+   - First: Call `ConfigEntries.register(prefix)`
+   - Second: Call `ConfigStore.getInstance().load(ConfigClass.class, this, this::register)`
+   - Third: Call `ConfigEntries.loadOverrides(prefix)`
+4. `register(String name, String value)` method using `Optional<ConfigModule>` and `ifPresent()`
+5. All getter methods using `configModule.asNamed(prefix)` when accessing ConfigStore
 
 ### ServiceLoader Registration
 - Always create `META-INF/services/<interface-name>` files
