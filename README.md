@@ -33,10 +33,16 @@ Add the desired modules to your project. For example, to use the default agent f
     <artifactId>forage-memory-message-window</artifactId>
     <version>1.0-SNAPSHOT</version>
 </dependency>
-<!--This component adds a memory-aware agent implementation -->
+<!--This component adds agent factories for single and multi-agent systems -->
 <dependency>
     <groupId>org.apache.camel.forage</groupId>
-    <artifactId>forage-agent-memory-aware</artifactId>
+    <artifactId>forage-agent-factories</artifactId>
+    <version>1.0-SNAPSHOT</version>
+</dependency>
+<!--This component adds the composable agent implementation -->
+<dependency>
+    <groupId>org.apache.camel.forage</groupId>
+    <artifactId>forage-agent</artifactId>
     <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
@@ -63,10 +69,8 @@ based on the dependencies available on the classpath.
 ### AI Modules
 
 #### Agents
-- **forage-agent-factory-default** - Default agent factory and common agent utilities ([Documentation](library/ai/agents/forage-agent-factory-default/README.md))
-- **forage-agent-memory-aware** - Memory-aware agent implementation ([Documentation](library/ai/agents/forage-agent-memory-aware/README.md))
-- **forage-agent-memoryless** - Stateless agent implementation ([Documentation](library/ai/agents/forage-agent-memoryless/README.md))
-- **forage-agent-multi-module** - Multi-agent coordination system ([Documentation](library/ai/agents/forage-agent-multi-module/README.md))
+- **forage-agent-factories** - Agent factories for single and multi-agent systems ([Documentation](library/ai/agents/forage-agent-factories/README.md))
+- **forage-agent** - Composable agent implementation with optional memory support ([Documentation](library/ai/agents/forage-agent/README.md))
 
 📋 **[Complete Agents Documentation](library/ai/agents/README.md)** - Comprehensive guide to all agent components
 

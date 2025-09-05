@@ -26,9 +26,8 @@ camel-forage/
 ├── library/                                # Implementation modules
 │   └── ai/
 │       ├── agents/                         # AI agent implementations
-│       │   ├── forage-agent-factory-default/
-│       │   ├── forage-agent-memory-aware/
-│       │   └── forage-agent-memoryless/
+│       │   ├── forage-agent-factories/
+│       │   └── forage-agent/
 │       ├── chat-memory/                    # Chat memory providers
 │       │   └── forage-memory-message-window/
 │       ├── models/chat/                    # AI model providers
@@ -237,9 +236,8 @@ Contains vector database interfaces:
 
 
 #### AI Agents
-- **forage-agent-factory-default**: Default factory with ServiceLoader discovery
-- **forage-agent-memory-aware**: Agent with conversation memory (uses `AiAgentWithMemoryService`)
-- **forage-agent-memoryless**: Stateless agent (uses custom `AiAgentService`)
+- **forage-agent-factories**: Agent factories with ServiceLoader discovery and multi-agent support
+- **forage-agent**: Composable agent with optional memory support (uses `AiAgentWithMemoryService` or `AiAgentService`)
 
 #### AI Models
 - **forage-model-openai**: OpenAI integration (GPT models)

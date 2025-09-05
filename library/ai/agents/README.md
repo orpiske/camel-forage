@@ -8,75 +8,46 @@ The agents module provides a complete ecosystem for AI agent functionality in Ap
 
 ## Available Agents
 
-### [forage-agent-factory-default](forage-agent-factory-default/README.md)
-**Default Agent Factory**
+### [forage-agent-factories](forage-agent-factories/README.md)
+**Agent Factories**
 
-The main entry point for creating AI agents with automatic component discovery.
+The main entry point for creating AI agents with automatic component discovery and multi-agent orchestration.
 
-- **Purpose**: ServiceLoader-based agent factory for automatic configuration
-- **Key Features**: Zero-configuration setup, component discovery, singleton pattern
-- **Use Case**: Primary factory for most applications
+- **Purpose**: ServiceLoader-based agent factories for automatic configuration and multi-agent coordination
+- **Key Features**: Zero-configuration setup, component discovery, singleton pattern, multi-agent support
+- **Use Case**: Primary factory for most applications, multi-agent systems
 - **Dependencies**: Core interfaces, camel-langchain4j-agent-api
 
-### [forage-agent-memory-aware](forage-agent-memory-aware/README.md)
-**Memory-Aware Agent**
+### [forage-agent](forage-agent/README.md)
+**Composable Agent**
 
-Full-featured agent implementation with conversation history and memory support.
+Flexible agent implementation that can work with or without memory based on configuration.
 
-- **Purpose**: Multi-turn conversations with persistent memory
-- **Key Features**: Memory ID support, conversation history, RAG, guardrails
-- **Use Case**: Chatbots, conversational AI, customer support
-- **Dependencies**: Factory default, langchain4j
-
-### [forage-agent-memoryless](forage-agent-memoryless/README.md)
-**Memoryless Agent**
-
-Lightweight, stateless agent implementation for single-turn interactions.
-
-- **Purpose**: Independent question-answer scenarios without memory
-- **Key Features**: Stateless operation, low resource usage, thread-safe
-- **Use Case**: API endpoints, batch processing, simple queries
-- **Dependencies**: Factory default, langchain4j
-
-### [forage-agent-multi-module](forage-agent-multi-module/README.md)
-**Multi-Module Agent**
-
-Sophisticated agent that coordinates multiple AI agents for complex collaborative tasks.
-
-- **Purpose**: Multi-agent coordination and collaboration
-- **Key Features**: configurable agent count, thread pool management
-- **Use Case**: Complex analysis, decision making, multi-perspective problem solving
-- **Dependencies**: Factory default, langchain4j, core common
+- **Purpose**: Configurable agent for both memory-aware and memoryless scenarios
+- **Key Features**: Composable design, memory support (optional), RAG, guardrails
+- **Use Case**: Universal agent for chatbots, API endpoints, conversational AI
+- **Dependencies**: Agent factories, langchain4j
 
 ## Quick Start
 
-### 1. Choose Your Agent Type
+### 1. Add Core Agent Dependencies
 
-**For conversational applications with memory:**
+**Composable agent (works with or without memory):**
 ```xml
 <dependency>
     <groupId>org.apache.camel.forage</groupId>
-    <artifactId>forage-agent-memory-aware</artifactId>
-    <version>1.0-SNAPSHOT</version>
-</dependency>
-```
-
-**For stateless, single-turn interactions:**
-```xml
-<dependency>
-    <groupId>org.apache.camel.forage</groupId>
-    <artifactId>forage-agent-memoryless</artifactId>
+    <artifactId>forage-agent</artifactId>
     <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
 
 ### 2. Add Required Dependencies
 
-**Agent factory (always required):**
+**Agent factories (always required):**
 ```xml
 <dependency>
     <groupId>org.apache.camel.forage</groupId>
-    <artifactId>forage-agent-factory-default</artifactId>
+    <artifactId>forage-agent-factories</artifactId>
     <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
@@ -105,7 +76,7 @@ Sophisticated agent that coordinates multiple AI agents for complex collaborativ
 </dependency>
 ```
 
-**Memory provider (for memory-aware agents):**
+**Memory provider (optional for memory-enabled conversations):**
 ```xml
 <dependency>
     <groupId>org.apache.camel.forage</groupId>
@@ -120,18 +91,18 @@ To check how it can be used in Camel routes, please read the specific agent docu
 
 ## Agent Comparison
 
-| Feature | Memory Aware | Memoryless | Multi-Module | Factory Default |
-|---------|--------------|------------|--------------|-----------------|
-| **Type** | Agent Implementation | Agent Implementation | Agent Implementation | Agent Factory |
-| **Memory Support** | ✅ Full memory support | ❌ No memory | ❌ No memory | 🔧 Configures agents |
-| **Multi-Agent Coordination** | ❌ Single agent | ❌ Single agent | ✅ Multiple agents | 🔧 Manages agents |
-| **Use Case** | Multi-turn conversations | Single interactions | Complex collaborative tasks | Component discovery |
-| **Resource Usage** | Higher (stores history) | Lower (stateless) | Highest (multiple agents) | Minimal (factory only) |
-| **Memory ID** | ✅ Required | ❌ Ignored | ❌ Ignored | 🔧 Passes through |
-| **Conversation History** | ✅ Maintained | ❌ None | ❌ None | 🔧 Depends on agent |
-| **Thread Safety** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
-| **RAG Support** | ✅ Yes | ✅ Yes | ✅ Yes | 🔧 Configures |
-| **Guardrails** | ✅ Yes | ✅ Yes | ✅ Yes | 🔧 Configures |
+| Feature | Composable Agent | Agent Factories |
+|---------|------------------|-----------------|
+| **Type** | Agent Implementation | Agent Factory |
+| **Memory Support** | ✅ Configurable (with/without) | 🔧 Configures agents |
+| **Multi-Agent Coordination** | ❌ Single agent | ✅ Multiple agents |
+| **Use Case** | Universal (memory or memoryless) | Component discovery & multi-agent |
+| **Resource Usage** | Variable (depends on config) | Minimal (factory only) |
+| **Memory ID** | 🔧 Optional (when memory configured) | 🔧 Passes through |
+| **Conversation History** | 🔧 Optional (when memory configured) | 🔧 Depends on agent |
+| **Thread Safety** | ✅ Yes | ✅ Yes |
+| **RAG Support** | ✅ Yes | 🔧 Configures |
+| **Guardrails** | ✅ Yes | 🔧 Configures |
 
 ## Architecture
 
@@ -143,15 +114,16 @@ The agents follow a layered architecture:
 ├─────────────────────────────────────┤
 │      langchain4j-agent Component    │
 ├─────────────────────────────────────┤
-│       DefaultAgentFactory           │
+│       Agent Factories               │
+│  ├─ DefaultAgentFactory             │
+│  └─ MultiAgentFactory               │
 ├─────────────────────────────────────┤
-│  Agent Implementations              │
-│  ├─ SimpleAgent (Memory Aware)      │
-│  └─ MemorylessAgent                 │
+│  Agent Implementation               │
+│  └─ SimpleAgent (Composable)        │
 ├─────────────────────────────────────┤
 │  Core Services (via ServiceLoader)  │
 │  ├─ ModelProvider                   │
-│  ├─ ChatMemoryFactory               │
+│  ├─ ChatMemoryFactory (Optional)    │
 │  └─ Other Extensions                │
 └─────────────────────────────────────┘
 ```
@@ -159,11 +131,12 @@ The agents follow a layered architecture:
 ## Configuration
 
 ### Automatic Configuration
-All agents support automatic configuration through the `DefaultAgentFactory`:
+All agents support automatic configuration through the agent factories:
 - **Model Provider**: Automatically discovered and configured
-- **Memory Provider**: Automatically discovered (if available)
+- **Memory Provider**: Automatically discovered (optional)
 - **RAG**: Configured through agent implementation
 - **Guardrails**: Configured through agent implementation
+- **Multi-Agent**: Configured through `MultiAgentFactory`
 
 ### Named/Prefixed Configuration
 Starting with version 1.0, all configuration classes support named/prefixed configurations for multi-instance setups:
@@ -225,7 +198,7 @@ model-name=gpt-3.5-turbo
 The agent factories automatically use prefixed configurations when creating providers:
 
 ```java
-// In DefaultAgentFactory
+// In Agent Factories
 ModelProvider provider = new OpenAIProvider();
 ChatModel model = provider.create("agent1");  // Uses OpenAIConfig("agent1")
 
@@ -238,7 +211,7 @@ For advanced scenarios, you can create custom agent factories or configure agent
 
 ## Examples
 
-### Memory-Aware Chat Bot
+### Memory-Enabled Chat Bot
 
 ```java
 @Component
@@ -310,9 +283,10 @@ The agents provide comprehensive error handling:
 
 ## Performance Considerations
 
-- **Memory-Aware**: Higher memory usage due to conversation storage
-- **Memoryless**: Optimal for high-throughput scenarios
-- **Factory**: Minimal overhead with singleton pattern
+- **With Memory**: Higher memory usage due to conversation storage
+- **Without Memory**: Optimal for high-throughput scenarios
+- **Multi-Agent**: Variable based on agent count and coordination
+- **Factories**: Minimal overhead with singleton pattern
 
 ## Requirements
 
@@ -323,6 +297,8 @@ The agents provide comprehensive error handling:
 ## See Also
 
 - [Multi-Agent Development Guide](../../../docs/multi-agent-guide.md) - Complete guide for creating multi-agent systems with Camel and Kaoto
+- [Agent Factories Documentation](forage-agent-factories/README.md) - Factory implementations and multi-agent support
+- [Composable Agent Documentation](forage-agent/README.md) - Detailed agent configuration
 - [Model Providers](../models/chat/README.md) - Available AI model integrations
 - [Memory Providers](../chat-memory/README.md) - Chat memory implementations
 - [Contributing Beans Guide](../../../docs/contributing-beans.md) - Creating custom components
