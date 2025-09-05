@@ -15,9 +15,8 @@
     <name>Camel Forage :: Library :: AI :: Agents</name>
 
     <modules>
-        <module>forage-agent-factory-default</module>
-        <module>forage-agent-memory-aware</module>
-        <module>forage-agent-memoryless</module>
+        <module>forage-agent-factories</module>
+        <module>forage-agent</module>
     </modules>
 
 </project>

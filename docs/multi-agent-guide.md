@@ -36,7 +36,7 @@ Camel Forage provides an opinionated library of beans for Apache Camel that simp
 
 Create configuration files for each component:
 
-#### forage-agent-factory-default.properties
+#### forage-agent-factory.properties
 ```properties
 # Define multi agents
 multi.agent.names=google,ollama
@@ -280,7 +280,8 @@ multi.agent.id.source.variable=selectedAgent
 
 ```bash
 camel run agent.camel.yaml \
-  --dep=mvn:org.apache.camel.forage:forage-agent-simple:1.0-SNAPSHOT \
+  --dep=mvn:org.apache.camel.forage:forage-agent-factories:1.0-SNAPSHOT \
+  --dep=mvn:org.apache.camel.forage:forage-agent:1.0-SNAPSHOT \
   --dep=mvn:org.apache.camel.forage:forage-memory-message-window:1.0-SNAPSHOT \
   --dep=mvn:org.apache.camel.forage:forage-model-google-gemini:1.0-SNAPSHOT \
   --dep=camel-langchain4j-agent
@@ -290,9 +291,9 @@ camel run agent.camel.yaml \
 
 ```bash
 camel run multi-agent.camel.yaml \
-  --dep=mvn:org.apache.camel.forage:forage-agent-simple:1.0-SNAPSHOT \
+  --dep=mvn:org.apache.camel.forage:forage-agent-factories:1.0-SNAPSHOT \
+  --dep=mvn:org.apache.camel.forage:forage-agent:1.0-SNAPSHOT \
   --dep=mvn:org.apache.camel.forage:forage-memory-message-window:1.0-SNAPSHOT \
-  --dep=mvn:org.apache.camel.forage:forage-agent-memoryless:1.0-SNAPSHOT \
   --dep=mvn:org.apache.camel.forage:forage-model-google-gemini:1.0-SNAPSHOT \
   --dep=mvn:org.apache.camel.forage:forage-model-ollama:1.0-SNAPSHOT \
   --dep=camel-langchain4j-agent
