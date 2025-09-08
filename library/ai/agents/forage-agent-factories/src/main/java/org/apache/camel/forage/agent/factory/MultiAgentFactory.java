@@ -70,10 +70,7 @@ public class MultiAgentFactory implements AgentFactory {
 
     //    @Override
     public synchronized Agent createAgent(Exchange exchange) throws Exception {
-        AgentIdSource agentIdSource = AgentIdSourceFactory.create(config);
-        final String agentId = agentIdSource.extract(exchange);
-
-        LOG.info("Creating Agent for {} using ID {}", exchange.getExchangeId(), agentId);
+        final String agentId = AgentIdSelectorHelper.select(config, exchange);
 
         if (LOG.isTraceEnabled()) {
             LOG.debug("Available agents: {}", agents);
@@ -101,7 +98,7 @@ public class MultiAgentFactory implements AgentFactory {
             return agent;
         }
 
-        throw AgentIdSourceFactory.newUndefinedAgentException(config, exchange);
+        throw AgentIdSelectorHelper.newUndefinedAgentException(config, exchange);
     }
 
     private synchronized Agent newAgent(AgentFactoryConfig agentFactoryConfig, String name) {

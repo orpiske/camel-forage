@@ -6,16 +6,16 @@ import org.apache.camel.Exchange;
  * Agent ID source that extracts the agent ID from a configurable exchange variable.
  * The variable name is configured via the multi.agent.id.source.variable property.
  */
-public class VariableAgentIdSource implements AgentIdSource {
+public class VariableAgentSelector implements AgentSelector {
 
     private final String variableName;
 
-    public VariableAgentIdSource(String variableName) {
+    public VariableAgentSelector(String variableName) {
         this.variableName = variableName;
     }
 
     @Override
-    public String extract(Exchange exchange) {
+    public String select(Exchange exchange) {
         if (variableName == null || variableName.isEmpty()) {
             return null;
         }

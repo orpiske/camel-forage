@@ -14,7 +14,7 @@ The `forage-agent-factories` module provides multiple factory implementations, i
 - **Multi-Agent Support**: Coordinated multi-agent systems with `MultiAgentFactory`
 - **Flexible Architecture**: Works with any compatible agent implementation
 - **Zero Configuration**: Works out-of-the-box with included modules
-- **Agent ID Sources**: Configurable strategies for multi-agent coordination
+- **Agent Selectors**: Configurable strategies for multi-agent coordination
 
 ## Quick Start
 
@@ -107,11 +107,11 @@ The agent factories use ServiceLoader to discover and configure components:
   - Interface for agents that accept configuration
   - Allows automatic configuration of discovered agents
 
-- **Agent ID Sources** - Various strategies for multi-agent coordination:
-  - `RouteIdAgentIdSource` - Uses Camel route ID
-  - `HeaderAgentIdSource` - Uses message header value
-  - `PropertyAgentIdSource` - Uses exchange property value
-  - `VariableAgentIdSource` - Uses exchange variable value
+- **Agent Selectors** - Various strategies for multi-agent coordination:
+  - `RouteIdAgentSelector` - Uses Camel route ID
+  - `HeaderAgentSelector` - Uses message header value
+  - `PropertyAgentSelector` - Uses exchange property value
+  - `VariableAgentSelector` - Uses exchange variable value
 
 ### ServiceLoader Integration
 
@@ -128,7 +128,7 @@ The factories automatically configure agents with:
 - **Chat Memory Provider**: First discovered memory factory (optional)
 - **Retrieval Augmentor**: Configured through the agent if supported
 - **Guardrails**: Configured through the agent if supported
-- **Multi-Agent Coordination**: Agent ID sources and orchestration (MultiAgentFactory)
+- **Multi-Agent Coordination**: Agent selectors and orchestration (MultiAgentFactory)
 
 ## Error Handling
 

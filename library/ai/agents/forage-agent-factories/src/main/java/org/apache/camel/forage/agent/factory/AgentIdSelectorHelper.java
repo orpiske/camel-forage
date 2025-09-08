@@ -2,12 +2,15 @@ package org.apache.camel.forage.agent.factory;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.forage.core.exceptions.UndefinedAgentException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Factory class for creating AgentIdSource implementations based on string identifiers.
+ * Helper class for creating the appropriate agent selector implementation based on string identifiers.
  * Supports creating different strategies for extracting agent IDs from exchanges.
  */
-public class AgentIdSourceFactory {
+public class AgentIdSelectorHelper {
+    private static final Logger LOG = LoggerFactory.getLogger(AgentIdSelectorHelper.class);
 
     /**
      * Creates an AgentIdSource implementation based on the specified source type.
@@ -16,12 +19,12 @@ public class AgentIdSourceFactory {
      * @return An appropriate AgentIdSource implementation
      * @throws IllegalArgumentException if the source type is unknown or unsupported
      */
-    public static AgentIdSource create(MultiAgentConfig config) {
+    private static AgentSelector create(MultiAgentConfig config) {
         String sourceType = config.multiAgentIdSource();
 
         switch (sourceType.toLowerCase()) {
             case MultiAgentConfig.ROUTE_ID:
-                return new RouteIdAgentIdSource();
+                return new RouteIdAgentSelector();
 
             case MultiAgentConfig.HEADER:
                 String headerName = config.multiAgentIdSourceHeader();
@@ -29,7 +32,7 @@ public class AgentIdSourceFactory {
                     throw new IllegalArgumentException(
                             "Header name must be configured via multi.agent.id.source.header when using header source type");
                 }
-                return new HeaderAgentIdSource(headerName);
+                return new HeaderAgentSelector(headerName);
 
             case MultiAgentConfig.PROPERTY:
                 String propertyName = config.multiAgentIdSourceProperty();
@@ -37,7 +40,7 @@ public class AgentIdSourceFactory {
                     throw new IllegalArgumentException(
                             "Property name must be configured via multi.agent.id.source.property when using property source type");
                 }
-                return new PropertyAgentIdSource(propertyName);
+                return new PropertyAgentSelector(propertyName);
 
             case MultiAgentConfig.VARIABLE:
                 String variableName = config.multiAgentIdSourceVariable();
@@ -45,42 +48,13 @@ public class AgentIdSourceFactory {
                     throw new IllegalArgumentException(
                             "Variable name must be configured via multi.agent.id.source.variable when using variable source type");
                 }
-                return new VariableAgentIdSource(variableName);
+                return new VariableAgentSelector(variableName);
 
             default:
                 throw new IllegalArgumentException("Unknown agent ID source type: " + sourceType
                         + ". Supported types are: " + MultiAgentConfig.ROUTE_ID + ", " + MultiAgentConfig.HEADER + ", "
                         + MultiAgentConfig.PROPERTY + ", " + MultiAgentConfig.VARIABLE);
         }
-    }
-
-    /**
-     * Checks if the given source type is supported by the factory.
-     *
-     * @param sourceType The source type to check
-     * @return true if the source type is supported, false otherwise
-     */
-    public static boolean isSupported(String sourceType) {
-        if (sourceType == null) {
-            return false;
-        }
-
-        String lowerSourceType = sourceType.toLowerCase();
-        return MultiAgentConfig.ROUTE_ID.equals(lowerSourceType)
-                || MultiAgentConfig.HEADER.equals(lowerSourceType)
-                || MultiAgentConfig.PROPERTY.equals(lowerSourceType)
-                || MultiAgentConfig.VARIABLE.equals(lowerSourceType);
-    }
-
-    /**
-     * Returns an array of all supported source types.
-     *
-     * @return Array of supported source type strings
-     */
-    public static String[] getSupportedTypes() {
-        return new String[] {
-            MultiAgentConfig.ROUTE_ID, MultiAgentConfig.HEADER, MultiAgentConfig.PROPERTY, MultiAgentConfig.VARIABLE
-        };
     }
 
     /**
@@ -130,5 +104,12 @@ public class AgentIdSourceFactory {
                 String fallbackRouteId = exchange.getFromRouteId();
                 return UndefinedAgentException.fromRouteId(fallbackRouteId);
         }
+    }
+
+    public static String select(MultiAgentConfig config, Exchange exchange) {
+        AgentSelector agentSelector = AgentIdSelectorHelper.create(config);
+        String agentId = agentSelector.select(exchange);
+        LOG.info("Creating Agent for {} using ID {}", exchange.getExchangeId(), agentId);
+        return agentId;
     }
 }

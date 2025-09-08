@@ -6,16 +6,16 @@ import org.apache.camel.Exchange;
  * Agent ID source that extracts the agent ID from a configurable exchange property.
  * The property name is configured via the multi.agent.id.source.property property.
  */
-public class PropertyAgentIdSource implements AgentIdSource {
+public class PropertyAgentSelector implements AgentSelector {
 
     private final String propertyName;
 
-    public PropertyAgentIdSource(String propertyName) {
+    public PropertyAgentSelector(String propertyName) {
         this.propertyName = propertyName;
     }
 
     @Override
-    public String extract(Exchange exchange) {
+    public String select(Exchange exchange) {
         if (propertyName == null || propertyName.isEmpty()) {
             return null;
         }
