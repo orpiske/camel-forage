@@ -6,16 +6,16 @@ import org.apache.camel.Exchange;
  * Agent ID source that extracts the agent ID from a configurable exchange header.
  * The header name is configured via the multi.agent.id.source.header property.
  */
-public class HeaderAgentIdSource implements AgentIdSource {
+public class HeaderAgentSelector implements AgentSelector {
 
     private final String headerName;
 
-    public HeaderAgentIdSource(String headerName) {
+    public HeaderAgentSelector(String headerName) {
         this.headerName = headerName;
     }
 
     @Override
-    public String extract(Exchange exchange) {
+    public String select(Exchange exchange) {
         if (headerName == null || headerName.isEmpty()) {
             return null;
         }
