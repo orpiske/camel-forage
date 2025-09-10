@@ -240,6 +240,7 @@ Contains vector database interfaces:
 - **forage-agent**: Composable agent with optional memory support (uses `AiAgentWithMemoryService` or `AiAgentService`)
 
 #### AI Models
+- **forage-model-azure-openai**: Azure OpenAI integration (GPT models via Azure)
 - **forage-model-openai**: OpenAI integration (GPT models)
 - **forage-model-google-gemini**: Google Gemini integration
 - **forage-model-ollama**: Ollama local model integration
@@ -323,6 +324,64 @@ public class NewVectorDbProvider implements EmbeddingStoreProvider {
    - Content: `org.apache.camel.forage.vectordb.newdb.NewVectorDbProvider`
 
 ## Configuration Examples
+
+### Azure OpenAI Configuration
+```bash
+# Required Environment variables
+export AZURE_OPENAI_API_KEY="your-api-key"
+export AZURE_OPENAI_ENDPOINT="https://your-resource.openai.azure.com/"
+export AZURE_OPENAI_DEPLOYMENT_NAME="gpt-35-turbo"
+
+# Optional Environment variables
+export AZURE_OPENAI_SERVICE_VERSION="2024-02-01"
+export AZURE_OPENAI_TEMPERATURE="0.7"
+export AZURE_OPENAI_MAX_TOKENS="2048"
+export AZURE_OPENAI_TOP_P="0.9"
+export AZURE_OPENAI_PRESENCE_PENALTY="0.0"
+export AZURE_OPENAI_FREQUENCY_PENALTY="0.0"
+export AZURE_OPENAI_SEED="12345"
+export AZURE_OPENAI_USER="user-123"
+export AZURE_OPENAI_TIMEOUT="60"
+export AZURE_OPENAI_MAX_RETRIES="3"
+export AZURE_OPENAI_LOG_REQUESTS_AND_RESPONSES="false"
+
+# Required System properties
+-Dazure.openai.api.key=your-api-key
+-Dazure.openai.endpoint=https://your-resource.openai.azure.com/
+-Dazure.openai.deployment.name=gpt-35-turbo
+
+# Optional System properties
+-Dazure.openai.service.version=2024-02-01
+-Dazure.openai.temperature=0.7
+-Dazure.openai.max.tokens=2048
+-Dazure.openai.top.p=0.9
+-Dazure.openai.presence.penalty=0.0
+-Dazure.openai.frequency.penalty=0.0
+-Dazure.openai.seed=12345
+-Dazure.openai.user=user-123
+-Dazure.openai.timeout=60
+-Dazure.openai.max.retries=3
+-Dazure.openai.log.requests.and.responses=false
+
+# forage-model-azure-openai.properties
+# Required
+api-key=your-api-key
+endpoint=https://your-resource.openai.azure.com/
+deployment-name=gpt-35-turbo
+
+# Optional
+service-version=2024-02-01
+temperature=0.7
+max-tokens=2048
+top-p=0.9
+presence-penalty=0.0
+frequency-penalty=0.0
+seed=12345
+user=user-123
+timeout=60
+max-retries=3
+log-requests-and-responses=false
+```
 
 ### OpenAI Configuration
 ```bash
