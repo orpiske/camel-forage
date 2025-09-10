@@ -1,7 +1,7 @@
 package org.apache.camel.forage.memory.chat.tck;
 
-import org.apache.camel.forage.core.ai.ChatMemoryFactory;
-import org.apache.camel.forage.memory.chat.messagewindow.MessageWindowChatMemoryFactory;
+import org.apache.camel.forage.core.ai.ChatMemoryBeanProvider;
+import org.apache.camel.forage.memory.chat.messagewindow.MessageWindowChatMemoryBeanProvider;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -13,11 +13,11 @@ import org.junit.jupiter.api.Test;
  *
  * @since 1.0
  */
-class MessageWindowChatMemoryTCKTest extends ChatMemoryFactoryTCK {
+class MessageWindowChatMemoryTCKTest extends ChatMemoryBeanProviderTCK {
 
     @Override
-    protected ChatMemoryFactory createChatMemoryFactory() {
-        return new MessageWindowChatMemoryFactory();
+    protected ChatMemoryBeanProvider createChatMemoryFactory() {
+        return new MessageWindowChatMemoryBeanProvider();
     }
 
     @Test

@@ -9,7 +9,7 @@ import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import java.util.List;
-import org.apache.camel.forage.core.ai.ChatMemoryFactory;
+import org.apache.camel.forage.core.ai.ChatMemoryBeanProvider;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -41,7 +41,7 @@ import org.junit.jupiter.api.Test;
  *
  * @since 1.0
  */
-public abstract class ChatMemoryFactoryTCK {
+public abstract class ChatMemoryBeanProviderTCK {
 
     /**
      * Creates a ChatMemoryFactory instance for testing.
@@ -52,7 +52,7 @@ public abstract class ChatMemoryFactoryTCK {
      *
      * @return a ChatMemoryFactory instance for testing
      */
-    protected abstract ChatMemoryFactory createChatMemoryFactory();
+    protected abstract ChatMemoryBeanProvider createChatMemoryFactory();
 
     @Test
     void shouldCreateFactoryWithoutException() {
@@ -61,14 +61,14 @@ public abstract class ChatMemoryFactoryTCK {
 
     @Test
     void shouldCreateChatMemoryFactory() {
-        ChatMemoryFactory factory = createChatMemoryFactory();
+        ChatMemoryBeanProvider factory = createChatMemoryFactory();
 
         assertThat(factory).isNotNull();
     }
 
     @Test
     void shouldCreateChatMemoryProvider() {
-        ChatMemoryFactory factory = createChatMemoryFactory();
+        ChatMemoryBeanProvider factory = createChatMemoryFactory();
 
         ChatMemoryProvider provider = factory.create();
 
@@ -77,7 +77,7 @@ public abstract class ChatMemoryFactoryTCK {
 
     @Test
     void shouldCreateMultipleChatMemoryProviders() {
-        ChatMemoryFactory factory = createChatMemoryFactory();
+        ChatMemoryBeanProvider factory = createChatMemoryFactory();
 
         ChatMemoryProvider provider1 = factory.create();
         ChatMemoryProvider provider2 = factory.create();
@@ -90,7 +90,7 @@ public abstract class ChatMemoryFactoryTCK {
 
     @Test
     void shouldCreateChatMemoryFromProvider() {
-        ChatMemoryFactory factory = createChatMemoryFactory();
+        ChatMemoryBeanProvider factory = createChatMemoryFactory();
         ChatMemoryProvider provider = factory.create();
 
         ChatMemory memory = provider.get("test-memory-id");
@@ -100,7 +100,7 @@ public abstract class ChatMemoryFactoryTCK {
 
     @Test
     void shouldStoreAndRetrieveMessages() {
-        ChatMemoryFactory factory = createChatMemoryFactory();
+        ChatMemoryBeanProvider factory = createChatMemoryFactory();
         ChatMemoryProvider provider = factory.create();
         ChatMemory memory = provider.get("test-memory-id");
 
@@ -119,7 +119,7 @@ public abstract class ChatMemoryFactoryTCK {
 
     @Test
     void shouldIsolateMemoryBetweenDifferentIds() {
-        ChatMemoryFactory factory = createChatMemoryFactory();
+        ChatMemoryBeanProvider factory = createChatMemoryFactory();
         ChatMemoryProvider provider = factory.create();
 
         ChatMemory memory1 = provider.get("memory-1");
@@ -140,7 +140,7 @@ public abstract class ChatMemoryFactoryTCK {
 
     @Test
     void shouldReturnSameMemoryForSameId() {
-        ChatMemoryFactory factory = createChatMemoryFactory();
+        ChatMemoryBeanProvider factory = createChatMemoryFactory();
         ChatMemoryProvider provider = factory.create();
 
         ChatMemory memory1 = provider.get("same-id");
@@ -160,7 +160,7 @@ public abstract class ChatMemoryFactoryTCK {
 
     @Test
     void shouldHandleEmptyMemory() {
-        ChatMemoryFactory factory = createChatMemoryFactory();
+        ChatMemoryBeanProvider factory = createChatMemoryFactory();
         ChatMemoryProvider provider = factory.create();
         ChatMemory memory = provider.get("empty-memory");
 
@@ -171,7 +171,7 @@ public abstract class ChatMemoryFactoryTCK {
 
     @Test
     void shouldClearMemory() {
-        ChatMemoryFactory factory = createChatMemoryFactory();
+        ChatMemoryBeanProvider factory = createChatMemoryFactory();
         ChatMemoryProvider provider = factory.create();
         ChatMemory memory = provider.get("clear-test");
 
@@ -187,7 +187,7 @@ public abstract class ChatMemoryFactoryTCK {
 
     @Test
     void shouldHandleMultipleMessageTypes() {
-        ChatMemoryFactory factory = createChatMemoryFactory();
+        ChatMemoryBeanProvider factory = createChatMemoryFactory();
         ChatMemoryProvider provider = factory.create();
         ChatMemory memory = provider.get("multi-type-test");
 

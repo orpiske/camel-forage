@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.apache.camel.forage</groupId>
+        <artifactId>camel-forage</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>forage-catalog</artifactId>
+    <packaging>jar</packaging>
+    <name>Camel Forage :: Catalog</name>
+    <description>Generated catalog of all Camel Forage components</description>
+
+    <dependencies>
+        <!-- Forage modules with ForageBean annotations - required for complete catalog generation -->
+        <dependency>
+            <groupId>org.apache.camel.forage</groupId>
+            <artifactId>forage-agent-factories</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Vector Database Modules -->
+        <dependency>
+            <groupId>org.apache.camel.forage</groupId>
+            <artifactId>forage-vectordb-infinispan</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.camel.forage</groupId>
+            <artifactId>forage-vectordb-default</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.camel.forage</groupId>
+            <artifactId>forage-vectordb-chroma</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.camel.forage</groupId>
+            <artifactId>forage-vectordb-redis</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.camel.forage</groupId>
+            <artifactId>forage-vectordb-pgvector</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.camel.forage</groupId>
+            <artifactId>forage-vectordb-milvus</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.camel.forage</groupId>
+            <artifactId>forage-vectordb-weaviate</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.camel.forage</groupId>
+            <artifactId>forage-vectordb-qdrant</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.camel.forage</groupId>
+            <artifactId>forage-vectordb-pinecone</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.camel.forage</groupId>
+            <artifactId>forage-vectordb-neo4j</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Chat Memory Modules -->
+        <dependency>
+            <groupId>org.apache.camel.forage</groupId>
+            <artifactId>forage-memory-infinispan</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.camel.forage</groupId>
+            <artifactId>forage-memory-redis</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.camel.forage</groupId>
+            <artifactId>forage-memory-message-window</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- AI Model Modules -->
+        <dependency>
+            <groupId>org.apache.camel.forage</groupId>
+            <artifactId>forage-model-azure-openai</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.camel.forage</groupId>
+            <artifactId>forage-model-open-ai</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.camel.forage</groupId>
+            <artifactId>forage-model-ollama</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.camel.forage</groupId>
+            <artifactId>forage-model-google-gemini</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Forage Maven Catalog Plugin -->
+            <plugin>
+                <groupId>org.apache.camel.forage</groupId>
+                <artifactId>forage-maven-catalog-plugin</artifactId>
+                <version>${project.version}</version>
+                <configuration>
+                    <outputDirectory>${project.build.directory}/generated-catalog</outputDirectory>
+                    <format>all</format>
+                    <scanTransitive>false</scanTransitive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>generate-catalog</id>
+                        <goals>
+                            <goal>generate-catalog</goal>
+                        </goals>
+                        <phase>process-classes</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Copy generated catalog files to resources -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-catalog-to-resources</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}/catalog</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}/generated-catalog</directory>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Attach catalog files as additional artifacts -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.4.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-catalog-json</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attach-artifact</goal>
+                        </goals>
+                        <configuration>
+                            <artifacts>
+                                <artifact>
+                                    <file>${project.build.directory}/generated-catalog/forage-catalog.json</file>
+                                    <type>json</type>
+                                    <classifier>catalog</classifier>
+                                </artifact>
+                            </artifacts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

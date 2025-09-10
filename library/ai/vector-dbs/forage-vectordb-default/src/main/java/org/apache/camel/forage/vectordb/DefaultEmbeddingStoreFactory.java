@@ -4,9 +4,15 @@ import dev.langchain4j.store.embedding.EmbeddingStore;
 import java.util.ServiceLoader;
 import org.apache.camel.CamelContext;
 import org.apache.camel.CamelContextAware;
+import org.apache.camel.forage.core.annotations.ForageFactory;
 import org.apache.camel.forage.core.vectordb.EmbeddingStoreFactory;
 import org.apache.camel.forage.core.vectordb.EmbeddingStoreProvider;
 
+@ForageFactory(
+        value = "default-embedding-store",
+        component = "camel-langchain4j-embeddings",
+        description = "Default embedding store factory with ServiceLoader discovery",
+        factoryType = "EmbeddingStore")
 public class DefaultEmbeddingStoreFactory implements EmbeddingStoreFactory, CamelContextAware {
     private CamelContext camelContext;
 

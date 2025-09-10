@@ -1,6 +1,7 @@
 package org.apache.camel.forage.vectordb.chroma;
 
 import dev.langchain4j.store.embedding.chroma.ChromaEmbeddingStore;
+import org.apache.camel.forage.core.annotations.ForageBean;
 import org.apache.camel.forage.core.vectordb.EmbeddingStoreProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,10 @@ import org.slf4j.LoggerFactory;
  *
  * @since 1.0
  */
+@ForageBean(
+        value = "chroma",
+        component = "camel-langchain4j-embeddings",
+        description = "Chroma vector database provider")
 public class ChromaProvider implements EmbeddingStoreProvider {
     private static final Logger LOG = LoggerFactory.getLogger(ChromaProvider.class);
 

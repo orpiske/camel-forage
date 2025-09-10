@@ -3,6 +3,7 @@ package org.apache.camel.forage.models.chat.ollama;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import org.apache.camel.forage.core.ai.ModelProvider;
+import org.apache.camel.forage.core.annotations.ForageBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +38,7 @@ import org.slf4j.LoggerFactory;
  * @see ModelProvider
  * @since 1.0
  */
+@ForageBean(value = "ollama", component = "camel-langchain4j-agent", description = "Ollama local chat model provider")
 public class OllamaProvider implements ModelProvider {
     private static final Logger LOG = LoggerFactory.getLogger(OllamaProvider.class);
 

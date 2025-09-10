@@ -2,7 +2,8 @@ package org.apache.camel.forage.memory.chat.infinispan;
 
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
-import org.apache.camel.forage.core.ai.ChatMemoryFactory;
+import org.apache.camel.forage.core.ai.ChatMemoryBeanProvider;
+import org.apache.camel.forage.core.annotations.ForageBean;
 import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
@@ -10,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Infinispan-based implementation of {@link ChatMemoryFactory} that creates chat memory providers
+ * Infinispan-based implementation of {@link ChatMemoryBeanProvider} that creates chat memory providers
  * with persistent storage using Infinispan as the backing store.
  *
  * <p>This factory creates {@link ChatMemoryProvider} instances that use Infinispan for storing
@@ -36,13 +37,17 @@ import org.slf4j.LoggerFactory;
  * Each call to {@link #create()} ()} returns a provider that can handle multiple
  * concurrent memory operations.
  *
- * @see ChatMemoryFactory
+ * @see ChatMemoryBeanProvider
  * @see InfinispanConfig
  * @see PersistentInfinispanStore
  * @since 1.0
  */
-public class InfinispanMemoryFactory implements ChatMemoryFactory {
-    private static final Logger LOG = LoggerFactory.getLogger(InfinispanMemoryFactory.class);
+@ForageBean(
+        value = "infinispan",
+        component = "camel-langchain4j-agent",
+        description = "Infinispan distributed chat memory factory")
+public class InfinispanMemoryBeanProvider implements ChatMemoryBeanProvider {
+    private static final Logger LOG = LoggerFactory.getLogger(InfinispanMemoryBeanProvider.class);
     private static final int DEFAULT_MAX_MESSAGES = 10;
 
     private static final InfinispanConfig CONFIG = new InfinispanConfig();
@@ -102,7 +107,7 @@ public class InfinispanMemoryFactory implements ChatMemoryFactory {
      * <p>The factory uses the statically initialized Infinispan cache manager that was
      * configured during class loading using the {@link InfinispanConfig} settings.
      */
-    public InfinispanMemoryFactory() {
+    public InfinispanMemoryBeanProvider() {
         // Cache manager and store are initialized statically
     }
 

@@ -24,6 +24,14 @@
         <junit-jupiter.version>5.13.4</junit-jupiter.version>
         <assertj-core.version>3.27.4</assertj-core.version>
         <testcontainers.version>1.21.3</testcontainers.version>
+
+        <maven.version>3.9.0</maven.version>
+        <maven-plugin-api.version>3.9.0</maven-plugin-api.version>
+        <maven-plugin-annotations.version>3.8.1</maven-plugin-annotations.version>
+        <maven-plugin-plugin.version>3.8.1</maven-plugin-plugin.version>
+        <javaparser.version>3.27.0</javaparser.version>
+        <jackson.version>2.15.2</jackson.version>
+        <maven-plugin-testing-harness.version>3.3.0</maven-plugin-testing-harness.version>
     </properties>
 
     <dependencyManagement>
@@ -94,6 +102,8 @@
     <modules>
         <module>core</module>
         <module>library</module>
+        <module>tooling</module>
+        <module>forage-catalog</module>
     </modules>
 
     <build>

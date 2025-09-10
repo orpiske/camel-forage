@@ -2,7 +2,8 @@ package org.apache.camel.forage.memory.chat.redis;
 
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
-import org.apache.camel.forage.core.ai.ChatMemoryFactory;
+import org.apache.camel.forage.core.ai.ChatMemoryBeanProvider;
+import org.apache.camel.forage.core.annotations.ForageBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.JedisPool;
@@ -10,7 +11,7 @@ import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.exceptions.JedisException;
 
 /**
- * Redis-based implementation of {@link ChatMemoryFactory} that creates chat memory providers
+ * Redis-based implementation of {@link ChatMemoryBeanProvider} that creates chat memory providers
  * with persistent storage using Redis as the backing store.
  *
  * <p>This factory creates {@link ChatMemoryProvider} instances that use Redis for storing
@@ -33,16 +34,17 @@ import redis.clients.jedis.exceptions.JedisException;
  *
  * <p><strong>Thread Safety:</strong>
  * This factory is thread-safe and can be safely used in concurrent environments.
- * Each call to {@link #newChatMemory()} returns a provider that can handle multiple
+ * Each call to {@link #create()} returns a provider that can handle multiple
  * concurrent memory operations.
  *
- * @see ChatMemoryFactory
+ * @see ChatMemoryBeanProvider
  * @see RedisConfig
  * @see PersistentRedisStore
  * @since 1.0
  */
-public class RedisMemoryFactory implements ChatMemoryFactory {
-    private static final Logger LOG = LoggerFactory.getLogger(RedisMemoryFactory.class);
+@ForageBean(value = "redis", component = "camel-langchain4j-agent", description = "Redis-based chat memory factory")
+public class RedisMemoryBeanProvider implements ChatMemoryBeanProvider {
+    private static final Logger LOG = LoggerFactory.getLogger(RedisMemoryBeanProvider.class);
     private static final int DEFAULT_MAX_MESSAGES = 100;
 
     private static final RedisConfig CONFIG = new RedisConfig();
@@ -104,7 +106,7 @@ public class RedisMemoryFactory implements ChatMemoryFactory {
      * <p>The factory uses the statically initialized Redis connection pool that was
      * configured during class loading using the {@link RedisConfig} settings.
      */
-    public RedisMemoryFactory() {
+    public RedisMemoryBeanProvider() {
         // Redis pool and store are initialized statically
     }
 

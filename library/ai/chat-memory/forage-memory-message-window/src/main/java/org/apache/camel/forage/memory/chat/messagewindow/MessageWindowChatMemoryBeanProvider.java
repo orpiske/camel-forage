@@ -2,17 +2,22 @@ package org.apache.camel.forage.memory.chat.messagewindow;
 
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
-import org.apache.camel.forage.core.ai.ChatMemoryFactory;
+import org.apache.camel.forage.core.ai.ChatMemoryBeanProvider;
+import org.apache.camel.forage.core.annotations.ForageBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MessageWindowChatMemoryFactory implements ChatMemoryFactory {
-    private static final Logger LOG = LoggerFactory.getLogger(MessageWindowChatMemoryFactory.class);
+@ForageBean(
+        value = "message-window",
+        component = "camel-langchain4j-agent",
+        description = "Message window chat memory factory")
+public class MessageWindowChatMemoryBeanProvider implements ChatMemoryBeanProvider {
+    private static final Logger LOG = LoggerFactory.getLogger(MessageWindowChatMemoryBeanProvider.class);
 
     private static final PersistentChatMemoryStore PERSISTENT_CHAT_MEMORY_STORE = new PersistentChatMemoryStore();
     private final ChatMemoryProvider chatMemoryProvider;
 
-    public MessageWindowChatMemoryFactory() {
+    public MessageWindowChatMemoryBeanProvider() {
         chatMemoryProvider = getChatMemoryProvider();
     }
 

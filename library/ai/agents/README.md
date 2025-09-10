@@ -256,7 +256,7 @@ All agents and factories use Java's ServiceLoader for automatic discovery:
 
 - **Agents**: Registered in `META-INF/services/org.apache.camel.component.langchain4j.agent.api.Agent`
 - **Model Providers**: Registered in `META-INF/services/org.apache.camel.forage.core.ai.ModelProvider`
-- **Memory Factories**: Registered in `META-INF/services/org.apache.camel.forage.core.ai.ChatMemoryFactory`
+- **Memory Factories**: Registered in `META-INF/services/org.apache.camel.forage.core.ai.ChatMemoryBeanProvider`
 
 ## Extending the Agents
 

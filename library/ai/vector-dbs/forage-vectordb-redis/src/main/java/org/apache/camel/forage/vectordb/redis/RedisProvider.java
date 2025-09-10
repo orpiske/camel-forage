@@ -7,6 +7,7 @@ import dev.langchain4j.store.embedding.EmbeddingStore;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import org.apache.camel.forage.core.annotations.ForageBean;
 import org.apache.camel.forage.core.vectordb.EmbeddingStoreProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,7 @@ import org.slf4j.LoggerFactory;
  * @see EmbeddingStoreProvider
  * @since 1.0
  */
+@ForageBean(value = "redis", component = "camel-langchain4j-embeddings", description = "Redis vector database provider")
 public class RedisProvider implements EmbeddingStoreProvider {
     private static final Logger LOG = LoggerFactory.getLogger(RedisProvider.class);
 

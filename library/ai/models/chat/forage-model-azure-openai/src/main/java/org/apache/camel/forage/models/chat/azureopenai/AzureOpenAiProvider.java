@@ -5,12 +5,17 @@ import static java.time.Duration.ofSeconds;
 import dev.langchain4j.model.azure.AzureOpenAiChatModel;
 import dev.langchain4j.model.chat.ChatModel;
 import org.apache.camel.forage.core.ai.ModelProvider;
+import org.apache.camel.forage.core.annotations.ForageBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Provider for creating Azure OpenAI chat models
  */
+@ForageBean(
+        value = "azure-openai",
+        component = "camel-langchain4j-agent",
+        description = "Azure OpenAI GPT chat model provider")
 public class AzureOpenAiProvider implements ModelProvider {
     private static final Logger LOG = LoggerFactory.getLogger(AzureOpenAiProvider.class);
 
@@ -31,27 +36,27 @@ public class AzureOpenAiProvider implements ModelProvider {
 
         // Configure model behavior parameters with defaults for unset values
         builder.temperature(config.temperature() != null ? config.temperature() : 1.0);
-        
+
         if (config.maxTokens() != null) {
             builder.maxTokens(config.maxTokens());
         }
-        
+
         if (config.topP() != null) {
             builder.topP(config.topP());
         }
-        
+
         if (config.presencePenalty() != null) {
             builder.presencePenalty(config.presencePenalty());
         }
-        
+
         if (config.frequencyPenalty() != null) {
             builder.frequencyPenalty(config.frequencyPenalty());
         }
-        
+
         if (config.seed() != null) {
             builder.seed(config.seed());
         }
-        
+
         if (config.user() != null) {
             builder.user(config.user());
         }
@@ -59,13 +64,14 @@ public class AzureOpenAiProvider implements ModelProvider {
         // Configure connection and reliability settings
         int timeoutSeconds = config.timeoutSeconds() != null ? config.timeoutSeconds() : 60;
         builder.timeout(ofSeconds(timeoutSeconds));
-        
+
         if (config.maxRetries() != null) {
             builder.maxRetries(config.maxRetries());
         }
 
         // Configure logging settings
-        boolean logRequestsAndResponses = config.logRequestsAndResponses() != null ? config.logRequestsAndResponses() : true;
+        boolean logRequestsAndResponses =
+                config.logRequestsAndResponses() != null ? config.logRequestsAndResponses() : true;
         builder.logRequestsAndResponses(logRequestsAndResponses);
 
         return builder.build();

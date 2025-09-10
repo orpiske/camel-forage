@@ -1,19 +1,19 @@
 package org.apache.camel.forage.models.chat.azureopenai;
 
 import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.API_KEY;
-import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.ENDPOINT;
 import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.DEPLOYMENT_NAME;
+import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.ENDPOINT;
+import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.FREQUENCY_PENALTY;
+import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.LOG_REQUESTS_AND_RESPONSES;
+import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.MAX_RETRIES;
+import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.MAX_TOKENS;
+import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.PRESENCE_PENALTY;
+import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.SEED;
 import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.SERVICE_VERSION;
 import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.TEMPERATURE;
-import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.MAX_TOKENS;
-import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.TOP_P;
-import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.PRESENCE_PENALTY;
-import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.FREQUENCY_PENALTY;
-import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.SEED;
-import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.USER;
 import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.TIMEOUT;
-import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.MAX_RETRIES;
-import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.LOG_REQUESTS_AND_RESPONSES;
+import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.TOP_P;
+import static org.apache.camel.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.USER;
 
 import java.util.Optional;
 import org.apache.camel.forage.core.util.config.Config;
@@ -232,9 +232,7 @@ public class AzureOpenAiConfig implements Config {
      * @return the Azure OpenAI service version, or null if not configured (uses service default)
      */
     public String serviceVersion() {
-        return ConfigStore.getInstance()
-                .get(SERVICE_VERSION.asNamed(prefix))
-                .orElse(null);
+        return ConfigStore.getInstance().get(SERVICE_VERSION.asNamed(prefix)).orElse(null);
     }
 
     /**
@@ -389,9 +387,7 @@ public class AzureOpenAiConfig implements Config {
      * @return the user identifier, or null if not configured
      */
     public String user() {
-        return ConfigStore.getInstance()
-                .get(USER.asNamed(prefix))
-                .orElse(null);
+        return ConfigStore.getInstance().get(USER.asNamed(prefix)).orElse(null);
     }
 
     /**
@@ -442,8 +438,8 @@ public class AzureOpenAiConfig implements Config {
     /**
      * Returns whether to log both request and response details.
      *
-     * <p>When enabled, logs the details of both requests sent to and responses received 
-     * from Azure OpenAI service. Useful for debugging and monitoring, but may expose 
+     * <p>When enabled, logs the details of both requests sent to and responses received
+     * from Azure OpenAI service. Useful for debugging and monitoring, but may expose
      * sensitive information in logs.
      *
      * <p><strong>Security Note:</strong> Be cautious when enabling in production

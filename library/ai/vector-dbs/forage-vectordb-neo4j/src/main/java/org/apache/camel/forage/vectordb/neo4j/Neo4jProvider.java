@@ -3,6 +3,7 @@ package org.apache.camel.forage.vectordb.neo4j;
 import dev.langchain4j.community.store.embedding.neo4j.Neo4jEmbeddingStore;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
+import org.apache.camel.forage.core.annotations.ForageBean;
 import org.apache.camel.forage.core.vectordb.EmbeddingStoreProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,7 @@ import org.slf4j.LoggerFactory;
  * @see EmbeddingStoreProvider
  * @since 1.0
  */
+@ForageBean(value = "neo4j", component = "camel-langchain4j-embeddings", description = "Neo4j database provider")
 public class Neo4jProvider implements EmbeddingStoreProvider {
     private static final Logger LOG = LoggerFactory.getLogger(Neo4jProvider.class);
 

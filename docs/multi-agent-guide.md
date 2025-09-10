@@ -45,13 +45,13 @@ multi.agent.names=google,ollama
 google.provider.agent.class=org.apache.camel.forage.agent.simple.SimpleAgent
 google.provider.model.factory.class=org.apache.camel.forage.models.chat.google.GoogleGeminiProvider
 google.provider.features=memory
-google.provider.features.memory.factory.class=org.apache.camel.forage.memory.chat.messagewindow.MessageWindowChatMemoryFactory
+google.provider.features.memory.factory.class=org.apache.camel.forage.memory.chat.messagewindow.MessageWindowChatMemoryBeanProvider
 
 # Ollama Agent Configuration
 ollama.provider.agent.class=org.apache.camel.forage.agent.memoryless.MemorylessAgent
 ollama.provider.model.factory.class=org.apache.camel.forage.models.chat.ollama.OllamaProvider
 ollama.provider.features=memoryless
-ollama.provider.features.memory.factory.class=org.apache.camel.forage.memory.chat.messagewindow.MessageWindowChatMemoryFactory
+ollama.provider.features.memory.factory.class=org.apache.camel.forage.memory.chat.messagewindow.MessageWindowChatMemoryBeanProvider
 ```
 
 #### forage-model-google-gemini.properties
@@ -448,7 +448,7 @@ Configure different memory strategies per agent:
 agent1.provider.features.memory.factory.class=org.apache.camel.forage.memory.chat.redis.RedisChatMemoryFactory
 
 # Short-term memory agent  
-agent2.provider.features.memory.factory.class=org.apache.camel.forage.memory.chat.messagewindow.MessageWindowChatMemoryFactory
+agent2.provider.features.memory.factory.class=org.apache.camel.forage.memory.chat.messagewindow.MessageWindowChatMemoryBeanProvider
 
 # Stateless agent
 agent3.provider.features=memoryless
