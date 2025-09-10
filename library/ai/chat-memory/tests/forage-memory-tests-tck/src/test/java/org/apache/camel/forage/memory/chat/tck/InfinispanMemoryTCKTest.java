@@ -1,7 +1,7 @@
 package org.apache.camel.forage.memory.chat.tck;
 
-import org.apache.camel.forage.core.ai.ChatMemoryFactory;
-import org.apache.camel.forage.memory.chat.infinispan.InfinispanMemoryFactory;
+import org.apache.camel.forage.core.ai.ChatMemoryBeanProvider;
+import org.apache.camel.forage.memory.chat.infinispan.InfinispanMemoryBeanProvider;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ import org.testcontainers.utility.DockerImageName;
  * @since 1.0
  */
 @Testcontainers(disabledWithoutDocker = true)
-class InfinispanMemoryTCKTest extends ChatMemoryFactoryTCK {
+class InfinispanMemoryTCKTest extends ChatMemoryBeanProviderTCK {
 
     private static final int INFINISPAN_PORT = 11222;
 
@@ -71,12 +71,12 @@ class InfinispanMemoryTCKTest extends ChatMemoryFactoryTCK {
         System.clearProperty("infinispan.max-retries");
 
         // Close Infinispan cache manager
-        InfinispanMemoryFactory.close();
+        InfinispanMemoryBeanProvider.close();
     }
 
     @Override
-    protected ChatMemoryFactory createChatMemoryFactory() {
-        return new InfinispanMemoryFactory();
+    protected ChatMemoryBeanProvider createChatMemoryFactory() {
+        return new InfinispanMemoryBeanProvider();
     }
 
     @Test

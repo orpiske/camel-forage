@@ -7,8 +7,9 @@ import org.apache.camel.Exchange;
 import org.apache.camel.component.langchain4j.agent.api.Agent;
 import org.apache.camel.component.langchain4j.agent.api.AgentConfiguration;
 import org.apache.camel.component.langchain4j.agent.api.AgentFactory;
-import org.apache.camel.forage.core.ai.ChatMemoryFactory;
+import org.apache.camel.forage.core.ai.ChatMemoryBeanProvider;
 import org.apache.camel.forage.core.ai.ModelProvider;
+import org.apache.camel.forage.core.annotations.ForageFactory;
 import org.apache.camel.forage.core.util.config.ConfigStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,11 @@ import org.slf4j.LoggerFactory;
 /**
  * Default implementation of AgentFactory that uses ServiceLoader to discover and create agents
  */
+@ForageFactory(
+        value = "default-agent",
+        component = "camel-langchain4j-agent",
+        description = "Default agent factory with ServiceLoader discovery",
+        factoryType = "Agent")
 public class DefaultAgentFactory implements AgentFactory {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultAgentFactory.class);
 
@@ -57,9 +63,9 @@ public class DefaultAgentFactory implements AgentFactory {
                 .orElseThrow(() -> new IllegalStateException("No Agent implementation found via ServiceLoader"));
     }
 
-    private ChatMemoryFactory newChatMemoryFactory() {
-        ServiceLoader<ChatMemoryFactory> serviceLoader =
-                ServiceLoader.load(ChatMemoryFactory.class, camelContext.getApplicationContextClassLoader());
+    private ChatMemoryBeanProvider newChatMemoryFactory() {
+        ServiceLoader<ChatMemoryBeanProvider> serviceLoader =
+                ServiceLoader.load(ChatMemoryBeanProvider.class, camelContext.getApplicationContextClassLoader());
 
         return serviceLoader.findFirst().orElse(null);
     }
@@ -86,10 +92,11 @@ public class DefaultAgentFactory implements AgentFactory {
             ModelProvider modelProvider = newModelProvider();
 
             LOG.trace("Creating Agent (step 2)");
-            ChatMemoryFactory chatMemoryFactory = newChatMemoryFactory();
+            ChatMemoryBeanProvider chatMemoryBeanProvider = newChatMemoryFactory();
 
             LOG.trace("Creating Agent (step 3)");
-            final ChatMemoryProvider chatMemoryProvider = chatMemoryFactory != null ? chatMemoryFactory.create() : null;
+            final ChatMemoryProvider chatMemoryProvider =
+                    chatMemoryBeanProvider != null ? chatMemoryBeanProvider.create() : null;
 
             AgentConfiguration agentConfiguration = new AgentConfiguration();
             agentConfiguration.withChatModel(modelProvider.create()).withChatMemoryProvider(chatMemoryProvider);

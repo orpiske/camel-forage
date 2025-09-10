@@ -6,4 +6,4 @@ import org.apache.camel.forage.core.common.BeanProvider;
 /**
  * Creates chat memory provider. This is named like this to avoid confusion with the ChatMemoryProvider from LangChain4j
  */
-public interface ChatMemoryFactory extends BeanProvider<ChatMemoryProvider> {}
+public interface ChatMemoryBeanProvider extends BeanProvider<ChatMemoryProvider> {}

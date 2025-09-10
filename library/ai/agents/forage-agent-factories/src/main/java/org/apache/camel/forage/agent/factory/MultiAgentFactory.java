@@ -11,8 +11,9 @@ import org.apache.camel.Exchange;
 import org.apache.camel.component.langchain4j.agent.api.Agent;
 import org.apache.camel.component.langchain4j.agent.api.AgentConfiguration;
 import org.apache.camel.component.langchain4j.agent.api.AgentFactory;
-import org.apache.camel.forage.core.ai.ChatMemoryFactory;
+import org.apache.camel.forage.core.ai.ChatMemoryBeanProvider;
 import org.apache.camel.forage.core.ai.ModelProvider;
+import org.apache.camel.forage.core.annotations.ForageFactory;
 import org.apache.camel.forage.core.common.ServiceLoaderHelper;
 import org.apache.camel.forage.core.util.config.ConfigStore;
 import org.slf4j.Logger;
@@ -21,6 +22,11 @@ import org.slf4j.LoggerFactory;
 /**
  * Implementation of AgentFactory that uses ServiceLoader to discover and create multiple agents
  */
+@ForageFactory(
+        value = "multi-agent",
+        component = "camel-langchain4j-agent",
+        description = "Multi-agent factory with ServiceLoader discovery and configuration-based selection",
+        factoryType = "Agent")
 public class MultiAgentFactory implements AgentFactory {
     private static final Logger LOG = LoggerFactory.getLogger(MultiAgentFactory.class);
 
@@ -61,9 +67,9 @@ public class MultiAgentFactory implements AgentFactory {
         return serviceLoader.stream().toList();
     }
 
-    private List<ServiceLoader.Provider<ChatMemoryFactory>> findChatMemoryFactories() {
-        ServiceLoader<ChatMemoryFactory> serviceLoader =
-                ServiceLoader.load(ChatMemoryFactory.class, camelContext.getApplicationContextClassLoader());
+    private List<ServiceLoader.Provider<ChatMemoryBeanProvider>> findChatMemoryFactories() {
+        ServiceLoader<ChatMemoryBeanProvider> serviceLoader =
+                ServiceLoader.load(ChatMemoryBeanProvider.class, camelContext.getApplicationContextClassLoader());
 
         return serviceLoader.stream().toList();
     }
@@ -133,12 +139,12 @@ public class MultiAgentFactory implements AgentFactory {
         return modelProvider.get();
     }
 
-    private ChatMemoryFactory newChatMemoryFactory(AgentFactoryConfig agentFactoryConfig) {
+    private ChatMemoryBeanProvider newChatMemoryFactory(AgentFactoryConfig agentFactoryConfig) {
         final String chatFactoryClass = agentFactoryConfig.providerFeaturesMemoryFactoryClass();
         LOG.trace("Creating ChatMemoryFactory of type {}", chatFactoryClass);
-        final List<ServiceLoader.Provider<ChatMemoryFactory>> providers = findChatMemoryFactories();
+        final List<ServiceLoader.Provider<ChatMemoryBeanProvider>> providers = findChatMemoryFactories();
 
-        final ServiceLoader.Provider<ChatMemoryFactory> chatMemoryFactoryProvider =
+        final ServiceLoader.Provider<ChatMemoryBeanProvider> chatMemoryFactoryProvider =
                 ServiceLoaderHelper.findProviderByClassName(providers, chatFactoryClass);
 
         if (chatMemoryFactoryProvider == null) {
@@ -164,9 +170,9 @@ public class MultiAgentFactory implements AgentFactory {
             ChatMemoryProvider chatMemoryProvider = null;
             if (features.contains(AgentFactoryConfigEntries.FEATURE_MEMORY)) {
                 LOG.trace("Creating the agent memory ");
-                final ChatMemoryFactory chatMemoryFactory = newChatMemoryFactory(agentFactoryConfig);
-                if (chatMemoryFactory != null) {
-                    chatMemoryProvider = chatMemoryFactory.create();
+                final ChatMemoryBeanProvider chatMemoryBeanProvider = newChatMemoryFactory(agentFactoryConfig);
+                if (chatMemoryBeanProvider != null) {
+                    chatMemoryProvider = chatMemoryBeanProvider.create();
                 }
             }
 

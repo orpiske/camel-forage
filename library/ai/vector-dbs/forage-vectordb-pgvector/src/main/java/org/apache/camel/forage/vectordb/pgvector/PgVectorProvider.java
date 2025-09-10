@@ -1,6 +1,7 @@
 package org.apache.camel.forage.vectordb.pgvector;
 
 import dev.langchain4j.store.embedding.pgvector.PgVectorEmbeddingStore;
+import org.apache.camel.forage.core.annotations.ForageBean;
 import org.apache.camel.forage.core.vectordb.EmbeddingStoreProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,10 @@ import org.slf4j.LoggerFactory;
  *
  * @since 1.0
  */
+@ForageBean(
+        value = "pgvector",
+        component = "camel-langchain4j-embeddings",
+        description = "PostgreSQL pgvector extension provider")
 public class PgVectorProvider implements EmbeddingStoreProvider {
     private static final Logger LOG = LoggerFactory.getLogger(PgVectorProvider.class);
 

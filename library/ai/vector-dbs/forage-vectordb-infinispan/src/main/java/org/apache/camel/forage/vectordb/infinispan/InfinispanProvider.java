@@ -1,6 +1,7 @@
 package org.apache.camel.forage.vectordb.infinispan;
 
 import dev.langchain4j.store.embedding.infinispan.InfinispanEmbeddingStore;
+import org.apache.camel.forage.core.annotations.ForageBean;
 import org.apache.camel.forage.core.vectordb.EmbeddingStoreProvider;
 import org.infinispan.client.hotrod.configuration.ClientIntelligence;
 import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
@@ -45,6 +46,10 @@ import org.slf4j.LoggerFactory;
  *
  * @since 1.0
  */
+@ForageBean(
+        value = "infinispan",
+        component = "camel-langchain4j-embeddings",
+        description = "Infinispan distributed vector database provider")
 public class InfinispanProvider implements EmbeddingStoreProvider {
     private static final Logger LOG = LoggerFactory.getLogger(InfinispanProvider.class);
 

@@ -1,7 +1,7 @@
 package org.apache.camel.forage.memory.chat.tck;
 
-import org.apache.camel.forage.core.ai.ChatMemoryFactory;
-import org.apache.camel.forage.memory.chat.redis.RedisMemoryFactory;
+import org.apache.camel.forage.core.ai.ChatMemoryBeanProvider;
+import org.apache.camel.forage.memory.chat.redis.RedisMemoryBeanProvider;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ import org.testcontainers.utility.DockerImageName;
  * @since 1.0
  */
 @Testcontainers(disabledWithoutDocker = true)
-class RedisMemoryTCKTest extends ChatMemoryFactoryTCK {
+class RedisMemoryTCKTest extends ChatMemoryBeanProviderTCK {
 
     private static final int REDIS_PORT = 6379;
 
@@ -65,12 +65,12 @@ class RedisMemoryTCKTest extends ChatMemoryFactoryTCK {
         System.clearProperty("redis.pool.min.idle");
 
         // Close Redis connection pool
-        RedisMemoryFactory.close();
+        RedisMemoryBeanProvider.close();
     }
 
     @Override
-    protected ChatMemoryFactory createChatMemoryFactory() {
-        return new RedisMemoryFactory();
+    protected ChatMemoryBeanProvider createChatMemoryFactory() {
+        return new RedisMemoryBeanProvider();
     }
 
     @Test

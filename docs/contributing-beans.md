@@ -163,7 +163,9 @@ library/vector-dbs/forage-milvus/
 package org.apache.camel.forage.vector.db.milvus;
 
 import org.apache.camel.forage.core.vector.db.VectorDBProvider;
+import org.apache.camel.forage.core.annotations.ForageBean;
 
+@ForageBean(value = "milvus", component = "camel-langchain4j-embeddings", description = "Milvus vector database provider")
 public class MilvusProvider implements VectorDBProvider {
     
     @Override
@@ -430,6 +432,7 @@ export embeddings.milvus.host="emb.milvus.com"   # "embeddings" config
 
 In your provider code:
 ```java
+@ForageBean(value = "milvus-multi", component = "camel-langchain4j-embeddings", description = "Multi-instance Milvus vector database provider")
 public class MultiInstanceMilvusProvider implements VectorDBProvider {
     @Override
     public VectorDatabase create(String id) {
@@ -445,7 +448,56 @@ public class MultiInstanceMilvusProvider implements VectorDBProvider {
 
 ## Best Practices
 
-### 1. Configuration and Provider Guidelines
+### 1. ForageBean Annotation Requirements
+
+**MANDATORY**: All provider classes must be annotated with `@ForageBean`:
+
+```java
+@ForageBean(value = "unique-name", component = "supported-component", description = "What it does")
+public class YourProvider implements ProviderInterface {
+    // Implementation
+}
+```
+
+**Annotation Parameters:**
+- `value`: Unique identifier for the bean (e.g., "milvus", "azure-openai", "message-window")
+- `component`: Supported Camel component - use standard components:
+  - "camel-langchain4j-agent" for model providers and memory providers
+  - "camel-langchain4j-embeddings" for vector database providers
+- `description`: Human-readable description of what the provider does
+
+**Required Import:**
+```java
+import org.apache.camel.forage.core.annotations.ForageBean;
+```
+
+### 2. ForageFactory Annotation Requirements
+
+**MANDATORY**: All factory classes must be annotated with `@ForageFactory`:
+
+```java
+@ForageFactory(
+    value = "unique-factory-name", 
+    component = "supported-component", 
+    description = "What the factory creates",
+    factoryType = "CreatedObjectType")
+public class YourFactory implements FactoryInterface {
+    // Implementation
+}
+```
+
+The annotation parameters:
+- `value`: Unique identifier for the factory (e.g., "default-agent", "multi-agent", "redis-memory")
+- `component`: Supported Camel component (e.g., "camel-langchain4j-agent", "camel-langchain4j-embeddings")
+- `description`: Human-readable description of what the factory creates
+- `factoryType`: Type of objects this factory creates (e.g., "Agent", "ChatMemoryProvider", "EmbeddingStore")
+
+**Required Import:**
+```java
+import org.apache.camel.forage.core.annotations.ForageFactory;
+```
+
+### 3. Configuration and Provider Guidelines
 - Always follow the Forage two-class configuration pattern with `Config` and `ConfigEntries` classes
 - Create a `*ConfigEntries` class extending `ConfigEntries` with static fields and maps
 - Support both default and named/prefixed configurations in the main `Config` class
@@ -460,22 +512,22 @@ public class MultiInstanceMilvusProvider implements VectorDBProvider {
 - Use the provided `id` parameter to create named configurations: `new Config(id)`
 - The `create()` method is provided automatically and calls `create(null)` for default configuration
 
-### 2. ServiceLoader Registration
+### 3. ServiceLoader Registration
 - Don't forget to create the ServiceLoader resource file
 - Use the full interface name as the filename
 - List all implementations in the file
 
-### 3. Error Handling
+### 4. Error Handling
 - Provide clear error messages when configuration is missing
 - Use `MissingConfigException` for required parameters
 - Validate configuration values where appropriate
 
-### 4. Testing
+### 5. Testing
 - Create unit tests for your provider and configuration classes
 - Test the ServiceLoader discovery mechanism
 - Verify that configuration sources work correctly
 
-### 5. Documentation
+### 6. Documentation
 - Add comprehensive Javadoc to all public classes and methods
 - Include usage examples in class-level documentation
 - Document configuration precedence clearly

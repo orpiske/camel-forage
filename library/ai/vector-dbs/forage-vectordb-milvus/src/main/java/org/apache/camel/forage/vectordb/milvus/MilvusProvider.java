@@ -1,6 +1,7 @@
 package org.apache.camel.forage.vectordb.milvus;
 
 import dev.langchain4j.store.embedding.milvus.MilvusEmbeddingStore;
+import org.apache.camel.forage.core.annotations.ForageBean;
 import org.apache.camel.forage.core.vectordb.EmbeddingStoreProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,10 @@ import org.slf4j.LoggerFactory;
  *
  * @since 1.0
  */
+@ForageBean(
+        value = "milvus",
+        component = "camel-langchain4j-embeddings",
+        description = "Milvus vector database provider")
 public class MilvusProvider implements EmbeddingStoreProvider {
     private static final Logger LOG = LoggerFactory.getLogger(MilvusProvider.class);
 

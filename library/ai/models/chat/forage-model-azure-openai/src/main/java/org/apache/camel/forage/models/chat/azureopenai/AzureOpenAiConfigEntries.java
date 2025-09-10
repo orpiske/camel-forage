@@ -11,18 +11,23 @@ import org.apache.camel.forage.core.util.config.ConfigModule;
 public final class AzureOpenAiConfigEntries extends ConfigEntries {
     public static final ConfigModule API_KEY = ConfigModule.of(AzureOpenAiConfig.class, "azure.openai.api.key");
     public static final ConfigModule ENDPOINT = ConfigModule.of(AzureOpenAiConfig.class, "azure.openai.endpoint");
-    public static final ConfigModule DEPLOYMENT_NAME = ConfigModule.of(AzureOpenAiConfig.class, "azure.openai.deployment.name");
-    public static final ConfigModule SERVICE_VERSION = ConfigModule.of(AzureOpenAiConfig.class, "azure.openai.service.version");
+    public static final ConfigModule DEPLOYMENT_NAME =
+            ConfigModule.of(AzureOpenAiConfig.class, "azure.openai.deployment.name");
+    public static final ConfigModule SERVICE_VERSION =
+            ConfigModule.of(AzureOpenAiConfig.class, "azure.openai.service.version");
     public static final ConfigModule TEMPERATURE = ConfigModule.of(AzureOpenAiConfig.class, "azure.openai.temperature");
     public static final ConfigModule MAX_TOKENS = ConfigModule.of(AzureOpenAiConfig.class, "azure.openai.max.tokens");
     public static final ConfigModule TOP_P = ConfigModule.of(AzureOpenAiConfig.class, "azure.openai.top.p");
-    public static final ConfigModule PRESENCE_PENALTY = ConfigModule.of(AzureOpenAiConfig.class, "azure.openai.presence.penalty");
-    public static final ConfigModule FREQUENCY_PENALTY = ConfigModule.of(AzureOpenAiConfig.class, "azure.openai.frequency.penalty");
+    public static final ConfigModule PRESENCE_PENALTY =
+            ConfigModule.of(AzureOpenAiConfig.class, "azure.openai.presence.penalty");
+    public static final ConfigModule FREQUENCY_PENALTY =
+            ConfigModule.of(AzureOpenAiConfig.class, "azure.openai.frequency.penalty");
     public static final ConfigModule SEED = ConfigModule.of(AzureOpenAiConfig.class, "azure.openai.seed");
     public static final ConfigModule USER = ConfigModule.of(AzureOpenAiConfig.class, "azure.openai.user");
     public static final ConfigModule TIMEOUT = ConfigModule.of(AzureOpenAiConfig.class, "azure.openai.timeout");
     public static final ConfigModule MAX_RETRIES = ConfigModule.of(AzureOpenAiConfig.class, "azure.openai.max.retries");
-    public static final ConfigModule LOG_REQUESTS_AND_RESPONSES = ConfigModule.of(AzureOpenAiConfig.class, "azure.openai.log.requests.and.responses");
+    public static final ConfigModule LOG_REQUESTS_AND_RESPONSES =
+            ConfigModule.of(AzureOpenAiConfig.class, "azure.openai.log.requests.and.responses");
 
     private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
 

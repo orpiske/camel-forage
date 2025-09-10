@@ -1,6 +1,7 @@
 package org.apache.camel.forage.vectordb.pinecone;
 
 import dev.langchain4j.store.embedding.pinecone.PineconeEmbeddingStore;
+import org.apache.camel.forage.core.annotations.ForageBean;
 import org.apache.camel.forage.core.vectordb.EmbeddingStoreProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,10 @@ import org.slf4j.LoggerFactory;
  *
  * @since 1.0
  */
+@ForageBean(
+        value = "pinecone",
+        component = "camel-langchain4j-embeddings",
+        description = "Pinecone managed vector database provider")
 public class PineconeProvider implements EmbeddingStoreProvider {
     private static final Logger LOG = LoggerFactory.getLogger(PineconeProvider.class);
 

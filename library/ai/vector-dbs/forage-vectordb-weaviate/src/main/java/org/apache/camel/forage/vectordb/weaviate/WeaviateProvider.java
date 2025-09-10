@@ -1,6 +1,7 @@
 package org.apache.camel.forage.vectordb.weaviate;
 
 import dev.langchain4j.store.embedding.weaviate.WeaviateEmbeddingStore;
+import org.apache.camel.forage.core.annotations.ForageBean;
 import org.apache.camel.forage.core.vectordb.EmbeddingStoreProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,10 @@ import org.slf4j.LoggerFactory;
  *
  * @since 1.0
  */
+@ForageBean(
+        value = "weaviate",
+        component = "camel-langchain4j-embeddings",
+        description = "Weaviate vector database provider")
 public class WeaviateProvider implements EmbeddingStoreProvider {
     private static final Logger LOG = LoggerFactory.getLogger(WeaviateProvider.class);
 

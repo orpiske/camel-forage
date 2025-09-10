@@ -3,6 +3,7 @@ package org.apache.camel.forage.models.chat.openai;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import org.apache.camel.forage.core.ai.ModelProvider;
+import org.apache.camel.forage.core.annotations.ForageBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +39,7 @@ import org.slf4j.LoggerFactory;
  * @see ModelProvider
  * @since 1.0
  */
+@ForageBean(value = "openai", component = "camel-langchain4j-agent", description = "OpenAI GPT chat model provider")
 public class OpenAIProvider implements ModelProvider {
     private static final Logger LOG = LoggerFactory.getLogger(OpenAIProvider.class);
 

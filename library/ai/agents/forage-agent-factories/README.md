@@ -77,7 +77,7 @@ The agent factories use ServiceLoader to discover and configure components:
 ### 1. Discovery Phase
 - **Agents**: Discovers implementations of `org.apache.camel.component.langchain4j.agent.api.Agent`
 - **Model Providers**: Discovers implementations of `org.apache.camel.forage.core.ai.ModelProvider`
-- **Memory Factories**: Discovers implementations of `org.apache.camel.forage.core.ai.ChatMemoryFactory`
+- **Memory Factories**: Discovers implementations of `org.apache.camel.forage.core.ai.ChatMemoryBeanProvider`
 
 ### 2. Configuration Phase
 - Creates a `ModelProvider` instance for chat model functionality
@@ -118,7 +118,7 @@ The agent factories use ServiceLoader to discover and configure components:
 The factory discovers components through standard ServiceLoader files:
 - `META-INF/services/org.apache.camel.component.langchain4j.agent.api.Agent`
 - `META-INF/services/org.apache.camel.forage.core.ai.ModelProvider`
-- `META-INF/services/org.apache.camel.forage.core.ai.ChatMemoryFactory`
+- `META-INF/services/org.apache.camel.forage.core.ai.ChatMemoryBeanProvider`
 
 ## Configuration
 
@@ -174,7 +174,7 @@ public class MyAgent implements Agent, ConfigurationAware {
 ### Creating Custom Memory Factories
 
 1. Implement the `ChatMemoryFactory` interface
-2. Register via ServiceLoader in `META-INF/services/org.apache.camel.forage.core.ai.ChatMemoryFactory`
+2. Register via ServiceLoader in `META-INF/services/org.apache.camel.forage.core.ai.ChatMemoryBeanProvider`
 
 ## Thread Safety
 
