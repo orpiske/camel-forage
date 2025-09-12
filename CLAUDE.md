@@ -366,229 +366,28 @@ public class NewVectorDbProvider implements EmbeddingStoreProvider {
    - File: `META-INF/services/org.apache.camel.forage.core.vectordb.EmbeddingStoreProvider`
    - Content: `org.apache.camel.forage.vectordb.newdb.NewVectorDbProvider`
 
-## Configuration Examples
+## Model Configuration
 
-### Azure OpenAI Configuration
-```bash
-# Required Environment variables
-export AZURE_OPENAI_API_KEY="your-api-key"
-export AZURE_OPENAI_ENDPOINT="https://your-resource.openai.azure.com/"
-export AZURE_OPENAI_DEPLOYMENT_NAME="gpt-35-turbo"
+Each AI model provider has its own configuration requirements and options. For detailed configuration instructions, please refer to the individual model documentation:
 
-# Optional Environment variables
-export AZURE_OPENAI_SERVICE_VERSION="2024-02-01"
-export AZURE_OPENAI_TEMPERATURE="0.7"
-export AZURE_OPENAI_MAX_TOKENS="2048"
-export AZURE_OPENAI_TOP_P="0.9"
-export AZURE_OPENAI_PRESENCE_PENALTY="0.0"
-export AZURE_OPENAI_FREQUENCY_PENALTY="0.0"
-export AZURE_OPENAI_SEED="12345"
-export AZURE_OPENAI_USER="user-123"
-export AZURE_OPENAI_TIMEOUT="60"
-export AZURE_OPENAI_MAX_RETRIES="3"
-export AZURE_OPENAI_LOG_REQUESTS_AND_RESPONSES="false"
+### AI Model Providers
 
-# Required System properties
--Dazure.openai.api.key=your-api-key
--Dazure.openai.endpoint=https://your-resource.openai.azure.com/
--Dazure.openai.deployment.name=gpt-35-turbo
+- **[Azure OpenAI](library/ai/models/chat/forage-model-azure-openai/README.md)** - Azure OpenAI GPT models
+- **[OpenAI](library/ai/models/chat/forage-model-open-ai/README.md)** - OpenAI GPT models
+- **[Google Gemini](library/ai/models/chat/forage-model-google-gemini/README.md)** - Google Gemini models
+- **[Ollama](library/ai/models/chat/forage-model-ollama/README.md)** - Local model hosting via Ollama
+- **[HuggingFace](library/ai/models/chat/forage-model-hugging-face/README.md)** - HuggingFace Inference API models
+- **[Anthropic](library/ai/models/chat/forage-model-anthropic/README.md)** - Anthropic Claude models *(placeholder)*
+- **[Dashscope](library/ai/models/chat/forage-model-dashscope/README.md)** - Alibaba Dashscope/Qwen models *(placeholder)*
 
-# Optional System properties
--Dazure.openai.service.version=2024-02-01
--Dazure.openai.temperature=0.7
--Dazure.openai.max.tokens=2048
--Dazure.openai.top.p=0.9
--Dazure.openai.presence.penalty=0.0
--Dazure.openai.frequency.penalty=0.0
--Dazure.openai.seed=12345
--Dazure.openai.user=user-123
--Dazure.openai.timeout=60
--Dazure.openai.max.retries=3
--Dazure.openai.log.requests.and.responses=false
-
-# forage-model-azure-openai.properties
-# Required
-api-key=your-api-key
-endpoint=https://your-resource.openai.azure.com/
-deployment-name=gpt-35-turbo
-
-# Optional
-service-version=2024-02-01
-temperature=0.7
-max-tokens=2048
-top-p=0.9
-presence-penalty=0.0
-frequency-penalty=0.0
-seed=12345
-user=user-123
-timeout=60
-max-retries=3
-log-requests-and-responses=false
-```
-
-### Anthropic Configuration
-**Note:** This is currently a placeholder implementation. The provider will throw an `UnsupportedOperationException` until LangChain4J adds full Anthropic support.
-
-```bash
-# Required Environment variables
-export ANTHROPIC_API_KEY="sk-ant-api03-..."
-
-# Optional Environment variables
-export ANTHROPIC_MODEL_NAME="claude-3-sonnet-20240229"
-export ANTHROPIC_TEMPERATURE="0.7"
-export ANTHROPIC_MAX_TOKENS="2048"
-export ANTHROPIC_TOP_P="0.9"
-export ANTHROPIC_TOP_K="50"
-export ANTHROPIC_STOP_SEQUENCES="Human:,Assistant:"
-export ANTHROPIC_TIMEOUT="60"
-export ANTHROPIC_MAX_RETRIES="3"
-export ANTHROPIC_LOG_REQUESTS_AND_RESPONSES="false"
-
-# Required System properties
--Danthropic.api.key=sk-ant-api03-...
-
-# Optional System properties
--Danthropic.model.name=claude-3-sonnet-20240229
--Danthropic.temperature=0.7
--Danthropic.max.tokens=2048
--Danthropic.top.p=0.9
--Danthropic.top.k=50
--Danthropic.stop.sequences=Human:,Assistant:
--Danthropic.timeout=60
--Danthropic.max.retries=3
--Danthropic.log.requests.and.responses=false
-
-# forage-model-anthropic.properties
-# Required
-api-key=sk-ant-api03-...
-
-# Optional
-model-name=claude-3-sonnet-20240229
-temperature=0.7
-max-tokens=2048
-top-p=0.9
-top-k=50
-stop-sequences=Human:,Assistant:
-timeout=60
-max-retries=3
-log-requests-and-responses=false
-```
-
-### OpenAI Configuration
-```bash
-# Environment variables
-export OPENAI_API_KEY="sk-..."
-export OPENAI_MODEL_NAME="gpt-4"
-
-# System properties
--Dopenai.api.key=sk-...
--Dopenai.model.name=gpt-4
-
-# forage-model-openai.properties
-api-key=sk-...
-model-name=gpt-4
-```
-
-### HuggingFace Configuration
-```bash
-# Required Environment variables
-export HUGGINGFACE_API_KEY="hf_your-api-key-here"
-
-# Optional Environment variables
-export HUGGINGFACE_MODEL_ID="microsoft/DialoGPT-medium"
-export HUGGINGFACE_TEMPERATURE="0.7"
-export HUGGINGFACE_MAX_NEW_TOKENS="256"
-export HUGGINGFACE_WAIT_FOR_MODEL="true"
-export HUGGINGFACE_TIMEOUT="60"
-
-# Required System properties
--Dhuggingface.api.key=hf_your-api-key-here
-
-# Optional System properties
--Dhuggingface.model.id=microsoft/DialoGPT-medium
--Dhuggingface.temperature=0.7
--Dhuggingface.max.new.tokens=256
--Dhuggingface.wait.for.model=true
--Dhuggingface.timeout=60
-
-# forage-model-hugging-face.properties
-# Required
-api-key=hf_your-api-key-here
-
-# Optional
-model-id=microsoft/DialoGPT-medium
-temperature=0.7
-max-new-tokens=256
-wait-for-model=true
-timeout=60
-```
-
-### Dashscope Configuration
-**Note:** This is currently a placeholder implementation. The provider will throw an `UnsupportedOperationException` until LangChain4J adds Dashscope support.
-
-```bash
-# Required Environment variables
-export DASHSCOPE_API_KEY="sk-..."
-
-# Optional Environment variables
-export DASHSCOPE_MODEL_NAME="qwen-max"
-export DASHSCOPE_TEMPERATURE="0.7"
-export DASHSCOPE_MAX_TOKENS="2048"
-export DASHSCOPE_TOP_P="0.9"
-export DASHSCOPE_TOP_K="50"
-export DASHSCOPE_REPETITION_PENALTY="1.1"
-export DASHSCOPE_SEED="12345"
-export DASHSCOPE_ENABLE_SEARCH="true"
-export DASHSCOPE_TIMEOUT="60"
-export DASHSCOPE_MAX_RETRIES="3"
-export DASHSCOPE_LOG_REQUESTS_AND_RESPONSES="false"
-
-# Required System properties
--Ddashscope.api.key=sk-...
-
-# Optional System properties
--Ddashscope.model.name=qwen-max
--Ddashscope.temperature=0.7
--Ddashscope.max.tokens=2048
--Ddashscope.top.p=0.9
--Ddashscope.top.k=50
--Ddashscope.repetition.penalty=1.1
--Ddashscope.seed=12345
--Ddashscope.enable.search=true
--Ddashscope.timeout=60
--Ddashscope.max.retries=3
--Ddashscope.log.requests.and.responses=false
-
-# forage-model-dashscope.properties
-# Required
-api-key=sk-...
-
-# Optional
-model-name=qwen-max
-temperature=0.7
-max-tokens=2048
-top-p=0.9
-top-k=50
-repetition-penalty=1.1
-seed=12345
-enable-search=true
-timeout=60
-max-retries=3
-log-requests-and-responses=false
-```
-
-### Ollama Configuration
-```bash
-# Environment variables
-export OLLAMA_BASE_URL="http://localhost:11434"
-export OLLAMA_MODEL_NAME="llama3"
-export OLLAMA_TEMPERATURE="0.7"
-
-# System properties
--Dollama.base.url=http://localhost:11434
--Dollama.model.name=llama3
--Dollama.temperature=0.7
-```
+Each model directory contains:
+- Detailed configuration instructions
+- Environment variable setup
+- System property configuration
+- Configuration file examples
+- Supported models list
+- Usage examples
+- Troubleshooting guides
 
 ## Usage Patterns
 
