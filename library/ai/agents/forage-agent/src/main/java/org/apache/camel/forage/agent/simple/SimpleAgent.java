@@ -56,9 +56,11 @@ public class SimpleAgent implements Agent, ConfigurationAware {
      */
     private <T> T createAiAgentService(ToolProvider toolProvider, Class<T> clazz) {
         LOG.info("Creating of type {}", clazz.getSimpleName());
-        AiServices<T> builder = AiServices.builder(clazz)
-                .chatModel(configuration.getChatModel())
-                .chatMemoryProvider(configuration.getChatMemoryProvider());
+        AiServices<T> builder = AiServices.builder(clazz).chatModel(configuration.getChatModel());
+
+        if (hasMemory()) {
+            builder = builder.chatMemoryProvider(configuration.getChatMemoryProvider());
+        }
 
         // Apache Camel Tool Provider
         if (toolProvider != null) {
