@@ -283,6 +283,7 @@ Contains vector database interfaces:
 - **forage-model-dashscope**: Alibaba Dashscope integration (Qwen models) - *placeholder implementation*
 - **forage-model-google-gemini**: Google Gemini integration
 - **forage-model-hugging-face**: HuggingFace Inference API integration (various open-source models)
+- **forage-model-local-ai**: LocalAI self-hosted OpenAI-compatible models integration
 - **forage-model-ollama**: Ollama local model integration
 - **forage-model-openai**: OpenAI integration (GPT models)
 
@@ -375,6 +376,7 @@ Each AI model provider has its own configuration requirements and options. For d
 - **[Azure OpenAI](library/ai/models/chat/forage-model-azure-openai/README.md)** - Azure OpenAI GPT models
 - **[OpenAI](library/ai/models/chat/forage-model-open-ai/README.md)** - OpenAI GPT models
 - **[Google Gemini](library/ai/models/chat/forage-model-google-gemini/README.md)** - Google Gemini models
+- **[LocalAI](library/ai/models/chat/forage-model-local-ai/README.md)** - Self-hosted OpenAI-compatible models
 - **[Ollama](library/ai/models/chat/forage-model-ollama/README.md)** - Local model hosting via Ollama
 - **[HuggingFace](library/ai/models/chat/forage-model-hugging-face/README.md)** - HuggingFace Inference API models
 - **[Anthropic](library/ai/models/chat/forage-model-anthropic/README.md)** - Anthropic Claude models *(placeholder)*
