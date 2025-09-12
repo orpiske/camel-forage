@@ -80,19 +80,19 @@ Create a `forage-model-ollama.properties` file in your classpath:
 
 ```properties
 # Ollama server configuration
-base-url=http://localhost:11434
-model-name=llama3
+ollama.base.url=http://localhost:11434
+ollama.model.name=llama3
 
 # Model parameters
-temperature=0.7
-top-k=40
-top-p=0.9
-min-p=0.05
-num-ctx=2048
+ollama.temperature=0.7
+ollama.top.k=40
+ollama.top.p=0.9
+ollama.min.p=0.05
+ollama.num.ctx=2048
 
 # Logging configuration
-log-requests=false
-log-responses=false
+ollama.log.requests=false
+ollama.log.responses=false
 ```
 
 ## Supported Models

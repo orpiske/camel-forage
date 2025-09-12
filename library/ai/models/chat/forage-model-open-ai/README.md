@@ -76,10 +76,10 @@ java -Dopenai.api.key="sk-..." -Dopenai.model.name="gpt-4" YourApplication
 Create a `forage-model-open-ai.properties` file in your classpath:
 
 ```properties
-api-key=sk-...
-model-name=gpt-4
-temperature=0.7
-max-tokens=1000
+openai.api.key=sk-...
+openai.model.name=gpt-4
+openai.temperature=0.7
+openai.max.tokens=1000
 ```
 
 ## Supported Models
@@ -157,23 +157,23 @@ Create `camel-forage-model-open-ai.properties`:
 
 ```properties
 # Required
-api-key=sk-your-api-key-here
+openai.api.key=sk-your-api-key-here
 
 # Model selection
-model-name=gpt-4
+openai.model.name=gpt-4
 
 # Response tuning
-temperature=0.7
-max-tokens=1500
-top-p=0.9
+openai.temperature=0.7
+openai.max.tokens=1500
+openai.top.p=0.9
 
 # Penalty settings
-frequency-penalty=0.1
-presence-penalty=0.1
+openai.frequency.penalty=0.1
+openai.presence.penalty=0.1
 
 # Logging (disable in production)
-log-requests=false
-log-responses=false
+openai.log.requests=false
+openai.log.responses=false
 ```
 
 ### Java Code Usage

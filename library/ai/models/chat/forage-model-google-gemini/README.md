@@ -62,8 +62,8 @@ java -Dgoogle.api.key="your-api-key-here" -Dgoogle.model.name="gemini-pro" YourA
 Create a `forage-model-google-gemini.properties` file in your classpath:
 
 ```properties
-api-key=your-api-key-here
-model-name=gemini-pro
+google.api.key=your-api-key-here
+google.model.name=gemini-pro
 ```
 
 ## Supported Models

@@ -44,14 +44,14 @@ Create a `forage-model-hugging-face.properties` file in your classpath:
 
 ```properties
 # Required
-api-key=hf_your-api-key-here
+huggingface.api.key=hf_your-api-key-here
 
 # Optional
-model-id=microsoft/DialoGPT-medium
-temperature=0.7
-max-new-tokens=256
-wait-for-model=true
-timeout=60
+huggingface.model.id=microsoft/DialoGPT-medium
+huggingface.temperature=0.7
+huggingface.max.new.tokens=256
+huggingface.wait.for.model=true
+huggingface.timeout=60
 ```
 
 ## Usage

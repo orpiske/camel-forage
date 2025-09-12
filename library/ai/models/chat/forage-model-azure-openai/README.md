@@ -62,22 +62,22 @@ Create a `forage-model-azure-openai.properties` file in your classpath:
 
 ```properties
 # Required
-api-key=your-api-key
-endpoint=https://your-resource.openai.azure.com/
-deployment-name=gpt-35-turbo
+azure.openai.api.key=your-api-key
+azure.openai.endpoint=https://your-resource.openai.azure.com/
+azure.openai.deployment.name=gpt-35-turbo
 
 # Optional
-service-version=2024-02-01
-temperature=0.7
-max-tokens=2048
-top-p=0.9
-presence-penalty=0.0
-frequency-penalty=0.0
-seed=12345
-user=user-123
-timeout=60
-max-retries=3
-log-requests-and-responses=false
+azure.openai.service.version=2024-02-01
+azure.openai.temperature=0.7
+azure.openai.max.tokens=2048
+azure.openai.top.p=0.9
+azure.openai.presence.penalty=0.0
+azure.openai.frequency.penalty=0.0
+azure.openai.seed=12345
+azure.openai.user=user-123
+azure.openai.timeout=60
+azure.openai.max.retries=3
+azure.openai.log.requests.and.responses=false
 ```
 
 ## Usage

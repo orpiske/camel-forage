@@ -58,20 +58,20 @@ Create a `forage-model-dashscope.properties` file in your classpath:
 
 ```properties
 # Required
-api-key=sk-...
+dashscope.api.key=sk-...
 
 # Optional
-model-name=qwen-max
-temperature=0.7
-max-tokens=2048
-top-p=0.9
-top-k=50
-repetition-penalty=1.1
-seed=12345
-enable-search=true
-timeout=60
-max-retries=3
-log-requests-and-responses=false
+dashscope.model.name=qwen-max
+dashscope.temperature=0.7
+dashscope.max.tokens=2048
+dashscope.top.p=0.9
+dashscope.top.k=50
+dashscope.repetition.penalty=1.1
+dashscope.seed=12345
+dashscope.enable.search=true
+dashscope.timeout=60
+dashscope.max.retries=3
+dashscope.log.requests.and.responses=false
 ```
 
 ## Usage

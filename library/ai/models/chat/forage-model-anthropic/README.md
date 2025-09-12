@@ -54,18 +54,18 @@ Create a `forage-model-anthropic.properties` file in your classpath:
 
 ```properties
 # Required
-api-key=sk-ant-api03-...
+anthropic.api.key=sk-ant-api03-...
 
 # Optional
-model-name=claude-3-sonnet-20240229
-temperature=0.7
-max-tokens=2048
-top-p=0.9
-top-k=50
-stop-sequences=Human:,Assistant:
-timeout=60
-max-retries=3
-log-requests-and-responses=false
+anthropic.model.name=claude-3-sonnet-20240229
+anthropic.temperature=0.7
+anthropic.max.tokens=2048
+anthropic.top.p=0.9
+anthropic.top.k=50
+anthropic.stop.sequences=Human:,Assistant:
+anthropic.timeout=60
+anthropic.max.retries=3
+anthropic.log.requests.and.responses=false
 ```
 
 ## Usage
