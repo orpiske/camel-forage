@@ -21,6 +21,7 @@
         <module>forage-model-google-gemini</module>
         <module>forage-model-hugging-face</module>
         <module>forage-model-local-ai</module>
+        <module>forage-model-mistral-ai</module>
         <module>forage-model-ollama</module>
         <module>forage-model-open-ai</module>
     </modules>
