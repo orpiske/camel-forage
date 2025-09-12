@@ -39,7 +39,8 @@ camel-forage/
 │       │   ├── forage-model-local-ai/
 │       │   ├── forage-model-mistral-ai/
 │       │   ├── forage-model-ollama/
-│       │   └── forage-model-open-ai/
+│       │   ├── forage-model-open-ai/
+│       │   └── forage-model-watsonx-ai/
 │       └── vector-dbs/                     # Vector database providers
 │           ├── forage-vectordb-milvus/
 │           ├── forage-vectordb-pgvector/
@@ -290,6 +291,7 @@ Contains vector database interfaces:
 - **forage-model-mistral-ai**: MistralAI integration (Mistral models)
 - **forage-model-ollama**: Ollama local model integration
 - **forage-model-openai**: OpenAI integration (GPT models)
+- **forage-model-watsonx-ai**: IBM Watsonx.ai integration (Llama, Granite, and other foundation models)
 
 #### Chat Memory
 - **forage-memory-message-window**: Message window memory with persistence

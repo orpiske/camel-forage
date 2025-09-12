@@ -24,6 +24,7 @@
         <module>forage-model-mistral-ai</module>
         <module>forage-model-ollama</module>
         <module>forage-model-open-ai</module>
+        <module>forage-model-watsonx-ai</module>
     </modules>
 
 </project>
