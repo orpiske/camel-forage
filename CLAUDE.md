@@ -35,6 +35,9 @@ camel-forage/
 │       │   ├── forage-model-azure-openai/
 │       │   ├── forage-model-dashscope/
 │       │   ├── forage-model-google-gemini/
+│       │   ├── forage-model-hugging-face/
+│       │   ├── forage-model-local-ai/
+│       │   ├── forage-model-mistral-ai/
 │       │   ├── forage-model-ollama/
 │       │   └── forage-model-open-ai/
 │       └── vector-dbs/                     # Vector database providers
@@ -284,6 +287,7 @@ Contains vector database interfaces:
 - **forage-model-google-gemini**: Google Gemini integration
 - **forage-model-hugging-face**: HuggingFace Inference API integration (various open-source models)
 - **forage-model-local-ai**: LocalAI self-hosted OpenAI-compatible models integration
+- **forage-model-mistral-ai**: MistralAI integration (Mistral models)
 - **forage-model-ollama**: Ollama local model integration
 - **forage-model-openai**: OpenAI integration (GPT models)
 
