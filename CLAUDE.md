@@ -282,6 +282,7 @@ Contains vector database interfaces:
 - **forage-model-azure-openai**: Azure OpenAI integration (GPT models via Azure)
 - **forage-model-dashscope**: Alibaba Dashscope integration (Qwen models) - *placeholder implementation*
 - **forage-model-google-gemini**: Google Gemini integration
+- **forage-model-hugging-face**: HuggingFace Inference API integration (various open-source models)
 - **forage-model-ollama**: Ollama local model integration
 - **forage-model-openai**: OpenAI integration (GPT models)
 
@@ -486,6 +487,40 @@ export OPENAI_MODEL_NAME="gpt-4"
 # forage-model-openai.properties
 api-key=sk-...
 model-name=gpt-4
+```
+
+### HuggingFace Configuration
+```bash
+# Required Environment variables
+export HUGGINGFACE_API_KEY="hf_your-api-key-here"
+
+# Optional Environment variables
+export HUGGINGFACE_MODEL_ID="microsoft/DialoGPT-medium"
+export HUGGINGFACE_TEMPERATURE="0.7"
+export HUGGINGFACE_MAX_NEW_TOKENS="256"
+export HUGGINGFACE_WAIT_FOR_MODEL="true"
+export HUGGINGFACE_TIMEOUT="60"
+
+# Required System properties
+-Dhuggingface.api.key=hf_your-api-key-here
+
+# Optional System properties
+-Dhuggingface.model.id=microsoft/DialoGPT-medium
+-Dhuggingface.temperature=0.7
+-Dhuggingface.max.new.tokens=256
+-Dhuggingface.wait.for.model=true
+-Dhuggingface.timeout=60
+
+# forage-model-hugging-face.properties
+# Required
+api-key=hf_your-api-key-here
+
+# Optional
+model-id=microsoft/DialoGPT-medium
+temperature=0.7
+max-new-tokens=256
+wait-for-model=true
+timeout=60
 ```
 
 ### Dashscope Configuration
