@@ -31,7 +31,7 @@ public class SimpleAgent implements Agent, ConfigurationAware {
 
     @Override
     public String chat(AiAgentBody aiAgentBody, ToolProvider toolProvider) {
-        LOG.info("Chatting using ForageAgent {}", Thread.currentThread().getId());
+        LOG.info("Chatting using ForageAgent");
 
         if (hasMemory()) {
             LOG.info("Chatting with memory");
@@ -55,7 +55,7 @@ public class SimpleAgent implements Agent, ConfigurationAware {
      * Create AI service with a single universal tool that handles multiple Camel routes and Memory Provider
      */
     private <T> T createAiAgentService(ToolProvider toolProvider, Class<T> clazz) {
-        LOG.info("Creating of type {}", Thread.currentThread().getId());
+        LOG.info("Creating of type {}", clazz.getSimpleName());
         AiServices<T> builder = AiServices.builder(clazz)
                 .chatModel(configuration.getChatModel())
                 .chatMemoryProvider(configuration.getChatMemoryProvider());
