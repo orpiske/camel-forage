@@ -1,13 +1,13 @@
 # Contributing Beans Guide
 
-This guide explains how to prepare an Apache Camel component for usage with the Camel Forage library and how to create new bean providers and factories.
+This guide explains how to prepare an Apache Camel component for usage with the Camel Forage plugin extension and how to create new bean providers and factories.
 
 ## Overview
 
-Adjusting a component for use with Camel Forage involves two main steps:
+Integrating a component with Camel Forage involves two main steps:
 
 1. **Modify the Apache Camel component** to support a factory-based approach
-2. **Create the corresponding Forage bean factory and provider**
+2. **Create the corresponding Forage bean factory and provider** that can be configured through properties
 
 ## Part 1: Adjusting the Apache Camel Component
 
