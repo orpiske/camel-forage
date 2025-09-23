@@ -4,7 +4,7 @@ This document provides Claude with comprehensive information about the Camel For
 
 ## Project Overview
 
-**Camel Forage** is an opinionated library of beans for Apache Camel that provides pre-configured components for AI integrations and other bean-based components. The library simplifies Apache Camel configuration by providing ready-to-use beans that follow best practices, particularly focused on AI components.
+**Camel Forage** is a plugin extension for Apache Camel that provides opinionated bean factories for simplified component configuration across various domains including AI, JDBC, and other bean-based components. The library simplifies Apache Camel configuration by providing factory classes that create configured beans through properties-based configuration, eliminating the need for manual Java bean instantiation.
 
 ## Technology Stack
 

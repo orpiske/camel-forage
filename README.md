@@ -1,18 +1,19 @@
 # Camel Forage
 
-An opinionated library of beans for Apache Camel that provides pre-configured components for AI integrations and other bean-based components.
+A plugin extension for Apache Camel that provides opinionated bean factories for simplified component configuration across various domains including AI, JDBC, and other bean-based components.
 
 ## Overview
 
-Camel Forage simplifies the configuration of Apache Camel components by providing ready-to-use beans that follow best practices. The library is particularly focused on AI components, offering seamless integration with various AI models, chat memory providers, and agent factories.
+Camel Forage is a plugin extension that simplifies Apache Camel configuration by providing opinionated bean factories. Instead of manually configuring beans, you choose the appropriate factory and configure it through properties files, environment variables, or system properties. The library offers seamless integration with various components including AI models, JDBC data sources, chat memory providers, and agent factories through a factory-based approach that requires no Java code instantiation.
 
 ## Features
 
-- **Plug-and-play AI components** - Pre-configured beans for AI models, agents, and memory providers
-- **Multiple AI provider support** - Support for OpenAI, Google Gemini, Ollama, and extensible for other providers
-- **Chat memory management** - Built-in message window chat memory with persistent storage
-- **Agent factory patterns** - Default agent factory with ServiceLoader-based discovery
+- **Opinionated bean factories** - Pre-configured factory classes that eliminate manual bean configuration
+- **Configuration-driven** - Configure beans through properties files, environment variables, or system properties
+- **Multiple provider support** - Support for various AI models (OpenAI, Google Gemini, Ollama), JDBC databases, and extensible for other providers
+- **ServiceLoader-based discovery** - Automatic factory discovery with no manual wiring required
 - **Modular architecture** - Pick only the modules you need
+- **Zero Java code instantiation** - Everything configurable through properties
 
 ## Quick Start
 
@@ -56,8 +57,7 @@ from("direct:start")
     .to("langchain4j-agent:test-memory-agent?agentFactory=#class:org.apache.camel.forage.agent.factory.DefaultAgentFactory");
 ```
 
-The `org.apache.camel.forage.agent.factory.DefaultAgentFactory` class is a default factory that builds AI agent automagically,
-based on the dependencies available on the classpath.
+The `org.apache.camel.forage.agent.factory.DefaultAgentFactory` class is a factory that builds AI agents automatically based on the dependencies available on the classpath and configured through properties.
 
 ## Available Modules
 
@@ -241,14 +241,14 @@ export OLLAMA_MODEL_NAME="llama3"                # Optional, this is the default
 
 ## Architecture
 
-Camel Forage uses a ServiceLoader-based discovery mechanism to automatically wire components together:
+Camel Forage uses a ServiceLoader-based discovery mechanism with opinionated bean factories:
 
-1. **ModelProvider** - Provides chat models (Ollama, Google Gemini, etc.)
-2. **ChatMemoryFactory** - Creates chat memory providers for conversation persistence
-3. **AgentFactory** - Orchestrates the creation of agents with models and memory
-4. **Agent** - The actual agent implementation
+1. **Bean Factories** - Factory classes that create configured beans (DataSourceFactory, AgentFactory, ModelProvider, etc.)
+2. **Configuration System** - Properties-based configuration with environment variable and system property support
+3. **ServiceLoader Discovery** - Automatic factory discovery without manual wiring
+4. **Catalog Integration** - Build-time catalog generation for tooling integration (e.g., Kaoto)
 
-The `DefaultAgentFactory` automatically discovers and combines these components using Java's ServiceLoader mechanism.
+Factories automatically discover and combine components using Java's ServiceLoader mechanism, with all configuration handled through properties rather than Java code.
 
 ## Examples
 
