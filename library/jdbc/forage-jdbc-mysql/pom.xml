@@ -16,30 +16,105 @@
         <mysql.version>9.1.0</mysql.version>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.camel.forage</groupId>
-            <artifactId>forage-core-jdbc</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+    <build>
+        <sourceDirectory>${src.dir}</sourceDirectory>
+    </build>
 
-        <dependency>
-            <groupId>org.apache.camel.forage</groupId>
-            <artifactId>forage-core-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+    <profiles>
+        <profile>
+            <id>spring</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <src.dir>src/main/java</src.dir>
+            </properties>
 
-        <dependency>
-            <groupId>org.apache.camel.forage</groupId>
-            <artifactId>forage-jdbc-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.camel.forage</groupId>
+                    <artifactId>forage-core-jdbc</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
 
-        <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
-            <version>${mysql.version}</version>
-        </dependency>
-    </dependencies>
+                <dependency>
+                    <groupId>org.apache.camel.forage</groupId>
+                    <artifactId>forage-core-common</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
 
+                <dependency>
+                    <groupId>org.apache.camel.forage</groupId>
+                    <artifactId>forage-jdbc-common</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.mysql</groupId>
+                    <artifactId>mysql-connector-j</artifactId>
+                    <version>${mysql.version}</version>
+                </dependency>
+            </dependencies>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>spring</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <classifier>spring</classifier>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>quarkus</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <src.dir>src/main/quarkus</src.dir>
+            </properties>
+
+            <dependencies>
+                <dependency>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-jdbc-mysql</artifactId>
+                    <version>3.26.3</version>
+                </dependency>
+            </dependencies>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>quarkus</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <classifier>spring</classifier>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
