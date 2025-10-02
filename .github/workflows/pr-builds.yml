@@ -34,9 +34,14 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
+        camel-profile: [camel-lts, camel-next]
         experimental: [false]
         include:
-          - os: [ windows-latest ]
+          - os: windows-latest
+            camel-profile: camel-lts
+            experimental: true
+          - os: windows-latest
+            camel-profile: camel-next
             experimental: true
       fail-fast: true
 
@@ -48,5 +53,5 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
+      - name: Build with Maven (${{ matrix.camel-profile }})
+        run: mvn -B package --file pom.xml -P ${{ matrix.camel-profile }}
