@@ -34,11 +34,11 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        camel-profile: [camel-lts, camel-next]
+        camel-profile: [camel-current, camel-next]
         experimental: [false]
         include:
           - os: windows-latest
-            camel-profile: camel-lts
+            camel-profile: camel-current
             experimental: true
           - os: windows-latest
             camel-profile: camel-next

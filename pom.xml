@@ -154,24 +154,24 @@
 
     <profiles>
         <profile>
-            <id>camel-lts</id>
+            <id>camel-current</id>
             <activation>
                 <property>
-                    <name>camel-lts</name>
+                    <name>camel-current</name>
                 </property>
             </activation>
             <properties>
-                <camel.version>4.14.1</camel.version>
-                <langchain4j-version>1.3.0</langchain4j-version>
-                <langchain4j-beta-version>1.3.0-beta9</langchain4j-beta-version>
-                <langchain4j-community-version>1.3.0-beta9</langchain4j-community-version>
+                <camel.version>4.15.0</camel.version>
+                <langchain4j-version>1.6.0</langchain4j-version>
+                <langchain4j-beta-version>1.6.0-beta12</langchain4j-beta-version>
+                <langchain4j-community-version>1.6.0-beta12</langchain4j-community-version>
             </properties>
         </profile>
         <profile>
             <id>camel-next</id>
             <activation>
                 <property>
-                    <name>!camel-lts</name>
+                    <name>!camel-current</name>
                 </property>
             </activation>
             <properties>
