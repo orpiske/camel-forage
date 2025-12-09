@@ -17,6 +17,7 @@
     <modules>
         <module>forage-model-anthropic</module>
         <module>forage-model-azure-openai</module>
+        <module>forage-model-bedrock</module>
         <module>forage-model-dashscope</module>
         <module>forage-model-google-gemini</module>
         <module>forage-model-hugging-face</module>
