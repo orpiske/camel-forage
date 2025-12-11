@@ -2,6 +2,7 @@ package org.apache.camel.forage.models.chat.bedrock;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -10,6 +11,17 @@ import org.junit.jupiter.api.Test;
  */
 @DisplayName("BedrockConfig Configuration Loading Tests")
 class BedrockConfigTest {
+
+    @AfterEach
+    void cleanup() {
+        System.clearProperty("bedrock.region");
+        System.clearProperty("bedrock.model.id");
+        System.clearProperty("bedrock.access.key.id");
+        System.clearProperty("bedrock.secret.access.key");
+        System.clearProperty("bedrock.temperature");
+        System.clearProperty("bedrock.max.tokens");
+        System.clearProperty("bedrock.top.p");
+    }
 
     @Test
     @DisplayName("Should load region from system property")

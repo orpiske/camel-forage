@@ -3,6 +3,7 @@ package org.apache.camel.forage.models.chat.bedrock;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import dev.langchain4j.model.chat.ChatModel;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,22 @@ import org.junit.jupiter.api.Test;
  */
 @DisplayName("BedrockProvider Integration Tests")
 class BedrockProviderTest {
+
+    @AfterEach
+    void cleanup() {
+        System.clearProperty("bedrock.model.id");
+        System.clearProperty("bedrock.region");
+        System.clearProperty("bedrock.temperature");
+        System.clearProperty("bedrock.max.tokens");
+        System.clearProperty("bedrock.top.p");
+        System.clearProperty("agent1.bedrock.model.id");
+        System.clearProperty("agent2.bedrock.model.id");
+        System.clearProperty("test1.bedrock.model.id");
+        System.clearProperty("test2.bedrock.model.id");
+        System.clearProperty("test3.bedrock.model.id");
+        System.clearProperty("test4.bedrock.model.id");
+        System.clearProperty("test5.bedrock.model.id");
+    }
 
     @Nested
     @DisplayName("Model Creation Tests")

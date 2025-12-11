@@ -2,6 +2,7 @@ package org.apache.camel.forage.models.chat.bedrock;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -10,6 +11,29 @@ import org.junit.jupiter.api.Test;
  */
 @DisplayName("BedrockConfig Named Configuration Tests")
 class BedrockNamedConfigurationTest {
+
+    @AfterEach
+    void cleanup() {
+        System.clearProperty("bedrock.model.id");
+        System.clearProperty("bedrock.region");
+        System.clearProperty("bedrock.temperature");
+        System.clearProperty("bedrock.access.key.id");
+        System.clearProperty("bedrock.secret.access.key");
+        System.clearProperty("agent1.bedrock.model.id");
+        System.clearProperty("agent2.bedrock.model.id");
+        System.clearProperty("eu.bedrock.region");
+        System.clearProperty("asia.bedrock.region");
+        System.clearProperty("creative.bedrock.temperature");
+        System.clearProperty("precise.bedrock.temperature");
+        System.clearProperty("prod.bedrock.access.key.id");
+        System.clearProperty("prod.bedrock.secret.access.key");
+        System.clearProperty("multi1.bedrock.model.id");
+        System.clearProperty("multi2.bedrock.model.id");
+        System.clearProperty("multi2.bedrock.temperature");
+        System.clearProperty("multi3.bedrock.model.id");
+        System.clearProperty("multi3.bedrock.temperature");
+        System.clearProperty("multi3.bedrock.max.tokens");
+    }
 
     @Test
     @DisplayName("Should support named configurations with different model IDs")

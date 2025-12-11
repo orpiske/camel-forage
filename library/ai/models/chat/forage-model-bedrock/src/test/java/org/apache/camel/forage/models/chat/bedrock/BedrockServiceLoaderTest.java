@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.stream.StreamSupport;
 import org.apache.camel.forage.core.ai.ModelProvider;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,13 @@ import org.junit.jupiter.api.Test;
  */
 @DisplayName("BedrockProvider ServiceLoader Discovery Tests")
 class BedrockServiceLoaderTest {
+
+    @AfterEach
+    void cleanup() {
+        System.clearProperty("bedrock.model.id");
+        System.clearProperty("test-instance.bedrock.model.id");
+        System.clearProperty("service-loader-test.bedrock.model.id");
+    }
 
     @Nested
     @DisplayName("ServiceLoader Discovery Tests")
