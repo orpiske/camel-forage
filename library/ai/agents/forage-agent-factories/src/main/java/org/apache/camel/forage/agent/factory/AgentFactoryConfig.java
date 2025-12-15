@@ -1,5 +1,7 @@
 package org.apache.camel.forage.agent.factory;
 
+import static org.apache.camel.forage.agent.factory.AgentFactoryConfigEntries.GUARDRAILS_INPUT_CLASSES;
+import static org.apache.camel.forage.agent.factory.AgentFactoryConfigEntries.GUARDRAILS_OUTPUT_CLASSES;
 import static org.apache.camel.forage.agent.factory.AgentFactoryConfigEntries.PROVIDER_AGENT_CLASS;
 import static org.apache.camel.forage.agent.factory.AgentFactoryConfigEntries.PROVIDER_FEATURES;
 import static org.apache.camel.forage.agent.factory.AgentFactoryConfigEntries.PROVIDER_FEATURES_MEMORY_FACTORY_CLASS;
@@ -75,5 +77,13 @@ public class AgentFactoryConfig implements Config {
         return ConfigStore.getInstance()
                 .get(PROVIDER_AGENT_CLASS.asNamed(prefix))
                 .orElse(null);
+    }
+
+    public List<String> guardrailsInputClasses() {
+        return ConfigHelper.readAsList(GUARDRAILS_INPUT_CLASSES.asNamed(prefix));
+    }
+
+    public List<String> guardrailsOutputClasses() {
+        return ConfigHelper.readAsList(GUARDRAILS_OUTPUT_CLASSES.asNamed(prefix));
     }
 }

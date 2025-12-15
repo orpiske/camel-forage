@@ -447,11 +447,62 @@ Configure different memory strategies per agent:
 # Long-term memory agent
 agent1.provider.features.memory.factory.class=org.apache.camel.forage.memory.chat.redis.RedisChatMemoryFactory
 
-# Short-term memory agent  
+# Short-term memory agent
 agent2.provider.features.memory.factory.class=org.apache.camel.forage.memory.chat.messagewindow.MessageWindowChatMemoryBeanProvider
 
 # Stateless agent
 agent3.provider.features=memoryless
+```
+
+### Guardrails
+
+Guardrails allow you to add validation, filtering, or transformation logic that runs before (input guardrails) or after (output guardrails) an agent processes a request. Guardrails are configured as fully-qualified class names.
+
+#### Configuring Guardrails
+
+Configure guardrails in your `forage-agent-factory.properties` file:
+
+```properties
+# Input guardrails - executed before the agent processes input
+guardrails.input.classes=com.example.ContentFilterGuardrail,com.example.RateLimitGuardrail
+
+# Output guardrails - executed after the agent produces output
+guardrails.output.classes=com.example.PiiRedactionGuardrail,com.example.ToxicityFilterGuardrail
+```
+
+#### Named Agent Guardrails
+
+For multi-agent configurations, use prefixed guardrails for each agent:
+
+```properties
+# Define agents
+multi.agent.names=secure,standard
+
+# Secure agent with strict guardrails
+secure.provider.agent.class=org.apache.camel.forage.agent.simple.SimpleAgent
+secure.provider.model.factory.class=org.apache.camel.forage.models.chat.openai.OpenAIProvider
+secure.guardrails.input.classes=com.example.StrictContentFilter,com.example.AuthorizationGuardrail
+secure.guardrails.output.classes=com.example.PiiRedactionGuardrail,com.example.ComplianceGuardrail
+
+# Standard agent with minimal guardrails
+standard.provider.agent.class=org.apache.camel.forage.agent.simple.SimpleAgent
+standard.provider.model.factory.class=org.apache.camel.forage.models.chat.ollama.OllamaProvider
+standard.guardrails.output.classes=com.example.BasicOutputFilter
+```
+
+#### Environment Variable Configuration
+
+Guardrails can also be configured via environment variables:
+
+```bash
+# Single guardrail
+export GUARDRAILS_INPUT_CLASSES=com.example.ContentFilterGuardrail
+
+# Multiple guardrails (comma-separated)
+export GUARDRAILS_OUTPUT_CLASSES=com.example.PiiRedactionGuardrail,com.example.ToxicityFilterGuardrail
+
+# Named agent guardrails (prefix with agent name in uppercase)
+export SECURE_GUARDRAILS_INPUT_CLASSES=com.example.StrictContentFilter
 ```
 
 ## Configuration Reference
@@ -468,6 +519,8 @@ agent3.provider.features=memoryless
 | `MULTI_AGENT_ID_SOURCE_HEADER` | Header name for agent ID (when using header source) | `AgentType` |
 | `MULTI_AGENT_ID_SOURCE_PROPERTY` | Property name for agent ID (when using property source) | `agent.name` |
 | `MULTI_AGENT_ID_SOURCE_VARIABLE` | Variable name for agent ID (when using variable source) | `selectedAgent` |
+| `GUARDRAILS_INPUT_CLASSES` | Comma-separated input guardrail class names | `com.example.InputFilter` |
+| `GUARDRAILS_OUTPUT_CLASSES` | Comma-separated output guardrail class names | `com.example.OutputFilter` |
 
 ### System Properties
 
@@ -479,6 +532,8 @@ Configure via `-D` flags:
 -Dmulti.agent.names=google,ollama
 -Dmulti.agent.id.source=header
 -Dmulti.agent.id.source.header=AgentType
+-Dguardrails.input.classes=com.example.InputFilter
+-Dguardrails.output.classes=com.example.OutputFilter
 ```
 
 ### Named Configurations
@@ -502,11 +557,15 @@ ollama.provider.model.factory.class=org.apache.camel.forage.models.chat.ollama.O
 2. **API Key Configuration**: Verify API keys are properly set in configuration files
 3. **Model Availability**: Check that configured models are available and accessible
 4. **Memory Configuration**: Ensure memory providers are properly configured for stateful agents
-5. **Agent ID Source Issues**: 
+5. **Agent ID Source Issues**:
    - **Unknown Agent Error**: Check that the extracted agent ID matches one of the configured agent names in `multi.agent.names`
    - **Header/Property/Variable Not Found**: Verify the header, property, or variable is set before reaching the agent endpoint
    - **Missing Source Configuration**: When using `header`, `property`, or `variable` sources, ensure the corresponding name configuration is set
    - **Invalid Source Type**: Check that `multi.agent.id.source` is set to one of: `route`, `header`, `property`, `variable`
+6. **Guardrail Issues**:
+   - **ClassNotFoundException**: Ensure guardrail class names are fully-qualified (e.g., `com.example.MyGuardrail`) and the classes are available on the classpath
+   - **RuntimeForageException**: Check that guardrail classes can be loaded by the application's class loader; in Quarkus or Spring Boot, ensure classes are properly packaged
+   - **Guardrails Not Executing**: Verify the configuration property names are correct (`guardrails.input.classes` or `guardrails.output.classes`) and for named agents, include the prefix (e.g., `myagent.guardrails.input.classes`)
 
 ### Debug Mode
 
