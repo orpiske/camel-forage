@@ -35,13 +35,13 @@ The composable agent is automatically discovered and used when you include this 
 from("direct:chat")
     .setBody(constant("My name is Alice"))
     .setHeader(Headers.MEMORY_ID, constant(1))
-    .to("langchain4j-agent:memory-agent?agentFactory=#class:org.apache.camel.forage.agent.factory.DefaultAgentFactory")
+    .to("langchain4j-agent:memory-agent?agentFactory=#class:org.apache.camel.forage.agent.factory.MultiAgentFactory")
     .log("Response: ${body}");
 
 from("timer:check?delay=5000&repeatCount=1")
          .setBody(constant("What is my name?"))
         .setHeader(Headers.MEMORY_ID, constant(1))
-        .to("langchain4j-agent:test-memory-agent?agentFactory=#class:org.apache.camel.forage.agent.factory.DefaultAgentFactory")
+        .to("langchain4j-agent:test-memory-agent?agentFactory=#class:org.apache.camel.forage.agent.factory.MultiAgentFactory")
         .log("${body}");
 ```
 

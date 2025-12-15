@@ -10,8 +10,7 @@ Camel Forage provides an opinionated library of beans for Apache Camel that simp
 
 ### Agent Factories
 
-- **DefaultAgentFactory**: Single-agent configuration with ServiceLoader discovery
-- **MultiAgentFactory**: Multi-agent orchestration with named agent configurations
+- **MultiAgentFactory**: Agent orchestration with ServiceLoader discovery, supporting both single-agent and multi-agent configurations
 
 ### Agent Types
 
@@ -187,7 +186,7 @@ multi.agent.id.source.variable=selectedAgent
         - to:
             uri: langchain4j-agent:test
             parameters:
-              agentFactory: "#class:org.apache.camel.forage.agent.factory.DefaultAgentFactory"
+              agentFactory: "#class:org.apache.camel.forage.agent.factory.MultiAgentFactory"
               tags: users
         - log: ${body}
 
@@ -436,7 +435,7 @@ Use Camel's choice component for dynamic agent selection:
                 - to:
                     uri: langchain4j-agent:simple
                     parameters:
-                      agentFactory: "#class:org.apache.camel.forage.agent.factory.DefaultAgentFactory"
+                      agentFactory: "#class:org.apache.camel.forage.agent.factory.MultiAgentFactory"
 ```
 
 ### Memory Management

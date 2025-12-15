@@ -172,7 +172,7 @@ Bedrock models require opt-in before use:
 
 ```java
 from("direct:chat")
-    .to("langchain4j-agent:bedrock?agentFactory=#class:org.apache.camel.forage.agent.factory.DefaultAgentFactory")
+    .to("langchain4j-agent:bedrock?agentFactory=#class:org.apache.camel.forage.agent.factory.MultiAgentFactory")
     .log("Response: ${body}");
 ```
 
@@ -184,11 +184,11 @@ System.setProperty("advanced.bedrock.model.id", "anthropic.claude-3-5-sonnet-202
 
 from("direct:fast-chat")
     .setHeader("agentId", constant("fast"))
-    .to("langchain4j-agent:fast?agentFactory=#class:org.apache.camel.forage.agent.factory.DefaultAgentFactory");
+    .to("langchain4j-agent:fast?agentFactory=#class:org.apache.camel.forage.agent.factory.MultiAgentFactory");
 
 from("direct:advanced-chat")
     .setHeader("agentId", constant("advanced"))
-    .to("langchain4j-agent:advanced?agentFactory=#class:org.apache.camel.forage.agent.factory.DefaultAgentFactory");
+    .to("langchain4j-agent:advanced?agentFactory=#class:org.apache.camel.forage.agent.factory.MultiAgentFactory");
 ```
 
 ### Using BedrockModelId Enum

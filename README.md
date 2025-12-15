@@ -54,10 +54,10 @@ Simply reference the bean class in your Camel route:
 
 ```java
 from("direct:start")
-    .to("langchain4j-agent:test-memory-agent?agentFactory=#class:org.apache.camel.forage.agent.factory.DefaultAgentFactory");
+    .to("langchain4j-agent:test-memory-agent?agentFactory=#class:org.apache.camel.forage.agent.factory.MultiAgentFactory");
 ```
 
-The `org.apache.camel.forage.agent.factory.DefaultAgentFactory` class is a factory that builds AI agents automatically based on the dependencies available on the classpath and configured through properties.
+The `org.apache.camel.forage.agent.factory.MultiAgentFactory` class is a factory that builds AI agents automatically based on the dependencies available on the classpath and configured through properties. It supports both single-agent and multi-agent configurations.
 
 ## Available Modules
 
@@ -268,7 +268,7 @@ Example for a memory-less agent.
 ```java
 from("timer:ai?period=30000")
     .setBody(constant("Tell me a joke"))
-    .to("langchain4j-agent:joke-agent?agentFactory=#class:org.apache.camel.forage.agent.factory.DefaultAgentFactory")
+    .to("langchain4j-agent:joke-agent?agentFactory=#class:org.apache.camel.forage.agent.factory.MultiAgentFactory")
     .log("AI Response: ${body}");
 ```
 
@@ -279,7 +279,7 @@ public class MyRoutes extends RouteBuilder {
     @Override
     public void configure() throws Exception {
         from("direct:chat")
-            .to("langchain4j-agent:chat-agent?agentFactory=#class:org.apache.camel.forage.agent.factory.DefaultAgentFactory")
+            .to("langchain4j-agent:chat-agent?agentFactory=#class:org.apache.camel.forage.agent.factory.MultiAgentFactory")
             .log("Chat response: ${body}");
     }
 }

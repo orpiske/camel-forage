@@ -115,7 +115,6 @@ The agents follow a layered architecture:
 │      langchain4j-agent Component    │
 ├─────────────────────────────────────┤
 │       Agent Factories               │
-│  ├─ DefaultAgentFactory             │
 │  └─ MultiAgentFactory               │
 ├─────────────────────────────────────┤
 │  Agent Implementation               │
@@ -220,7 +219,7 @@ public class ChatBotRoutes extends RouteBuilder {
         from("timer:conversation?period=30s")
             .setHeader("CamelLangChain4jAgent.memoryId", constant("user-123"))
             .setBody(constant("How are you today?"))
-            .to("langchain4j-agent:chatbot?agentFactory=#class:org.apache.camel.forage.agent.factory.DefaultAgentFactory")
+            .to("langchain4j-agent:chatbot?agentFactory=#class:org.apache.camel.forage.agent.factory.MultiAgentFactory")
             .log("Bot: ${body}");
     }
 }
@@ -233,7 +232,7 @@ public class ApiRoutes extends RouteBuilder {
     @Override
     public void configure() throws Exception {
         from("rest:post:/ask")
-            .to("langchain4j-agent:api?agentFactory=#class:org.apache.camel.forage.agent.factory.DefaultAgentFactory")
+            .to("langchain4j-agent:api?agentFactory=#class:org.apache.camel.forage.agent.factory.MultiAgentFactory")
             .log("API Response: ${body}");
     }
 }
@@ -244,7 +243,7 @@ public class ApiRoutes extends RouteBuilder {
 ```java
 from("file:questions?noop=true")
     .split(body().tokenize("\n"))
-    .to("langchain4j-agent:processor?agentFactory=#class:org.apache.camel.forage.agent.factory.DefaultAgentFactory")
+    .to("langchain4j-agent:processor?agentFactory=#class:org.apache.camel.forage.agent.factory.MultiAgentFactory")
     .to("file:answers");
 ```
 

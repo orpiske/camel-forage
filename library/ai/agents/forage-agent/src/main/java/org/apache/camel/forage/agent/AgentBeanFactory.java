@@ -65,9 +65,6 @@ public class AgentBeanFactory implements BeanFactory {
         if (!prefixes.isEmpty()) {
             LOG.info("Detected agent prefixes: {}", prefixes);
             configureMultiAgent(prefixes);
-        } else if (defaultConfig.modelKind() != null) {
-            LOG.info("Configuring single agent with model kind: {}", defaultConfig.modelKind());
-            configureSingleAgent(defaultConfig);
         } else {
             LOG.debug("No agent configuration found, skipping agent registration");
         }
@@ -87,21 +84,6 @@ public class AgentBeanFactory implements BeanFactory {
                     LOG.warn("Failed to create agent '{}': {}", agentName, e.getMessage());
                     LOG.debug("Agent creation exception details", e);
                 }
-            }
-        }
-    }
-
-    private void configureSingleAgent(AgentConfig config) {
-        if (camelContext.getRegistry().lookupByNameAndType(DEFAULT_AGENT, Agent.class) == null) {
-            try {
-                Agent agent = createAgent(config, DEFAULT_AGENT);
-                if (agent != null) {
-                    camelContext.getRegistry().bind(DEFAULT_AGENT, agent);
-                    LOG.info("Registered default Agent bean with name: {}", DEFAULT_AGENT);
-                }
-            } catch (Exception e) {
-                LOG.warn("Failed to create default agent: {}", e.getMessage());
-                LOG.debug("Agent creation exception details", e);
             }
         }
     }
