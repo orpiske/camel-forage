@@ -4,7 +4,7 @@ Agent factory implementations for Apache Camel that provide automatic discovery 
 
 ## Overview
 
-The `forage-agent-factories` module provides multiple factory implementations, including `DefaultAgentFactory` for single agents and `MultiAgentFactory` for multi-agent orchestration. These serve as the main entry points for creating AI agents in the Camel Forage ecosystem, automatically discovering and wiring together agents, model providers, and chat memory factories using Java's ServiceLoader mechanism.
+The `forage-agent-factories` module provides the `MultiAgentFactory` implementation for AI agent orchestration. This factory serves as the main entry point for creating AI agents in the Camel Forage ecosystem, automatically discovering and wiring together agents, model providers, and chat memory factories using Java's ServiceLoader mechanism. It supports both single-agent and multi-agent configurations.
 
 ## Features
 
@@ -32,7 +32,7 @@ The `forage-agent-factories` module provides multiple factory implementations, i
 
 ```java
 from("direct:chat")
-    .to("langchain4j-agent:my-agent?agentFactory=#class:org.apache.camel.forage.agent.factory.DefaultAgentFactory")
+    .to("langchain4j-agent:my-agent?agentFactory=#class:org.apache.camel.forage.agent.factory.MultiAgentFactory")
     .log("Response: ${body}");
 ```
 
@@ -93,15 +93,12 @@ The agent factories use ServiceLoader to discover and configure components:
 
 ### Main Classes
 
-- **`DefaultAgentFactory`** (`org.apache.camel.forage.agent.factory.DefaultAgentFactory`)
-  - Implements `AgentFactory` from camel-langchain4j-agent-api
-  - Manages component discovery and single agent creation
-  - Thread-safe singleton implementation
-
 - **`MultiAgentFactory`** (`org.apache.camel.forage.agent.factory.MultiAgentFactory`)
   - Implements `AgentFactory` from camel-langchain4j-agent-api
-  - Orchestrates multiple agents for collaborative tasks
+  - Supports both single-agent and multi-agent configurations
+  - Orchestrates agents for collaborative tasks
   - Supports configurable agent ID sources and coordination
+  - Thread-safe implementation with singleton agent instances per configuration
 
 - **`ConfigurationAware`** (`org.apache.camel.forage.agent.factory.ConfigurationAware`)
   - Interface for agents that accept configuration
@@ -178,7 +175,7 @@ public class MyAgent implements Agent, ConfigurationAware {
 
 ## Thread Safety
 
-Both `DefaultAgentFactory` and `MultiAgentFactory` are thread-safe and use proper synchronization for agent creation. The singleton pattern ensures that multiple calls to `createAgent()` return the same configured instance.
+`MultiAgentFactory` is thread-safe and uses proper synchronization for agent creation. The singleton pattern ensures that multiple calls to `createAgent()` return the same configured instance for each agent configuration.
 
 ## Requirements
 

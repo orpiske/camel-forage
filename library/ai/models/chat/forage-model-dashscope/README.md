@@ -82,7 +82,7 @@ Once functional, it will be automatically discovered via ServiceLoader:
 
 ```java
 from("direct:chat")
-    .to("langchain4j-agent:my-agent?agentFactory=#class:org.apache.camel.forage.agent.factory.DefaultAgentFactory")
+    .to("langchain4j-agent:my-agent?agentFactory=#class:org.apache.camel.forage.agent.factory.MultiAgentFactory")
     .log("Response: ${body}");
 ```
 

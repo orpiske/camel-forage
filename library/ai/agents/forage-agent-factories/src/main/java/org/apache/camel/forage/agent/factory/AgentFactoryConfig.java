@@ -21,8 +21,8 @@ import org.apache.camel.forage.core.util.config.ConfigStore;
  * access to model providers, agent features, and memory factory configurations. It supports
  * both default and named/prefixed configurations for multi-instance scenarios.
  *
- * <p>This configuration is typically used by the DefaultAgentFactory for single-agent setups
- * or as individual agent configurations within multi-agent scenarios.
+ * <p>This configuration is typically used by the MultiAgentFactory for agent setups,
+ * supporting both single-agent and multi-agent scenarios.
  */
 public class AgentFactoryConfig implements Config {
 
