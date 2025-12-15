@@ -27,6 +27,10 @@ public final class AgentFactoryConfigEntries extends ConfigEntries {
             ConfigModule.of(AgentFactoryConfig.class, "provider.features.memory.factory.class");
     public static final ConfigModule PROVIDER_AGENT_CLASS =
             ConfigModule.of(AgentFactoryConfig.class, "provider.agent.class");
+    public static final ConfigModule GUARDRAILS_INPUT_CLASSES =
+            ConfigModule.of(AgentFactoryConfig.class, "guardrails.input.classes");
+    public static final ConfigModule GUARDRAILS_OUTPUT_CLASSES =
+            ConfigModule.of(AgentFactoryConfig.class, "guardrails.output.classes");
 
     private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
 
@@ -39,6 +43,8 @@ public final class AgentFactoryConfigEntries extends ConfigEntries {
         CONFIG_MODULES.put(PROVIDER_FEATURES, ConfigEntry.fromModule());
         CONFIG_MODULES.put(PROVIDER_FEATURES_MEMORY_FACTORY_CLASS, ConfigEntry.fromModule());
         CONFIG_MODULES.put(PROVIDER_AGENT_CLASS, ConfigEntry.fromModule());
+        CONFIG_MODULES.put(GUARDRAILS_INPUT_CLASSES, ConfigEntry.fromModule());
+        CONFIG_MODULES.put(GUARDRAILS_OUTPUT_CLASSES, ConfigEntry.fromModule());
     }
 
     public static Map<ConfigModule, ConfigEntry> entries() {

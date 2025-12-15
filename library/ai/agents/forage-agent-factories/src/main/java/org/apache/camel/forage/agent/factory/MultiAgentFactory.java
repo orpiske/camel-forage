@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.langchain4j.agent.api.Agent;
@@ -15,6 +17,7 @@ import org.apache.camel.forage.core.ai.ChatMemoryBeanProvider;
 import org.apache.camel.forage.core.ai.ModelProvider;
 import org.apache.camel.forage.core.annotations.ForageFactory;
 import org.apache.camel.forage.core.common.ServiceLoaderHelper;
+import org.apache.camel.forage.core.exceptions.RuntimeForageException;
 import org.apache.camel.forage.core.util.config.ConfigStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -182,9 +185,41 @@ public class MultiAgentFactory implements AgentFactory {
             AgentConfiguration agentConfiguration = new AgentConfiguration();
             agentConfiguration.withChatModel(chatModel).withChatMemoryProvider(chatMemoryProvider);
 
+            final List<String> inputGuardrailsList = agentFactoryConfig.guardrailsInputClasses();
+            setGuardrail(inputGuardrailsList, agentConfiguration::withInputGuardrailClasses);
+
+            final List<String> outputGuardrailsList = agentFactoryConfig.guardrailsOutputClasses();
+            setGuardrail(outputGuardrailsList, agentConfiguration::withOutputGuardrailClasses);
+
             configurationAware.configure(agentConfiguration);
         }
 
         return agent;
+    }
+
+    /**
+     * The configuration comes as a list of classes in String format, but we need the list to be a list of Classes.
+     * @param classesList
+     * @param listConsumer
+     */
+    private void setGuardrail(List<String> classesList, Consumer<List<Class<?>>> listConsumer) {
+        if (classesList != null && !classesList.isEmpty()) {
+
+            final List<Class<?>> collect = classesList.stream()
+                    .map(strClassName -> {
+                        try {
+                            final ClassLoader applicationContextClassLoader =
+                                    camelContext.getApplicationContextClassLoader();
+                            return Class.forName(strClassName, true, applicationContextClassLoader);
+                        } catch (ClassNotFoundException e) {
+                            final String className = strClassName == null ? "null" : strClassName;
+                            throw new RuntimeForageException(
+                                    String.format("The class named %s could not be loaded", className), e);
+                        }
+                    })
+                    .collect(Collectors.toList());
+
+            listConsumer.accept(collect);
+        }
     }
 }
