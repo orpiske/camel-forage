@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -403,5 +404,13 @@ public final class ConfigStore {
 
     public void setClassLoader(ClassLoader classLoader) {
         this.classLoader = classLoader;
+    }
+
+    /**
+     * Gets all the configuration entries stored/set
+     * @return A Set of all the entries
+     */
+    public Set<Map.Entry<Object, Object>> entries() {
+        return properties.entrySet();
     }
 }
