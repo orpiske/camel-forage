@@ -33,15 +33,10 @@ jobs:
     continue-on-error: ${{ matrix.experimental }}
     strategy:
       matrix:
-        os: [macos-latest]
-        camel-profile: [camel-current, camel-next]
+        os: [macos-latest, windows-latest]
         experimental: [false]
         include:
           - os: windows-latest
-            camel-profile: camel-current
-            experimental: true
-          - os: windows-latest
-            camel-profile: camel-next
             experimental: true
       fail-fast: true
 
@@ -53,8 +48,8 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
-      - name: Build with Maven (${{ matrix.camel-profile }})
-        run: mvn -B '-Dsurefire.rerunFailingTestsCount=2' '-Dci.env.name=github.com' package --file pom.xml -P ${{ matrix.camel-profile }}
+      - name: Build with Maven
+        run: mvn -B '-Dsurefire.rerunFailingTestsCount=2' '-Dci.env.name=github.com' package --file pom.xml
 
   build-with-integration-tests:
     runs-on: ${{ matrix.os }}
@@ -62,7 +57,6 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest ]
-        camel-profile: [ camel-current, camel-next ]
         experimental: [ false ]
       fail-fast: true
 
@@ -74,5 +68,5 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
-      - name: Build with Maven (${{ matrix.camel-profile }}) and run integration tests
-        run: mvn -B '-Dsurefire.rerunFailingTestsCount=2' '-Dci.env.name=github.com' install failsafe:integration-test failsafe:verify --file pom.xml -P ${{ matrix.camel-profile }}
+      - name: Build with Maven and run integration tests
+        run: mvn -B '-Dsurefire.rerunFailingTestsCount=2' '-Dci.env.name=github.com' install failsafe:integration-test failsafe:verify --file pom.xml
