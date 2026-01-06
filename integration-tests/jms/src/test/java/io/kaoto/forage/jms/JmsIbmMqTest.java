@@ -10,6 +10,8 @@ import org.citrusframework.annotations.CitrusTest;
 import org.citrusframework.junit.jupiter.CitrusSupport;
 import org.eclipse.microprofile.config.ConfigProvider;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +25,7 @@ import org.testcontainers.utility.DockerImageName;
 @CitrusSupport
 @Testcontainers
 @ExtendWith(IntegrationTestSetupExtension.class)
+@DisabledOnOs(OS.MAC)
 public class JmsIbmMqTest implements ForageIntegrationTest {
     private static final Logger LOG = LoggerFactory.getLogger(JmsIbmMqTest.class);
 
