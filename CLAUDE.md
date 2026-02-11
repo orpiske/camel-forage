@@ -8,8 +8,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Technology Stack:**
 - Java 17+
-- Apache Camel 4.16.0
-- LangChain4j 1.7.1 (with beta 1.9.0-beta16 for some features)
+- Apache Camel 4.x
+- LangChain4j 1.x
 - Maven, Spotless (Palantir Java Format), JUnit 5, AssertJ, Testcontainers, Citrus Test Framework
 
 ## Build Commands
