@@ -196,3 +196,11 @@ public class MyTest implements ForageIntegrationTest {
 - All factory classes must have `@ForageFactory` annotation
 - Use `MissingConfigException` for required missing configuration
 - Properties files named `<module-name>.properties` in resources
+
+## Active Technologies
+- Java 17+ + Apache Camel 4.16+, camel-api (RoutePolicyFactory, RoutePolicy) (001-route-policies)
+- N/A (stateless policy configuration) (001-route-policies)
+- Java 17+ + Apache Camel 4.16+ (camel-api: RoutePolicyFactory, RoutePolicy, RoutePolicySupport) (001-route-policies)
+
+## Recent Changes
+- 001-route-policies: Added Java 17+ + Apache Camel 4.16+, camel-api (RoutePolicyFactory, RoutePolicy)

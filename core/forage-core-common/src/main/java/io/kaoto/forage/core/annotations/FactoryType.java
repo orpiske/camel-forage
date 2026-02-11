@@ -15,7 +15,11 @@ public enum FactoryType {
     /** Factory that creates ConnectionFactory beans for JMS */
     CONNECTION_FACTORY("jakarta.jms.ConnectionFactory", "forage-jms-common");
 
+    /** Factory that creates ConnectionFactory beans for JMS */
+    //    CORE_FACTORIES("jakarta.jms.ConnectionFactory", "forage-jms-common");
+
     private final String displayName;
+
     private final String configArtifactId;
 
     FactoryType(String displayName, String configArtifactId) {
