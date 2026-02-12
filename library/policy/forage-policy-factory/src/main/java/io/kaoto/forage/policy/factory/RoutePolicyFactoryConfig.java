@@ -87,6 +87,7 @@ public class RoutePolicyFactoryConfig implements Config {
      */
     public Optional<String> getPolicyNames(String routeId) {
         ConfigModule module = RoutePolicyFactoryConfigEntries.policyNameModule(routeId);
+        ConfigStore.getInstance().load(module);
         return ConfigStore.getInstance().get(module);
     }
 }

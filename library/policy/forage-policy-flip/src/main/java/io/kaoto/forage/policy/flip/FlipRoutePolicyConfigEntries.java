@@ -32,13 +32,13 @@ public final class FlipRoutePolicyConfigEntries extends ConfigEntries {
     private FlipRoutePolicyConfigEntries() {}
 
     /**
-     * Creates a ConfigModule for the paired-route configuration with the given routeId.
+     * Creates a ConfigModule for the paired-route configuration with the given config prefix.
      *
-     * @param routeId the route ID
+     * @param configPrefix the full config prefix (e.g., camel.forage.route.policy.routeId.flip)
      * @return a ConfigModule for the paired-route configuration
      */
-    public static ConfigModule pairedRoute(String routeId) {
-        String name = CONFIG_PREFIX + "." + routeId + ".flip.paired-route";
+    public static ConfigModule pairedRoute(String configPrefix) {
+        String name = configPrefix + ".paired-route";
         return ConfigModule.of(
                 FlipRoutePolicyConfig.class,
                 name,
@@ -51,13 +51,13 @@ public final class FlipRoutePolicyConfigEntries extends ConfigEntries {
     }
 
     /**
-     * Creates a ConfigModule for the initially-active configuration with the given routeId.
+     * Creates a ConfigModule for the initially-active configuration with the given config prefix.
      *
-     * @param routeId the route ID
+     * @param configPrefix the full config prefix (e.g., camel.forage.route.policy.routeId.flip)
      * @return a ConfigModule for the initially-active configuration
      */
-    public static ConfigModule initiallyActive(String routeId) {
-        String name = CONFIG_PREFIX + "." + routeId + ".flip.initially-active";
+    public static ConfigModule initiallyActive(String configPrefix) {
+        String name = configPrefix + ".initially-active";
         return ConfigModule.of(
                 FlipRoutePolicyConfig.class,
                 name,
@@ -73,11 +73,11 @@ public final class FlipRoutePolicyConfigEntries extends ConfigEntries {
         return Collections.unmodifiableMap(CONFIG_MODULES);
     }
 
-    public static Optional<ConfigModule> find(String routeId, String name) {
-        if (routeId == null) {
+    public static Optional<ConfigModule> find(String configPrefix, String name) {
+        if (configPrefix == null) {
             return Optional.empty();
         }
-        String fullName = CONFIG_PREFIX + "." + routeId + ".flip." + extractPropertyName(name);
+        String fullName = configPrefix + "." + extractPropertyName(name);
         return CONFIG_MODULES.keySet().stream()
                 .filter(m -> m.name().equals(fullName))
                 .findFirst();
@@ -91,17 +91,17 @@ public final class FlipRoutePolicyConfigEntries extends ConfigEntries {
         return name;
     }
 
-    public static void register(String routeId) {
-        if (routeId != null) {
-            CONFIG_MODULES.put(pairedRoute(routeId), ConfigEntry.fromModule());
-            CONFIG_MODULES.put(initiallyActive(routeId), ConfigEntry.fromModule());
+    public static void register(String configPrefix) {
+        if (configPrefix != null) {
+            CONFIG_MODULES.put(pairedRoute(configPrefix), ConfigEntry.fromModule());
+            CONFIG_MODULES.put(initiallyActive(configPrefix), ConfigEntry.fromModule());
         }
     }
 
-    public static void loadOverrides(String routeId) {
-        if (routeId != null) {
-            loadForModule(pairedRoute(routeId));
-            loadForModule(initiallyActive(routeId));
+    public static void loadOverrides(String configPrefix) {
+        if (configPrefix != null) {
+            loadForModule(pairedRoute(configPrefix));
+            loadForModule(initiallyActive(configPrefix));
         }
     }
 
