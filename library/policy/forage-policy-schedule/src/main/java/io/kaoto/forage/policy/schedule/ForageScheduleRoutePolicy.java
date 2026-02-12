@@ -81,6 +81,7 @@ public class ForageScheduleRoutePolicy extends RoutePolicySupport {
 
     @Override
     public void onInit(Route route) {
+        LOG.info("Initializing schedule route policy for route {}", route.getId());
         super.onInit(route);
         this.route = route;
 
@@ -95,6 +96,7 @@ public class ForageScheduleRoutePolicy extends RoutePolicySupport {
 
     @Override
     public void onStart(Route route) {
+        LOG.info("Starting schedule route policy for route {}", route.getId());
         super.onStart(route);
 
         // Schedule periodic checks

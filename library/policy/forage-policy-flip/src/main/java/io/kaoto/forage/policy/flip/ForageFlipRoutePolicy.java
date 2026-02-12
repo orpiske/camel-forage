@@ -70,6 +70,7 @@ public class ForageFlipRoutePolicy extends RoutePolicySupport {
 
     @Override
     public void onInit(Route route) {
+        LOG.info("Initializing flip route policy for route {}", route.getId());
         super.onInit(route);
         this.route = route;
 
@@ -82,6 +83,7 @@ public class ForageFlipRoutePolicy extends RoutePolicySupport {
 
     @Override
     public void onStart(Route route) {
+        LOG.info("Starting flip route policy for route {}", route.getId());
         super.onStart(route);
 
         // Create executor for async flipping

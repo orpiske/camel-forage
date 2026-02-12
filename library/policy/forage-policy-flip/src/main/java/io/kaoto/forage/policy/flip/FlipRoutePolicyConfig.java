@@ -51,8 +51,10 @@ public class FlipRoutePolicyConfig implements Config {
      * @throws MissingConfigException if not configured
      */
     public String pairedRouteId() {
+        ConfigModule module = FlipRoutePolicyConfigEntries.pairedRoute(prefix);
+        ConfigStore.getInstance().load(module);
         return ConfigStore.getInstance()
-                .get(FlipRoutePolicyConfigEntries.pairedRoute(prefix))
+                .get(module)
                 .orElseThrow(() -> new MissingConfigException("Missing paired-route configuration for flip policy"));
     }
 
@@ -62,9 +64,8 @@ public class FlipRoutePolicyConfig implements Config {
      * @return true if this route should start active, false otherwise
      */
     public boolean initiallyActive() {
-        return ConfigStore.getInstance()
-                .get(FlipRoutePolicyConfigEntries.initiallyActive(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(true);
+        ConfigModule module = FlipRoutePolicyConfigEntries.initiallyActive(prefix);
+        ConfigStore.getInstance().load(module);
+        return ConfigStore.getInstance().get(module).map(Boolean::parseBoolean).orElse(true);
     }
 }
