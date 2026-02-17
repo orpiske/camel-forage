@@ -3,6 +3,7 @@ package io.kaoto.forage.agent.factory;
 import io.kaoto.forage.core.util.config.ConfigEntries;
 import io.kaoto.forage.core.util.config.ConfigEntry;
 import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigTag;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -20,18 +21,60 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class AgentFactoryConfigEntries extends ConfigEntries {
     public static final String FEATURE_MEMORY = "memory";
-    public static final ConfigModule PROVIDER_MODEL_FACTORY_CLASS =
-            ConfigModule.of(AgentFactoryConfig.class, "forage.provider.model.factory.class");
-    public static final ConfigModule PROVIDER_FEATURES =
-            ConfigModule.of(AgentFactoryConfig.class, "forage.provider.features");
-    public static final ConfigModule PROVIDER_FEATURES_MEMORY_FACTORY_CLASS =
-            ConfigModule.of(AgentFactoryConfig.class, "forage.provider.features.memory.factory.class");
-    public static final ConfigModule PROVIDER_AGENT_CLASS =
-            ConfigModule.of(AgentFactoryConfig.class, "forage.provider.agent.class");
-    public static final ConfigModule GUARDRAILS_INPUT_CLASSES =
-            ConfigModule.of(AgentFactoryConfig.class, "forage.guardrails.input.classes");
-    public static final ConfigModule GUARDRAILS_OUTPUT_CLASSES =
-            ConfigModule.of(AgentFactoryConfig.class, "forage.guardrails.output.classes");
+    public static final ConfigModule PROVIDER_MODEL_FACTORY_CLASS = ConfigModule.of(
+            AgentFactoryConfig.class,
+            "forage.provider.model.factory.class",
+            "Fully qualified class name of the model provider factory",
+            "Model Factory Class",
+            null,
+            "string",
+            false,
+            ConfigTag.ADVANCED);
+    public static final ConfigModule PROVIDER_FEATURES = ConfigModule.of(
+            AgentFactoryConfig.class,
+            "forage.provider.features",
+            "Comma-separated list of agent features to enable (e.g., memory)",
+            "Features",
+            null,
+            "string",
+            false,
+            ConfigTag.COMMON);
+    public static final ConfigModule PROVIDER_FEATURES_MEMORY_FACTORY_CLASS = ConfigModule.of(
+            AgentFactoryConfig.class,
+            "forage.provider.features.memory.factory.class",
+            "Fully qualified class name of the chat memory factory",
+            "Memory Factory Class",
+            null,
+            "string",
+            false,
+            ConfigTag.ADVANCED);
+    public static final ConfigModule PROVIDER_AGENT_CLASS = ConfigModule.of(
+            AgentFactoryConfig.class,
+            "forage.provider.agent.class",
+            "Fully qualified class name of the agent factory implementation",
+            "Agent Class",
+            null,
+            "string",
+            false,
+            ConfigTag.ADVANCED);
+    public static final ConfigModule GUARDRAILS_INPUT_CLASSES = ConfigModule.of(
+            AgentFactoryConfig.class,
+            "forage.guardrails.input.classes",
+            "Comma-separated list of input guardrail class names",
+            "Input Guardrails",
+            null,
+            "string",
+            false,
+            ConfigTag.ADVANCED);
+    public static final ConfigModule GUARDRAILS_OUTPUT_CLASSES = ConfigModule.of(
+            AgentFactoryConfig.class,
+            "forage.guardrails.output.classes",
+            "Comma-separated list of output guardrail class names",
+            "Output Guardrails",
+            null,
+            "string",
+            false,
+            ConfigTag.ADVANCED);
 
     private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
 

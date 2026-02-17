@@ -12,7 +12,8 @@ import org.h2.jdbcx.JdbcDataSource;
 @ForageBean(
         value = "h2",
         components = {"camel-sql", "camel-jdbc", "camel-spring-jdbc"},
-        description = "H2 database")
+        description = "H2 database",
+        feature = "javax.sql.DataSource")
 public class H2Jdbc extends PooledDataSource {
 
     @Override

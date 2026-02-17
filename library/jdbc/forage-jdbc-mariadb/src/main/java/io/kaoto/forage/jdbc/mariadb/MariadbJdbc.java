@@ -12,7 +12,8 @@ import org.mariadb.jdbc.MariaDbDataSource;
 @ForageBean(
         value = "mariadb",
         components = {"camel-sql", "camel-jdbc", "camel-spring-jdbc"},
-        description = "MariaDB database")
+        description = "MariaDB database",
+        feature = "javax.sql.DataSource")
 public class MariadbJdbc extends PooledDataSource {
 
     @Override

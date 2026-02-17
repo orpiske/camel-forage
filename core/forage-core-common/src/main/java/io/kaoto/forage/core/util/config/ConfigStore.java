@@ -6,7 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -148,8 +148,25 @@ public final class ConfigStore {
      */
     public <T extends Config> Set<String> readPrefixes(T instance, String regexp) {
         final String fileName = asProperties(instance);
+        Properties merged = loadPropertiesWithPriority(instance, fileName);
 
-        return readPrefixes(loadPropertiesWithPriority(instance, fileName), regexp);
+        // Also include properties from application.properties so that prefixes
+        // defined there (e.g., forage.ollama.agent.*) are detected
+        Properties appProps = ConfigHelper.getApplicationProperties();
+        if (appProps != null) {
+            merged.putAll(appProps);
+        }
+
+        // Also include properties already registered in ConfigStore by the Config
+        // constructor, which may have loaded them from a properties file that cannot
+        // be re-read in certain runtime contexts (e.g., JBang classloader)
+        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+            if (entry.getKey() instanceof ConfigModule cm) {
+                merged.putIfAbsent(cm.propertyName(), entry.getValue());
+            }
+        }
+
+        return readPrefixes(merged, regexp);
     }
 
     /**
@@ -167,15 +184,15 @@ public final class ConfigStore {
      */
     private <T extends Config> Properties loadPropertiesWithPriority(T instance, String fileName) {
         InputStream is = null;
-        File file = Paths.get("", fileName).toAbsolutePath().toFile();
+        File file = Path.of("", fileName).toAbsolutePath().toFile();
         if (!file.exists()) {
             final String property = System.getProperty("forage.config.dir");
             if (property != null) {
-                file = Paths.get(property, fileName).toAbsolutePath().toFile();
+                file = Path.of(property, fileName).toAbsolutePath().toFile();
             } else {
                 final String environment = System.getenv("FORAGE_CONFIG_DIR");
                 if (environment != null) {
-                    file = Paths.get(environment, fileName).toAbsolutePath().toFile();
+                    file = Path.of(environment, fileName).toAbsolutePath().toFile();
                 }
             }
         }
@@ -276,18 +293,12 @@ public final class ConfigStore {
             return Optional.of(propertyValue);
         }
 
-        Optional<String> value = null;
-        switch (ConfigHelper.getRuntime()) {
-            case springBoot:
-                value = ConfigHelper.getSpringBootProperty(module.propertyName());
-                break;
-            case quarkus:
-                value = ConfigHelper.getQuarkusProperty(module.propertyName());
-                break;
-            case main:
-                value = ConfigHelper.getCamelMainProperty(module.propertyName());
-                break;
-        }
+        Optional<String> value =
+                switch (ConfigHelper.getRuntime()) {
+                    case springBoot -> ConfigHelper.getSpringBootProperty(module.propertyName());
+                    case quarkus -> ConfigHelper.getQuarkusProperty(module.propertyName());
+                    case main -> ConfigHelper.getCamelMainProperty(module.propertyName());
+                };
 
         if (value != null && (!value.isEmpty())) {
             return value;

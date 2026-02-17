@@ -54,7 +54,7 @@ public abstract class AbstractConfigSource implements ConfigSource {
 
     public static class ConfigurationBuilder {
 
-        private static final Map<String, String> configuration = new HashMap<>();
+        private final Map<String, String> configuration = new HashMap<>();
 
         public ConfigurationBuilder add(String key, Supplier<?> method) {
             Object value = method.get();

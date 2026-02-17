@@ -12,7 +12,8 @@ import io.kaoto.forage.jdbc.common.PooledDataSource;
 @ForageBean(
         value = "db2",
         components = {"camel-sql", "camel-jdbc", "camel-spring-jdbc"},
-        description = "IBM DB2 database")
+        description = "IBM DB2 database",
+        feature = "javax.sql.DataSource")
 public class Db2Jdbc extends PooledDataSource {
 
     @Override

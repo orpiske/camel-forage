@@ -12,15 +12,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class DataSourceFactoryConfigEntries extends ConfigEntries {
 
     // Database connection configuration
-    public static final ConfigModule DB_KIND = ConfigModule.of(
+    public static final ConfigModule DB_KIND = ConfigModule.ofBeanName(
             DataSourceFactoryConfig.class,
             "forage.jdbc.db.kind",
             "The database kind/type",
             "Database Kind",
-            null,
-            "bean-name",
             true,
-            ConfigTag.COMMON);
+            ConfigTag.COMMON,
+            "javax.sql.DataSource");
 
     public static final ConfigModule JDBC_URL = ConfigModule.of(
             DataSourceFactoryConfig.class,
@@ -48,7 +47,7 @@ public final class DataSourceFactoryConfigEntries extends ConfigEntries {
             "The database password",
             "Password",
             null,
-            "string",
+            "password",
             true,
             ConfigTag.SECURITY);
 

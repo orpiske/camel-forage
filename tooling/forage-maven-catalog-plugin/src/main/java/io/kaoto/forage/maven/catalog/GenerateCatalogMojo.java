@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -70,9 +69,8 @@ public class GenerateCatalogMojo extends AbstractMojo {
             // Generate catalog
             CatalogResult result = generator.generateCatalog(project, outputDirectory);
 
-            getLog().info(String.format(
-                    "Catalog generation completed. Found %d components, generated %d files",
-                    result.getComponentCount(), result.getGeneratedFileCount()));
+            getLog().info("Catalog generation completed. Found %d components, generated %d files"
+                    .formatted(result.getComponentCount(), result.getGeneratedFileCount()));
 
             // Log generated files
             result.getGeneratedFiles().forEach(file -> getLog().info("Generated: " + file.getAbsolutePath()));
@@ -83,7 +81,7 @@ public class GenerateCatalogMojo extends AbstractMojo {
     }
 
     private void ensureOutputDirectory() throws IOException {
-        Path outputPath = Paths.get(outputDirectory.getAbsolutePath());
+        Path outputPath = Path.of(outputDirectory.getAbsolutePath());
         if (!Files.exists(outputPath)) {
             Files.createDirectories(outputPath);
             getLog().debug("Created output directory: " + outputPath);

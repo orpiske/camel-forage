@@ -83,8 +83,7 @@ public class InfinispanMemoryBeanProvider implements ChatMemoryBeanProvider {
                     CACHE = CACHE_MANAGER.getCache(cacheName);
                 }
             } catch (Exception e) {
-                throw new IllegalArgumentException(
-                        String.format("Failed to get or create named cache %s", cacheName), e);
+                throw new IllegalArgumentException("Failed to get or create named cache %s".formatted(cacheName), e);
             }
 
             // Test the connection by performing a simple operation

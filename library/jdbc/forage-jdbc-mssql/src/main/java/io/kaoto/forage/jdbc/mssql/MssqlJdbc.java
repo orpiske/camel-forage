@@ -12,7 +12,8 @@ import io.kaoto.forage.jdbc.common.PooledDataSource;
 @ForageBean(
         value = "mssql",
         components = {"camel-sql", "camel-jdbc", "camel-spring-jdbc"},
-        description = "Microsoft SQL Server database")
+        description = "Microsoft SQL Server database",
+        feature = "javax.sql.DataSource")
 public class MssqlJdbc extends PooledDataSource {
 
     @Override

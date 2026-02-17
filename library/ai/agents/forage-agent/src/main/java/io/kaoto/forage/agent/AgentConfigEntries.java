@@ -37,15 +37,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class AgentConfigEntries extends ConfigEntries {
 
     // Core agent configuration
-    public static final ConfigModule MODEL_KIND = ConfigModule.of(
+    public static final ConfigModule MODEL_KIND = ConfigModule.ofBeanName(
             AgentConfig.class,
             "forage.agent.model.kind",
             "The model provider kind (e.g., ollama, openai, google-gemini, azure-openai, anthropic)",
             "Model Kind",
-            null,
-            "bean-name",
             true,
-            ConfigTag.COMMON);
+            ConfigTag.COMMON,
+            "Chat Model");
 
     public static final ConfigModule FEATURES = ConfigModule.of(
             AgentConfig.class,
@@ -57,15 +56,14 @@ public final class AgentConfigEntries extends ConfigEntries {
             false,
             ConfigTag.COMMON);
 
-    public static final ConfigModule MEMORY_KIND = ConfigModule.of(
+    public static final ConfigModule MEMORY_KIND = ConfigModule.ofBeanName(
             AgentConfig.class,
             "forage.agent.memory.kind",
             "The memory provider kind (e.g., message-window, redis, infinispan)",
             "Memory Kind",
-            null,
-            "bean-name",
             false,
-            ConfigTag.COMMON);
+            ConfigTag.COMMON,
+            "Memory");
 
     // Common model configuration (shared across providers)
     public static final ConfigModule API_KEY = ConfigModule.of(

@@ -128,18 +128,17 @@ public class WeaviateConfig implements Config {
     }
 
     public String toString() {
-        String result = String.format(
-                "apiKey: %s, scheme %s, host %s, port %s, useGrpcForInserts %s, securedGrpc %s, objectClass %s, avoidDups %s, consistencyLevel %s",
-                apiKey(),
-                scheme(),
-                host(),
-                port().toString(),
-                useGrpcForInserts().toString(),
-                securedGrpc().toString(),
-                objectClass(),
-                avoidDups().toString(),
-                consistencyLevel().toString());
-        return result;
+        return "apiKey: %s, scheme %s, host %s, port %s, useGrpcForInserts %s, securedGrpc %s, objectClass %s, avoidDups %s, consistencyLevel %s"
+                .formatted(
+                        apiKey(),
+                        scheme(),
+                        host(),
+                        port().toString(),
+                        useGrpcForInserts().toString(),
+                        securedGrpc().toString(),
+                        objectClass(),
+                        avoidDups().toString(),
+                        consistencyLevel().toString());
     }
 
     @Override

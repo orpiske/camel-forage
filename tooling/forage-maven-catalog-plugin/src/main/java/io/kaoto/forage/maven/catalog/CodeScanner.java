@@ -24,7 +24,6 @@ import io.kaoto.forage.core.annotations.FactoryType;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -184,7 +183,7 @@ public class CodeScanner {
             return sourceDirectoryCache.get(artifactId);
         }
 
-        Path projectBase = Paths.get(rootProject.getBasedir().getAbsolutePath());
+        Path projectBase = Path.of(rootProject.getBasedir().getAbsolutePath());
         log.debug("Project base directory: " + projectBase);
         log.debug("Looking for source directory for artifact: " + artifactId);
 
@@ -327,36 +326,27 @@ public class CodeScanner {
             Expression value = pair.getValue();
 
             switch (pairName) {
-                case "value":
+                case "value" -> {
                     if (value instanceof StringLiteralExpr stringLiteral) {
                         data.setName(stringLiteral.asString());
                     }
-                    break;
-                case "components":
-                    data.setComponents(extractStringArrayValue(value));
-                    break;
-                case "description":
+                }
+                case "components" -> data.setComponents(extractStringArrayValue(value));
+                case "description" -> {
                     if (value instanceof StringLiteralExpr stringLiteral) {
                         data.setDescription(stringLiteral.asString());
                     }
-                    break;
-                case "type":
-                    data.setFactoryType(extractFactoryTypeValue(value));
-                    break;
-                case "autowired":
+                }
+                case "type" -> data.setFactoryType(extractFactoryTypeValue(value));
+                case "autowired" -> {
                     if (value instanceof BooleanLiteralExpr booleanLiteral) {
                         data.setAutowired(booleanLiteral.getValue());
                     }
-                    break;
-                case "conditionalBeans":
-                    data.setConditionalBeans(extractConditionalBeanGroupArray(value));
-                    break;
-                case "variant":
-                    data.setVariant(extractVariantValue(value));
-                    break;
-                case "configClass":
-                    data.setConfigClassName(extractClassValue(value, cu));
-                    break;
+                }
+                case "conditionalBeans" -> data.setConditionalBeans(extractConditionalBeanGroupArray(value));
+                case "variant" -> data.setVariant(extractVariantValue(value));
+                case "configClass" -> data.setConfigClassName(extractClassValue(value, cu));
+                default -> {}
             }
         }
     }
@@ -367,11 +357,10 @@ public class CodeScanner {
     private List<ConditionalBeanGroup> extractConditionalBeanGroupArray(Expression value) {
         List<ConditionalBeanGroup> groups = new ArrayList<>();
 
-        if (value instanceof ArrayInitializerExpr) {
-            ArrayInitializerExpr arrayExpr = (ArrayInitializerExpr) value;
+        if (value instanceof ArrayInitializerExpr arrayExpr) {
             for (Expression element : arrayExpr.getValues()) {
-                if (element instanceof NormalAnnotationExpr) {
-                    ConditionalBeanGroup group = extractConditionalBeanGroupInfo((NormalAnnotationExpr) element);
+                if (element instanceof NormalAnnotationExpr normalAnnotation) {
+                    ConditionalBeanGroup group = extractConditionalBeanGroupInfo(normalAnnotation);
                     if (group != null) {
                         groups.add(group);
                     }
@@ -396,24 +385,23 @@ public class CodeScanner {
             Expression value = pair.getValue();
 
             switch (pairName) {
-                case "id":
-                    if (value instanceof StringLiteralExpr) {
-                        id = ((StringLiteralExpr) value).asString();
+                case "id" -> {
+                    if (value instanceof StringLiteralExpr stringLiteral) {
+                        id = stringLiteral.asString();
                     }
-                    break;
-                case "description":
-                    if (value instanceof StringLiteralExpr) {
-                        description = ((StringLiteralExpr) value).asString();
+                }
+                case "description" -> {
+                    if (value instanceof StringLiteralExpr stringLiteral) {
+                        description = stringLiteral.asString();
                     }
-                    break;
-                case "configEntry":
-                    if (value instanceof StringLiteralExpr) {
-                        configEntry = ((StringLiteralExpr) value).asString();
+                }
+                case "configEntry" -> {
+                    if (value instanceof StringLiteralExpr stringLiteral) {
+                        configEntry = stringLiteral.asString();
                     }
-                    break;
-                case "beans":
-                    beans = extractConditionalBeanArray(value);
-                    break;
+                }
+                case "beans" -> beans = extractConditionalBeanArray(value);
+                default -> {}
             }
         }
 
@@ -430,11 +418,10 @@ public class CodeScanner {
     private List<ConditionalBeanInfo> extractConditionalBeanArray(Expression value) {
         List<ConditionalBeanInfo> beans = new ArrayList<>();
 
-        if (value instanceof ArrayInitializerExpr) {
-            ArrayInitializerExpr arrayExpr = (ArrayInitializerExpr) value;
+        if (value instanceof ArrayInitializerExpr arrayExpr) {
             for (Expression element : arrayExpr.getValues()) {
-                if (element instanceof NormalAnnotationExpr) {
-                    ConditionalBeanInfo beanInfo = extractConditionalBeanInfo((NormalAnnotationExpr) element);
+                if (element instanceof NormalAnnotationExpr normalAnnotation) {
+                    ConditionalBeanInfo beanInfo = extractConditionalBeanInfo(normalAnnotation);
                     if (beanInfo != null) {
                         beans.add(beanInfo);
                     }
@@ -459,35 +446,36 @@ public class CodeScanner {
             Expression pairValue = pair.getValue();
 
             switch (pairName) {
-                case "name":
-                    if (pairValue instanceof StringLiteralExpr) {
-                        String nameValue = ((StringLiteralExpr) pairValue).asString();
+                case "name" -> {
+                    if (pairValue instanceof StringLiteralExpr stringLiteral) {
+                        String nameValue = stringLiteral.asString();
                         if (!nameValue.isEmpty()) {
                             name = nameValue;
                         }
                     }
-                    break;
-                case "nameFromConfig":
-                    if (pairValue instanceof StringLiteralExpr) {
-                        String nameFromConfigValue = ((StringLiteralExpr) pairValue).asString();
+                }
+                case "nameFromConfig" -> {
+                    if (pairValue instanceof StringLiteralExpr stringLiteral) {
+                        String nameFromConfigValue = stringLiteral.asString();
                         if (!nameFromConfigValue.isEmpty()) {
                             nameFromConfig = nameFromConfigValue;
                         }
                     }
-                    break;
-                case "javaType":
-                    if (pairValue instanceof StringLiteralExpr) {
-                        javaType = ((StringLiteralExpr) pairValue).asString();
+                }
+                case "javaType" -> {
+                    if (pairValue instanceof StringLiteralExpr stringLiteral) {
+                        javaType = stringLiteral.asString();
                     }
-                    break;
-                case "description":
-                    if (pairValue instanceof StringLiteralExpr) {
-                        String descValue = ((StringLiteralExpr) pairValue).asString();
+                }
+                case "description" -> {
+                    if (pairValue instanceof StringLiteralExpr stringLiteral) {
+                        String descValue = stringLiteral.asString();
                         if (!descValue.isEmpty()) {
                             description = descValue;
                         }
                     }
-                    break;
+                }
+                default -> {}
             }
         }
 
@@ -510,39 +498,34 @@ public class CodeScanner {
         String configClassName = null;
 
         // Extract annotation values
-        if (annotation instanceof SingleMemberAnnotationExpr) {
-            SingleMemberAnnotationExpr singleMember = (SingleMemberAnnotationExpr) annotation;
-            if (singleMember.getMemberValue() instanceof StringLiteralExpr) {
-                name = ((StringLiteralExpr) singleMember.getMemberValue()).asString();
+        if (annotation instanceof SingleMemberAnnotationExpr singleMember) {
+            if (singleMember.getMemberValue() instanceof StringLiteralExpr stringLiteral) {
+                name = stringLiteral.asString();
             }
-        } else if (annotation instanceof NormalAnnotationExpr) {
-            NormalAnnotationExpr normalAnnotation = (NormalAnnotationExpr) annotation;
+        } else if (annotation instanceof NormalAnnotationExpr normalAnnotation) {
             for (MemberValuePair pair : normalAnnotation.getPairs()) {
                 String pairName = pair.getNameAsString();
                 Expression value = pair.getValue();
 
                 switch (pairName) {
-                    case "value":
-                        if (value instanceof StringLiteralExpr) {
-                            name = ((StringLiteralExpr) value).asString();
+                    case "value" -> {
+                        if (value instanceof StringLiteralExpr stringLiteral) {
+                            name = stringLiteral.asString();
                         }
-                        break;
-                    case "components":
-                        components = extractStringArrayValue(value);
-                        break;
-                    case "description":
-                        if (value instanceof StringLiteralExpr) {
-                            description = ((StringLiteralExpr) value).asString();
+                    }
+                    case "components" -> components = extractStringArrayValue(value);
+                    case "description" -> {
+                        if (value instanceof StringLiteralExpr stringLiteral) {
+                            description = stringLiteral.asString();
                         }
-                        break;
-                    case "feature":
-                        if (value instanceof StringLiteralExpr) {
-                            feature = ((StringLiteralExpr) value).asString();
+                    }
+                    case "feature" -> {
+                        if (value instanceof StringLiteralExpr stringLiteral) {
+                            feature = stringLiteral.asString();
                         }
-                        break;
-                    case "configClass":
-                        configClassName = extractClassValue(value, cu);
-                        break;
+                    }
+                    case "configClass" -> configClassName = extractClassValue(value, cu);
+                    default -> {}
                 }
             }
         }
@@ -616,7 +599,7 @@ public class CodeScanner {
     }
 
     /**
-     * Extracts configuration entry from a ConfigModule.of() method call.
+     * Extracts configuration entry from a ConfigModule.of() or ConfigModule.ofBeanName() method call.
      */
     private ConfigEntry extractConfigEntryFromMethodCall(MethodCallExpr methodCall) {
         int argCount = methodCall.getArguments().size();
@@ -635,7 +618,10 @@ public class CodeScanner {
         ConfigEntry configProp = new ConfigEntry();
         configProp.setName(configKey);
 
-        if (argCount >= 8) {
+        String methodName = methodCall.getNameAsString();
+        if ("ofBeanName".equals(methodName)) {
+            extractBeanNameConfigEntry(methodCall, configProp);
+        } else if (argCount >= 8) {
             extractFullConfigEntry(methodCall, configProp);
         } else {
             extractSimpleConfigEntry(configKey, configProp);
@@ -684,6 +670,45 @@ public class CodeScanner {
         configProp.setType("String");
         configProp.setDescription(configKey);
         configProp.setRequired(false);
+    }
+
+    /**
+     * Extracts bean-name configuration entry from ConfigModule.ofBeanName() call.
+     * Arguments: (config, name, description, label, required, configTag, selectsFrom)
+     */
+    private void extractBeanNameConfigEntry(MethodCallExpr methodCall, ConfigEntry configProp) {
+        configProp.setType("bean-name");
+
+        int argCount = methodCall.getArguments().size();
+
+        // Description (3rd argument)
+        if (argCount > 2) {
+            extractStringArg(methodCall, 2, configProp::setDescription);
+        }
+
+        // Label (4th argument)
+        if (argCount > 3) {
+            extractStringArg(methodCall, 3, configProp::setLabel);
+        }
+
+        // Required (5th argument)
+        if (argCount > 4) {
+            extractBooleanArg(methodCall, 4, configProp::setRequired);
+        }
+
+        // ConfigTag (6th argument)
+        if (methodCall.getArguments().size() > 5) {
+            var configTagArg = methodCall.getArguments().get(5);
+            String configTagValue = extractConfigTagValue(configTagArg);
+            if (configTagValue != null) {
+                configProp.setConfigTag(configTagValue);
+            }
+        }
+
+        // SelectsFrom (7th argument)
+        if (methodCall.getArguments().size() > 6) {
+            extractStringArg(methodCall, 6, configProp::setSelectsFrom);
+        }
     }
 
     /**
@@ -811,10 +836,11 @@ public class CodeScanner {
     }
 
     /**
-     * Checks if a method call is ConfigModule.of().
+     * Checks if a method call is ConfigModule.of() or ConfigModule.ofBeanName().
      */
     private boolean isConfigModuleOfCall(MethodCallExpr methodCall) {
-        return methodCall.getNameAsString().equals("of")
+        String methodName = methodCall.getNameAsString();
+        return (methodName.equals("of") || methodName.equals("ofBeanName"))
                 && methodCall.getScope().isPresent()
                 && (methodCall.getScope().get().toString().equals("ConfigModule")
                         || methodCall.getScope().get().toString().endsWith(".ConfigModule")

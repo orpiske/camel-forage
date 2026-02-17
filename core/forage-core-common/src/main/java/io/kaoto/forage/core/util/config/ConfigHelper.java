@@ -165,106 +165,81 @@ public final class ConfigHelper {
         return false;
     }
 
+    /**
+     * Returns the application.properties as a Properties object for the current runtime,
+     * or null if unavailable (e.g., Quarkus uses SmallRyeConfig instead).
+     */
+    public static Properties getApplicationProperties() {
+        return switch (getRuntime()) {
+            case springBoot -> getSpringBootConfig();
+            case main -> getCamelMainConfig();
+            case quarkus -> null;
+        };
+    }
+
     private static SmallRyeConfig getQuarkusConfig() {
-        if (quarkusConfig != null) {
-            return quarkusConfig;
-        } else {
+        if (quarkusConfig == null) {
             quarkusConfig = (SmallRyeConfig)
                     org.eclipse.microprofile.config.ConfigProvider.getConfig().unwrap(SmallRyeConfig.class);
-            return quarkusConfig;
         }
+        return quarkusConfig;
+    }
+
+    private static Properties loadApplicationProperties() {
+        InputStream input = null;
+
+        // Try loading from working directory first
+        try {
+            java.io.File file = java.nio.file.Path.of("", "application.properties")
+                    .toAbsolutePath()
+                    .toFile();
+            if (file.exists()) {
+                LOG.info("Loading application.properties from working directory: {}", file.getAbsolutePath());
+                input = new java.io.FileInputStream(file);
+            }
+        } catch (IOException ex) {
+            LOG.debug("Failed to load application.properties from working directory", ex);
+        }
+
+        // Fallback to classpath
+        if (input == null) {
+            input = ConfigHelper.class.getClassLoader().getResourceAsStream("application.properties");
+            if (input != null) {
+                LOG.info("Loading application.properties from classpath");
+            }
+        }
+
+        if (input != null) {
+            try {
+                Properties props = new Properties();
+                props.load(input);
+                return props;
+            } catch (IOException ex) {
+                LOG.error("Failed to load application.properties", ex);
+            } finally {
+                try {
+                    input.close();
+                } catch (IOException ex) {
+                    // Ignore
+                }
+            }
+        }
+
+        return null;
     }
 
     private static Properties getSpringBootConfig() {
-        if (springBootConfig != null) {
-            return springBootConfig;
-        } else {
-            InputStream input = null;
-
-            // Try loading from working directory first
-            try {
-                java.io.File file = java.nio.file.Paths.get("", "application.properties")
-                        .toAbsolutePath()
-                        .toFile();
-                if (file.exists()) {
-                    LOG.info("Loading application.properties from working directory: {}", file.getAbsolutePath());
-                    input = new java.io.FileInputStream(file);
-                }
-            } catch (IOException ex) {
-                LOG.debug("Failed to load application.properties from working directory", ex);
-            }
-
-            // Fallback to classpath
-            if (input == null) {
-                input = ConfigHelper.class.getClassLoader().getResourceAsStream("application.properties");
-                if (input != null) {
-                    LOG.info("Loading application.properties from classpath");
-                }
-            }
-
-            if (input != null) {
-                try {
-                    springBootConfig = new Properties();
-                    springBootConfig.load(input);
-                } catch (IOException ex) {
-                    LOG.error("Failed to load application.properties", ex);
-                } finally {
-                    try {
-                        input.close();
-                    } catch (IOException ex) {
-                        // Ignore
-                    }
-                }
-            }
-
-            return springBootConfig;
+        if (springBootConfig == null) {
+            springBootConfig = loadApplicationProperties();
         }
+        return springBootConfig;
     }
 
     private static Properties getCamelMainConfig() {
-        if (camelConfig != null) {
-            return camelConfig;
-        } else {
-            InputStream input = null;
-
-            // Try loading from working directory first
-            try {
-                java.io.File file = java.nio.file.Paths.get("", "application.properties")
-                        .toAbsolutePath()
-                        .toFile();
-                if (file.exists()) {
-                    LOG.info("Loading application.properties from working directory: {}", file.getAbsolutePath());
-                    input = new java.io.FileInputStream(file);
-                }
-            } catch (IOException ex) {
-                LOG.debug("Failed to load application.properties from working directory", ex);
-            }
-
-            // Fallback to classpath
-            if (input == null) {
-                input = ConfigHelper.class.getClassLoader().getResourceAsStream("application.properties");
-                if (input != null) {
-                    LOG.info("Loading application.properties from classpath");
-                }
-            }
-
-            if (input != null) {
-                try {
-                    camelConfig = new Properties();
-                    camelConfig.load(input);
-                } catch (IOException ex) {
-                    LOG.error("Failed to load application.properties", ex);
-                } finally {
-                    try {
-                        input.close();
-                    } catch (IOException ex) {
-                        // Ignore
-                    }
-                }
-            }
-
-            return camelConfig;
+        if (camelConfig == null) {
+            camelConfig = loadApplicationProperties();
         }
+        return camelConfig;
     }
 
     /**

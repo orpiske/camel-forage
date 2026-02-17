@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
             @ConditionalBeanGroup(
                     id = "jta-transaction-policies",
                     description = "JTA Transaction Policy beans for Camel transacted routes",
-                    configEntry = "jdbc.transaction.enabled",
+                    configEntry = "forage.jdbc.transaction.enabled",
                     beans = {
                         @ConditionalBean(
                                 name = "PROPAGATION_REQUIRED",
@@ -72,20 +72,20 @@ import org.slf4j.LoggerFactory;
             @ConditionalBeanGroup(
                     id = "aggregation-repository",
                     description = "JDBC-backed aggregation repository for Camel aggregator EIP",
-                    configEntry = "jdbc.aggregation.repository.enabled",
+                    configEntry = "forage.jdbc.aggregation.repository.enabled",
                     beans = {
                         @ConditionalBean(
-                                nameFromConfig = "jdbc.aggregation.repository.name",
+                                nameFromConfig = "forage.jdbc.aggregation.repository.name",
                                 javaType = "org.apache.camel.processor.aggregate.jdbc.JdbcAggregationRepository",
                                 description = "Transactional JDBC aggregation repository")
                     }),
             @ConditionalBeanGroup(
                     id = "idempotent-repository",
                     description = "JDBC-backed idempotent repository for message deduplication",
-                    configEntry = "jdbc.idempotent.repository.enabled",
+                    configEntry = "forage.jdbc.idempotent.repository.enabled",
                     beans = {
                         @ConditionalBean(
-                                nameFromConfig = "jdbc.idempotent.repository.table.name",
+                                nameFromConfig = "forage.jdbc.idempotent.repository.table.name",
                                 javaType = "org.apache.camel.processor.idempotent.jdbc.JdbcMessageIdRepository",
                                 description = "JDBC message ID repository for idempotent consumer")
                     })

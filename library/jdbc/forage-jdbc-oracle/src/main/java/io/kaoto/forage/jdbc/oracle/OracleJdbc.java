@@ -12,7 +12,8 @@ import oracle.jdbc.xa.OracleXADataSource;
 @ForageBean(
         value = "oracle",
         components = {"camel-sql", "camel-jdbc", "camel-spring-jdbc"},
-        description = "Oracle database")
+        description = "Oracle database",
+        feature = "javax.sql.DataSource")
 public class OracleJdbc extends PooledDataSource {
 
     @Override

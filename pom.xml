@@ -18,6 +18,7 @@
         <langchain4j-beta-version>1.10.0-beta18</langchain4j-beta-version>
         <langchain4j-community-version>1.10.0-beta18</langchain4j-community-version>
 
+        <infinispan.version>16.0.5</infinispan.version>
         <agroal.version>2.8</agroal.version>
         <assertj-core.version>3.27.6</assertj-core.version>
         <aws-sdk.version>2.37.2</aws-sdk.version>
@@ -97,6 +98,18 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- TODO: Remove this Infinispan BOM override once Camel is upgraded to 4.18+,
+                 which ships Infinispan 16.x natively.
+                 langchain4j-infinispan requires Infinispan 16.x (protostream 6.x where Schema is an interface).
+                 Camel 4.17 ships Infinispan 15.x (protostream 5.x where Schema is a class),
+                 causing IncompatibleClassChangeError at InfinispanEmbeddingStore.<init>. -->
+            <dependency>
+                <groupId>org.infinispan</groupId>
+                <artifactId>infinispan-bom</artifactId>
+                <version>${infinispan.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.apache.camel</groupId>
                 <artifactId>camel-bom</artifactId>

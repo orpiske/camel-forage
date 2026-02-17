@@ -16,7 +16,7 @@ public class PropertyAgentSelector implements AgentSelector {
 
     @Override
     public String select(Exchange exchange) {
-        if (propertyName == null || propertyName.isEmpty()) {
+        if (propertyName == null || propertyName.isBlank()) {
             return null;
         }
 

@@ -11,11 +11,13 @@ import org.slf4j.LoggerFactory;
         value = "message-window",
         components = {"camel-langchain4j-agent"},
         feature = "Memory",
+        configClass = MessageWindowConfig.class,
         description = "In-memory storage with configurable message window size")
 public class MessageWindowChatMemoryBeanProvider implements ChatMemoryBeanProvider {
     private static final Logger LOG = LoggerFactory.getLogger(MessageWindowChatMemoryBeanProvider.class);
 
     private static final PersistentChatMemoryStore PERSISTENT_CHAT_MEMORY_STORE = new PersistentChatMemoryStore();
+    private static final MessageWindowConfig CONFIG = new MessageWindowConfig();
     private final ChatMemoryProvider chatMemoryProvider;
 
     public MessageWindowChatMemoryBeanProvider() {
@@ -34,10 +36,10 @@ public class MessageWindowChatMemoryBeanProvider implements ChatMemoryBeanProvid
     }
 
     private static ChatMemoryProvider getChatMemoryProvider() {
-        LOG.trace("Creating MessageWindowChatMemoryFactory");
+        LOG.trace("Creating MessageWindowChatMemoryFactory with maxMessages={}", CONFIG.maxMessages());
         return memoryId -> MessageWindowChatMemory.builder()
                 .id(memoryId)
-                .maxMessages(10)
+                .maxMessages(CONFIG.maxMessages())
                 .chatMemoryStore(PERSISTENT_CHAT_MEMORY_STORE)
                 .build();
     }

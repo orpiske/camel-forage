@@ -12,7 +12,8 @@ import org.hsqldb.jdbc.pool.JDBCXADataSource;
 @ForageBean(
         value = "hsqldb",
         components = {"camel-sql", "camel-jdbc", "camel-spring-jdbc"},
-        description = "HSQLDB database")
+        description = "HSQLDB database",
+        feature = "javax.sql.DataSource")
 public class HsqldbJdbc extends PooledDataSource {
 
     @Override

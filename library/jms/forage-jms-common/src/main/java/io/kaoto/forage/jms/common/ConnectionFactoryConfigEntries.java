@@ -12,15 +12,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class ConnectionFactoryConfigEntries extends ConfigEntries {
 
     // JMS connection configuration
-    public static final ConfigModule JMS_KIND = ConfigModule.of(
+    public static final ConfigModule JMS_KIND = ConfigModule.ofBeanName(
             ConnectionFactoryConfig.class,
             "forage.jms.kind",
             "The JMS broker kind/type",
             "JMS Kind",
-            null,
-            "bean-name",
             true,
-            ConfigTag.COMMON);
+            ConfigTag.COMMON,
+            "jakarta.jms.ConnectionFactory");
 
     public static final ConfigModule BROKER_URL = ConfigModule.of(
             ConnectionFactoryConfig.class,
@@ -48,7 +47,7 @@ public final class ConnectionFactoryConfigEntries extends ConfigEntries {
             "The JMS broker password",
             "Password",
             null,
-            "string",
+            "password",
             false,
             ConfigTag.SECURITY);
 

@@ -208,7 +208,7 @@ public class MultiAgentFactory implements AgentFactory {
                         } catch (ClassNotFoundException e) {
                             final String className = strClassName == null ? "null" : strClassName;
                             throw new RuntimeForageException(
-                                    String.format("The class named %s could not be loaded", className), e);
+                                    "The class named %s could not be loaded".formatted(className), e);
                         }
                     })
                     .collect(Collectors.toList());

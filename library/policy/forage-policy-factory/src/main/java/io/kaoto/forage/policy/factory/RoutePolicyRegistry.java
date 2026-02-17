@@ -121,7 +121,7 @@ public class RoutePolicyRegistry {
         // First try the name() method
         try {
             String name = provider.name();
-            if (name != null && !name.isEmpty()) {
+            if (name != null && !name.isBlank()) {
                 return name;
             }
         } catch (Exception e) {

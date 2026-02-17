@@ -415,8 +415,8 @@ public class AgentBeanFactory implements BeanFactory {
         setSystemPropertyIfNotNull(
                 null, providerPrefix, "in.memory.store.overlap.size", config.embeddingStoreOverlapSize());
 
-        if (embeddingStoreProvider instanceof EmbeddingModelAware) {
-            ((EmbeddingModelAware) embeddingStoreProvider).withEmbeddingModel(embeddingModel);
+        if (embeddingStoreProvider instanceof EmbeddingModelAware modelAware) {
+            modelAware.withEmbeddingModel(embeddingModel);
         }
 
         return embeddingStoreProvider.create(prefix);
@@ -440,11 +440,11 @@ public class AgentBeanFactory implements BeanFactory {
         setSystemPropertyIfNotNull(null, providerPrefix, "rag.max.results", config.defaultRagMaxResults());
         setSystemPropertyIfNotNull(null, providerPrefix, "rag.min.score", config.defaultRagMinScore());
 
-        if (retrievalAugmentorProvider instanceof EmbeddingModelAware) {
-            ((EmbeddingModelAware) retrievalAugmentorProvider).withEmbeddingModel(embeddingModel);
+        if (retrievalAugmentorProvider instanceof EmbeddingModelAware modelAware) {
+            modelAware.withEmbeddingModel(embeddingModel);
         }
-        if (retrievalAugmentorProvider instanceof EmbeddingStoreAware) {
-            ((EmbeddingStoreAware) retrievalAugmentorProvider).withEmbeddingStore(embeddingStore);
+        if (retrievalAugmentorProvider instanceof EmbeddingStoreAware storeAware) {
+            storeAware.withEmbeddingStore(embeddingStore);
         }
 
         return retrievalAugmentorProvider.create(prefix);

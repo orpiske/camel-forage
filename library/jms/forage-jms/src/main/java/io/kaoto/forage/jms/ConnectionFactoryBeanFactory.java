@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
             @ConditionalBeanGroup(
                     id = "jta-transaction-policies",
                     description = "JTA Transaction Policy beans for Camel transacted routes",
-                    configEntry = "jms.transaction.enabled",
+                    configEntry = "forage.jms.transaction.enabled",
                     beans = {
                         @ConditionalBean(
                                 name = "PROPAGATION_REQUIRED",

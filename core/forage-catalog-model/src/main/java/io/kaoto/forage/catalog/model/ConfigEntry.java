@@ -33,6 +33,9 @@ public class ConfigEntry {
     @JsonProperty("configTag")
     private String configTag;
 
+    @JsonProperty("selectsFrom")
+    private String selectsFrom;
+
     public ConfigEntry() {}
 
     public ConfigEntry(String name, String type, String description, boolean required) {
@@ -104,5 +107,13 @@ public class ConfigEntry {
 
     public void setConfigTag(String configTag) {
         this.configTag = configTag;
+    }
+
+    public String getSelectsFrom() {
+        return selectsFrom;
+    }
+
+    public void setSelectsFrom(String selectsFrom) {
+        this.selectsFrom = selectsFrom;
     }
 }

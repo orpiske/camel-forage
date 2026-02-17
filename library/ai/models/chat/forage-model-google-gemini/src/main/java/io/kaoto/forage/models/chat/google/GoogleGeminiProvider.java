@@ -25,12 +25,24 @@ public class GoogleGeminiProvider implements ModelProvider {
         final GoogleConfig config = new GoogleConfig(id);
         LOG.trace("Creating google chat model");
 
-        return GoogleAiGeminiChatModel.builder()
-                .apiKey(config.apiKey())
-                .modelName(config.modelName())
-                .temperature(1.0)
-                .timeout(ofSeconds(60))
-                .logRequestsAndResponses(true)
-                .build();
+        GoogleAiGeminiChatModel.GoogleAiGeminiChatModelBuilder builder =
+                GoogleAiGeminiChatModel.builder().apiKey(config.apiKey()).modelName(config.modelName());
+
+        Double temperature = config.temperature();
+        if (temperature != null) {
+            builder.temperature(temperature);
+        }
+
+        Integer timeout = config.timeout();
+        if (timeout != null) {
+            builder.timeout(ofSeconds(timeout));
+        }
+
+        Boolean logRequests = config.logRequestsAndResponses();
+        if (logRequests != null) {
+            builder.logRequestsAndResponses(logRequests);
+        }
+
+        return builder.build();
     }
 }

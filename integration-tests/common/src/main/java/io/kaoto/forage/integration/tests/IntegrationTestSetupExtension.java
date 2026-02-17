@@ -63,14 +63,13 @@ public class IntegrationTestSetupExtension implements BeforeEachCallback, AfterA
 
     private void runBeforeAll(ExtensionContext context, CamelActionBuilder camel) throws Exception {
 
-        if (context.getRequiredTestInstance() instanceof ForageIntegrationTest) {
+        if (context.getRequiredTestInstance() instanceof ForageIntegrationTest forageTest) {
 
             ForageTestCaseRunner runner = (ForageTestCaseRunner) CitrusExtensionHelper.getTestRunner(context);
 
             LOG.info("Running 'runBeforeAll' setup for class: %s"
                     .formatted(context.getRequiredTestClass().getName()));
-            String integrationName =
-                    ((ForageIntegrationTest) context.getRequiredTestInstance()).runBeforeAll(runner, closeables::add);
+            String integrationName = forageTest.runBeforeAll(runner, closeables::add);
             if (integrationName == null) {
                 LOG.warn(
                         "'runBeforeAll' method did not return name of the integration. Any required cleanup has to be registered manually.");

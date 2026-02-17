@@ -30,24 +30,24 @@ public class UndefinedAgentException extends ForageException {
 
     public static UndefinedAgentException fromRouteId(String routeId) {
         return new UndefinedAgentException(
-                String.format("Route id '%s' has no defined agent capable of handling this request", routeId));
+                "Route id '%s' has no defined agent capable of handling this request".formatted(routeId));
     }
 
     public static UndefinedAgentException fromHeader(String headerName, String headerValue) {
-        return new UndefinedAgentException(String.format(
-                "Header '%s' with value '%s' has no defined agent capable of handling this request",
-                headerName, headerValue));
+        return new UndefinedAgentException(
+                "Header '%s' with value '%s' has no defined agent capable of handling this request"
+                        .formatted(headerName, headerValue));
     }
 
     public static UndefinedAgentException fromProperty(String propertyName, String propertyValue) {
-        return new UndefinedAgentException(String.format(
-                "Property '%s' with value '%s' has no defined agent capable of handling this request",
-                propertyName, propertyValue));
+        return new UndefinedAgentException(
+                "Property '%s' with value '%s' has no defined agent capable of handling this request"
+                        .formatted(propertyName, propertyValue));
     }
 
     public static UndefinedAgentException fromVariable(String variableName, String variableValue) {
-        return new UndefinedAgentException(String.format(
-                "Variable '%s' with value '%s' has no defined agent capable of handling this request",
-                variableName, variableValue));
+        return new UndefinedAgentException(
+                "Variable '%s' with value '%s' has no defined agent capable of handling this request"
+                        .formatted(variableName, variableValue));
     }
 }

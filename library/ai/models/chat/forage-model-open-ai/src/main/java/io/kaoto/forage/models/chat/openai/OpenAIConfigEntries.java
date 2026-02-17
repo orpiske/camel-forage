@@ -17,7 +17,7 @@ public final class OpenAIConfigEntries extends ConfigEntries {
             "API Key",
             null,
             "password",
-            false,
+            true,
             ConfigTag.SECURITY);
     public static final ConfigModule MODEL_NAME = ConfigModule.of(
             OpenAIConfig.class,
@@ -35,7 +35,7 @@ public final class OpenAIConfigEntries extends ConfigEntries {
             "Base URL",
             null,
             "string",
-            true,
+            false,
             ConfigTag.COMMON);
     public static final ConfigModule TEMPERATURE = ConfigModule.of(
             OpenAIConfig.class,

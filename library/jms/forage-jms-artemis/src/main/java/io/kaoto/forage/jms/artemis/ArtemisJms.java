@@ -15,7 +15,8 @@ import org.apache.activemq.artemis.jms.client.ActiveMQXAConnectionFactory;
 @ForageBean(
         value = "artemis",
         components = {"camel-jms"},
-        description = "ActiveMQ Artemis message broker")
+        description = "ActiveMQ Artemis message broker",
+        feature = "jakarta.jms.ConnectionFactory")
 public class ArtemisJms extends PooledConnectionFactory {
 
     @Override

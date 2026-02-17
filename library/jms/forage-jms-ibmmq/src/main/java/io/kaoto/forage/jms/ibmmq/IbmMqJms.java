@@ -17,7 +17,8 @@ import jakarta.jms.XAConnectionFactory;
 @ForageBean(
         value = "ibmmq",
         components = {"camel-jms"},
-        description = "IBM MQ message broker")
+        description = "IBM MQ message broker",
+        feature = "jakarta.jms.ConnectionFactory")
 public class IbmMqJms extends PooledConnectionFactory {
 
     @Override
@@ -68,20 +69,42 @@ public class IbmMqJms extends PooledConnectionFactory {
 
     private String[] parseBrokerUrl(String brokerUrl) {
         // Expected format: mq://host:port/channel/queueManager
-        String url = brokerUrl.replaceFirst("^mq://", "");
-        String[] parts = url.split("/");
+        try {
+            java.net.URI uri = new java.net.URI(brokerUrl);
 
-        if (parts.length < 3) {
+            String host = uri.getHost();
+            if (host == null || host.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Invalid IBM MQ broker URL: host is missing. Expected: mq://host:port/channel/queueManager");
+            }
+
+            int portNum = uri.getPort();
+            String port = portNum > 0 ? String.valueOf(portNum) : "1414";
+
+            String path = uri.getPath();
+            if (path == null || path.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Invalid IBM MQ broker URL: channel and queue manager are missing. Expected: mq://host:port/channel/queueManager");
+            }
+
+            // Remove leading slash and split
+            String[] pathParts = path.substring(1).split("/");
+            if (pathParts.length < 2) {
+                throw new IllegalArgumentException(
+                        "Invalid IBM MQ broker URL: expected both channel and queue manager in path. Expected: mq://host:port/channel/queueManager");
+            }
+
+            String channel = pathParts[0];
+            String queueManager = pathParts[1];
+            if (channel.isEmpty() || queueManager.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Invalid IBM MQ broker URL: channel and queue manager must be non-empty. Expected: mq://host:port/channel/queueManager");
+            }
+
+            return new String[] {host, port, channel, queueManager};
+        } catch (java.net.URISyntaxException e) {
             throw new IllegalArgumentException(
-                    "Invalid IBM MQ broker URL format. Expected: mq://host:port/channel/queueManager");
+                    "Invalid IBM MQ broker URL: failed to parse URI. Expected: mq://host:port/channel/queueManager", e);
         }
-
-        String[] hostPort = parts[0].split(":");
-        String host = hostPort[0];
-        String port = hostPort.length > 1 ? hostPort[1] : "1414";
-        String channel = parts[1];
-        String queueManager = parts[2];
-
-        return new String[] {host, port, channel, queueManager};
     }
 }

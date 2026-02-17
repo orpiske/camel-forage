@@ -1,7 +1,10 @@
 package io.kaoto.forage.models.chat.google;
 
 import static io.kaoto.forage.models.chat.google.GoogleConfigEntries.API_KEY;
+import static io.kaoto.forage.models.chat.google.GoogleConfigEntries.LOG_REQUESTS;
 import static io.kaoto.forage.models.chat.google.GoogleConfigEntries.MODEL_NAME;
+import static io.kaoto.forage.models.chat.google.GoogleConfigEntries.TEMPERATURE;
+import static io.kaoto.forage.models.chat.google.GoogleConfigEntries.TIMEOUT;
 
 import io.kaoto.forage.core.util.config.Config;
 import io.kaoto.forage.core.util.config.ConfigModule;
@@ -166,5 +169,26 @@ public class GoogleConfig implements Config {
         return ConfigStore.getInstance()
                 .get(MODEL_NAME.asNamed(prefix))
                 .orElseThrow(() -> new MissingConfigException("Missing Google model name"));
+    }
+
+    public Double temperature() {
+        return ConfigStore.getInstance()
+                .get(TEMPERATURE.asNamed(prefix))
+                .map(Double::parseDouble)
+                .orElse(null);
+    }
+
+    public Integer timeout() {
+        return ConfigStore.getInstance()
+                .get(TIMEOUT.asNamed(prefix))
+                .map(Integer::parseInt)
+                .orElse(null);
+    }
+
+    public Boolean logRequestsAndResponses() {
+        return ConfigStore.getInstance()
+                .get(LOG_REQUESTS.asNamed(prefix))
+                .map(Boolean::parseBoolean)
+                .orElse(null);
     }
 }

@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,19 +17,24 @@ class DefaultCamelForageRoutePolicyFactoryBeanTest {
 
     private CamelContext camelContext;
 
-    @BeforeEach
-    void setUp() {
-        // Reset to enabled state before each test to avoid pollution from previous tests
-        System.setProperty("camel.forage.route.policy.enabled", "true");
-        camelContext = new DefaultCamelContext();
-    }
-
     @AfterEach
     void tearDown() throws Exception {
         System.clearProperty("camel.forage.route.policy.enabled");
         if (camelContext != null) {
             camelContext.close();
         }
+    }
+
+    /**
+     * Creates a CamelContext with the given enabled property already set.
+     * The property must be set BEFORE context creation because
+     * {@link ForageContextServicePlugin} auto-discovers and configures
+     * BeanFactory implementations (including the route policy factory)
+     * during CamelContext initialization.
+     */
+    private CamelContext createContextWithEnabledProperty(String value) {
+        System.setProperty("camel.forage.route.policy.enabled", value);
+        return new DefaultCamelContext();
     }
 
     @Nested
@@ -40,6 +44,8 @@ class DefaultCamelForageRoutePolicyFactoryBeanTest {
         @Test
         @DisplayName("Should register factory when enabled (default)")
         void shouldRegisterFactoryWhenEnabledByDefault() {
+            camelContext = createContextWithEnabledProperty("true");
+
             DefaultCamelForageRoutePolicyFactoryBean bean = new DefaultCamelForageRoutePolicyFactoryBean();
             bean.setCamelContext(camelContext);
 
@@ -55,7 +61,7 @@ class DefaultCamelForageRoutePolicyFactoryBeanTest {
         @Test
         @DisplayName("Should not register factory when disabled")
         void shouldNotRegisterFactoryWhenDisabled() {
-            System.setProperty("camel.forage.route.policy.enabled", "false");
+            camelContext = createContextWithEnabledProperty("false");
 
             DefaultCamelForageRoutePolicyFactoryBean bean = new DefaultCamelForageRoutePolicyFactoryBean();
             bean.setCamelContext(camelContext);
@@ -72,7 +78,7 @@ class DefaultCamelForageRoutePolicyFactoryBeanTest {
         @Test
         @DisplayName("Should register factory when explicitly enabled")
         void shouldRegisterFactoryWhenExplicitlyEnabled() {
-            System.setProperty("camel.forage.route.policy.enabled", "true");
+            camelContext = createContextWithEnabledProperty("true");
 
             DefaultCamelForageRoutePolicyFactoryBean bean = new DefaultCamelForageRoutePolicyFactoryBean();
             bean.setCamelContext(camelContext);
@@ -92,6 +98,7 @@ class DefaultCamelForageRoutePolicyFactoryBeanTest {
         @Test
         @DisplayName("Should store and return CamelContext")
         void shouldStoreAndReturnCamelContext() {
+            camelContext = new DefaultCamelContext();
             DefaultCamelForageRoutePolicyFactoryBean bean = new DefaultCamelForageRoutePolicyFactoryBean();
 
             bean.setCamelContext(camelContext);

@@ -16,7 +16,7 @@ public class VariableAgentSelector implements AgentSelector {
 
     @Override
     public String select(Exchange exchange) {
-        if (variableName == null || variableName.isEmpty()) {
+        if (variableName == null || variableName.isBlank()) {
             return null;
         }
 

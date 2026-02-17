@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,96 +57,84 @@ public class CatalogGenerator {
     public CatalogResult generateCatalog(MavenProject project, File outputDirectory) throws IOException {
         log.info("Scanning project dependencies for Forage components...");
 
-        // Discover all components (old structure for gathering data)
         List<ForageComponent> components = discoverComponents(project);
 
         log.info("Found " + components.size() + " Forage components");
 
-        // Transform to new simplified catalog structure
         List<ForageFactory> factories = transformToSimplifiedCatalog(components);
 
         log.info("Generated " + factories.size() + " factories in simplified catalog");
 
-        // Create catalog data structure
         ForageCatalog catalog = new ForageCatalog();
         catalog.setVersion("2.0");
         catalog.setFactories(factories);
         catalog.setGeneratedBy("forage-maven-catalog-plugin");
         catalog.setTimestamp(System.currentTimeMillis());
 
-        // Generate output files
         List<File> generatedFiles = new ArrayList<>();
 
         switch (format.toLowerCase()) {
-            case "json":
-                generatedFiles.add(generateJsonCatalog(catalog, outputDirectory));
-                break;
-            case "yaml":
-                generatedFiles.add(generateYamlCatalog(catalog, outputDirectory));
-                break;
-            default:
-                // Generate all formats
+            case "json" -> generatedFiles.add(generateJsonCatalog(catalog, outputDirectory));
+            case "yaml" -> generatedFiles.add(generateYamlCatalog(catalog, outputDirectory));
+            default -> {
                 generatedFiles.add(generateJsonCatalog(catalog, outputDirectory));
                 generatedFiles.add(generateYamlCatalog(catalog, outputDirectory));
+            }
         }
 
         return new CatalogResult(factories.size(), generatedFiles);
     }
 
     /**
-     * Transform legacy component-based structure to simplified factory-centric catalog.
+     * Transform component-based structure to simplified factory-centric catalog.
      */
     private List<ForageFactory> transformToSimplifiedCatalog(List<ForageComponent> components) {
-        // Collect all config mappings first (needed for other steps)
-        Map<String, String> allConfigMappings = collectAllConfigMappings(components);
-        log.info("Found " + allConfigMappings.size() + " Config classes total");
+        ConfigMappings configMappings = collectConfigMappings(components);
+        log.info("Found " + configMappings.classToConfigName.size() + " Config classes total");
 
-        // Collect data from components
-        Map<String, ForageFactory> factoryMap = new LinkedHashMap<>();
-        Map<String, List<ConfigEntry>> configsByPrefix = new HashMap<>();
-        Map<String, List<BeanWithGav>> beansByComponent = new HashMap<>();
+        CollectedData data = collectDataFromComponents(components, configMappings);
 
-        collectDataFromComponents(components, factoryMap, configsByPrefix, beansByComponent, allConfigMappings);
+        associateBeansWithFactories(data, configMappings.classToConfigName);
+        associateConfigEntriesWithFactories(data, configMappings.classToArtifactId);
 
-        // Associate beans and configs with factories
-        associateBeansWithFactories(factoryMap, beansByComponent, allConfigMappings);
-        associateConfigEntriesWithFactories(factoryMap, configsByPrefix);
-
-        return new ArrayList<>(factoryMap.values());
+        return new ArrayList<>(data.factoryMap.values());
     }
 
     /**
-     * Collects all Config class mappings from components.
+     * Builds both config class mappings in a single pass over components.
      */
-    private Map<String, String> collectAllConfigMappings(List<ForageComponent> components) {
-        Map<String, String> allConfigMappings = new HashMap<>();
+    private ConfigMappings collectConfigMappings(List<ForageComponent> components) {
+        Map<String, String> classToConfigName = new HashMap<>();
+        Map<String, String> classToArtifactId = new HashMap<>();
+
         for (ForageComponent component : components) {
-            if (component.getConfigClasses() != null
-                    && !component.getConfigClasses().isEmpty()) {
-                allConfigMappings.putAll(component.getConfigClasses());
+            if (component.getConfigClasses() != null) {
+                classToConfigName.putAll(component.getConfigClasses());
+                for (String className : component.getConfigClasses().keySet()) {
+                    classToArtifactId.put(className, component.getArtifactId());
+                }
             }
         }
-        return allConfigMappings;
+
+        return new ConfigMappings(classToConfigName, classToArtifactId);
     }
 
     /**
      * Collects factories, config entries, and beans from components.
      */
-    private void collectDataFromComponents(
-            List<ForageComponent> components,
-            Map<String, ForageFactory> factoryMap,
-            Map<String, List<ConfigEntry>> configsByPrefix,
-            Map<String, List<BeanWithGav>> beansByComponent,
-            Map<String, String> allConfigMappings) {
+    private CollectedData collectDataFromComponents(List<ForageComponent> components, ConfigMappings configMappings) {
+        CollectedData data = new CollectedData();
 
         for (ForageComponent component : components) {
             String artifactId = component.getArtifactId();
             String gav = createGav(component.getGroupId(), artifactId, component.getVersion());
 
-            collectConfigEntries(component, artifactId, configsByPrefix);
-            collectFactories(component, factoryMap, gav, allConfigMappings);
-            collectBeans(component, beansByComponent, gav);
+            collectConfigEntries(component, artifactId, data.configsByPrefix);
+            collectFactories(component, data, gav, configMappings);
+            collectBeans(component, data.beansByComponent, gav);
         }
+
+        return data;
     }
 
     private static String createGav(String groupId, String artifactId, String version) {
@@ -167,10 +156,7 @@ public class CatalogGenerator {
      * Collects factories from a component.
      */
     private void collectFactories(
-            ForageComponent component,
-            Map<String, ForageFactory> factoryMap,
-            String gav,
-            Map<String, String> allConfigMappings) {
+            ForageComponent component, CollectedData data, String gav, ConfigMappings configMappings) {
 
         if (component.getFactories() == null) {
             return;
@@ -180,8 +166,14 @@ public class CatalogGenerator {
             String platform = mapVariantToPlatformKey(scannedFactory.getVariant());
             String factoryType = scannedFactory.getFactoryType();
 
-            ForageFactory catalogFactory = factoryMap.computeIfAbsent(
-                    factoryType, k -> createCatalogFactory(scannedFactory, allConfigMappings));
+            ForageFactory catalogFactory = data.factoryMap.computeIfAbsent(
+                    factoryType, k -> createCatalogFactory(scannedFactory, configMappings.classToConfigName));
+
+            // Track config class for this factory type (used later for config entry association)
+            String configClassName = scannedFactory.getConfigClassName();
+            if (configClassName != null && !configClassName.equals(Constants.DEFAULT_CONFIG_FQN)) {
+                data.factoryTypeToConfigClassName.put(factoryType, configClassName);
+            }
 
             // Add this platform variant
             FactoryVariant variant = new FactoryVariant(scannedFactory.getClassName(), gav);
@@ -198,7 +190,7 @@ public class CatalogGenerator {
     /**
      * Creates a new ForageFactory for the catalog from a scanned factory.
      */
-    private ForageFactory createCatalogFactory(ScannedFactory scannedFactory, Map<String, String> allConfigMappings) {
+    private ForageFactory createCatalogFactory(ScannedFactory scannedFactory, Map<String, String> classToConfigName) {
         ForageFactory catalogFactory = new ForageFactory();
         catalogFactory.setName(scannedFactory.getName());
         catalogFactory.setFactoryType(scannedFactory.getFactoryType());
@@ -207,7 +199,7 @@ public class CatalogGenerator {
         catalogFactory.setAutowired(scannedFactory.isAutowired());
         catalogFactory.setVariants(new FactoryVariants());
         catalogFactory.setBeansByFeature(new ArrayList<>());
-        catalogFactory.setPropertiesFile(determinePropertiesFile(scannedFactory, allConfigMappings));
+        catalogFactory.setPropertiesFile(resolvePropertiesFile(scannedFactory.getConfigClassName(), classToConfigName));
         return catalogFactory;
     }
 
@@ -234,12 +226,8 @@ public class CatalogGenerator {
     /**
      * Associates beans with their corresponding factories.
      */
-    private void associateBeansWithFactories(
-            Map<String, ForageFactory> factoryMap,
-            Map<String, List<BeanWithGav>> beansByComponent,
-            Map<String, String> allConfigMappings) {
-
-        for (ForageFactory factory : factoryMap.values()) {
+    private void associateBeansWithFactories(CollectedData data, Map<String, String> classToConfigName) {
+        for (ForageFactory factory : data.factoryMap.values()) {
             if (factory.getComponents() == null) {
                 continue;
             }
@@ -248,9 +236,9 @@ public class CatalogGenerator {
             Map<String, Set<String>> addedBeansByFeature = new HashMap<>();
 
             for (String component : factory.getComponents()) {
-                List<BeanWithGav> matchingBeans = beansByComponent.get(component);
+                List<BeanWithGav> matchingBeans = data.beansByComponent.get(component);
                 if (matchingBeans != null) {
-                    addBeansToFactory(factory, matchingBeans, addedBeansByFeature, allConfigMappings);
+                    addBeansToFactory(factory, matchingBeans, addedBeansByFeature, classToConfigName);
                 }
             }
         }
@@ -263,20 +251,20 @@ public class CatalogGenerator {
             ForageFactory factory,
             List<BeanWithGav> matchingBeans,
             Map<String, Set<String>> addedBeansByFeature,
-            Map<String, String> allConfigMappings) {
+            Map<String, String> classToConfigName) {
 
         for (BeanWithGav beanWithGav : matchingBeans) {
             String feature = determineFeature(beanWithGav.bean, factory.getFactoryType());
             String beanName = beanWithGav.bean.getName();
 
             // Skip if already added
-            Set<String> addedBeans = addedBeansByFeature.computeIfAbsent(feature, k -> new java.util.HashSet<>());
+            Set<String> addedBeans = addedBeansByFeature.computeIfAbsent(feature, k -> new HashSet<>());
             if (addedBeans.contains(beanName)) {
                 continue;
             }
             addedBeans.add(beanName);
 
-            ForageBean catalogBean = createCatalogBean(beanWithGav, allConfigMappings);
+            ForageBean catalogBean = createCatalogBean(beanWithGav, classToConfigName);
             getOrCreateFeatureBeans(factory.getBeansByFeature(), feature)
                     .getBeans()
                     .add(catalogBean);
@@ -300,10 +288,10 @@ public class CatalogGenerator {
     /**
      * Associates config entries with factories.
      */
-    private void associateConfigEntriesWithFactories(
-            Map<String, ForageFactory> factoryMap, Map<String, List<ConfigEntry>> configsByPrefix) {
-        for (ForageFactory factory : factoryMap.values()) {
-            List<ConfigEntry> factoryConfigs = findConfigsForFactory(factory, configsByPrefix);
+    private void associateConfigEntriesWithFactories(CollectedData data, Map<String, String> classToArtifactId) {
+        for (ForageFactory factory : data.factoryMap.values()) {
+            List<ConfigEntry> factoryConfigs = findConfigsForFactory(
+                    factory, data.configsByPrefix, classToArtifactId, data.factoryTypeToConfigClassName);
             if (!factoryConfigs.isEmpty()) {
                 factory.setConfigEntries(factoryConfigs);
             }
@@ -332,41 +320,31 @@ public class CatalogGenerator {
      */
     private void setVariantByPlatform(FactoryVariants variants, String platform, FactoryVariant variant) {
         switch (platform) {
-            case "base":
-                variants.setBase(variant);
-                break;
-            case "springboot":
-                variants.setSpringboot(variant);
-                break;
-            case "quarkus":
-                variants.setQuarkus(variant);
-                break;
-            default:
+            case "base" -> variants.setBase(variant);
+            case "springboot" -> variants.setSpringboot(variant);
+            case "quarkus" -> variants.setQuarkus(variant);
+            default -> {
                 log.warn("Unknown platform: " + platform + ", setting as base");
                 variants.setBase(variant);
+            }
         }
     }
 
     /**
-     * Determine the properties file name based on the factory's Config class.
-     * Uses the Config class's name() method return value to determine the properties file name.
+     * Resolves the properties file name from a config class name.
+     * Returns null for absent or default config classes.
      */
-    private String determinePropertiesFile(ScannedFactory factory, Map<String, String> configMappings) {
-        String configClassName = factory.getConfigClassName();
-
-        // If no config class specified or it's the default Config.class, return null
+    private String resolvePropertiesFile(String configClassName, Map<String, String> classToConfigName) {
         if (configClassName == null || configClassName.equals(Constants.DEFAULT_CONFIG_FQN)) {
-            log.debug("No config class for factory: " + factory.getName());
             return null;
         }
 
-        // Look up config name from mappings
-        String configName = configMappings.get(configClassName);
+        String configName = classToConfigName.get(configClassName);
         if (configName != null) {
             return configName + ".properties";
         }
 
-        log.warn("Config class not found in mappings: " + configClassName + " for factory: " + factory.getName());
+        log.debug("Config class not found in mappings: " + configClassName);
         return null;
     }
 
@@ -379,16 +357,15 @@ public class CatalogGenerator {
             return bean.getFeature();
         }
 
-        String s = FactoryType.fromDisplayName(factoryType)
+        return FactoryType.fromDisplayName(factoryType)
                 .map(FactoryType::toString)
                 .orElse(factoryType);
-        return s;
     }
 
     /**
      * Create a ForageBean for the catalog output from the scanned bean with GAV and configs.
      */
-    private ForageBean createCatalogBean(BeanWithGav beanWithGav, Map<String, String> configMappings) {
+    private ForageBean createCatalogBean(BeanWithGav beanWithGav, Map<String, String> classToConfigName) {
         ForageBean catalogBean = beanWithGav.bean.toCatalogBean(beanWithGav.gav);
 
         // Add config entries if available
@@ -397,55 +374,52 @@ public class CatalogGenerator {
         }
 
         // Set properties file based on bean's Config class
-        catalogBean.setPropertiesFile(determineBeanPropertiesFile(beanWithGav.bean, configMappings));
+        catalogBean.setPropertiesFile(resolvePropertiesFile(beanWithGav.bean.getConfigClassName(), classToConfigName));
 
         return catalogBean;
     }
 
     /**
-     * Determine properties file name for a bean based on its Config class.
-     * Uses the Config class's name() method return value to determine the properties file name.
-     * Returns null for beans without individual configs (like JDBC beans).
-     */
-    private String determineBeanPropertiesFile(ScannedBean bean, Map<String, String> configMappings) {
-        String configClassName = bean.getConfigClassName();
-
-        // Beans without configs (like JDBC beans) - no properties file
-        if (configClassName == null || configClassName.equals(Constants.DEFAULT_CONFIG_FQN)) {
-            return null;
-        }
-
-        // Look up config name from mappings
-        String configName = configMappings.get(configClassName);
-        if (configName != null) {
-            return configName + ".properties";
-        }
-
-        log.debug("Config class not found in mappings: " + configClassName + " for bean: " + bean.getName());
-        return null;
-    }
-
-    /**
-     * Find config entries that belong to a factory.
+     * Finds config entries for a factory by merging entries from the FactoryType enum's
+     * configArtifactId and from the factory's own configClass module.
      */
     private List<ConfigEntry> findConfigsForFactory(
-            ForageFactory factory, Map<String, List<ConfigEntry>> configsByPrefix) {
+            ForageFactory factory,
+            Map<String, List<ConfigEntry>> configsByPrefix,
+            Map<String, String> classToArtifactId,
+            Map<String, String> factoryTypeToConfigClassName) {
         List<ConfigEntry> result = new ArrayList<>();
+        Set<String> seenNames = new HashSet<>();
 
-        // Match configs based on factory type
         String factoryType = factory.getFactoryType();
         if (factoryType == null || factoryType.isEmpty()) {
             return result;
         }
 
-        // Look for common modules that match this factory type
-        // The config artifact ID is now stored directly in the FactoryType enum
-        String configPrefix = io.kaoto.forage.core.annotations.FactoryType.fromDisplayName(factoryType)
-                .map(io.kaoto.forage.core.annotations.FactoryType::getConfigArtifactId)
+        // 1. Configs from the FactoryType enum's configArtifactId
+        String configPrefix = FactoryType.fromDisplayName(factoryType)
+                .map(FactoryType::getConfigArtifactId)
                 .orElse(null);
 
         if (configPrefix != null && configsByPrefix.containsKey(configPrefix)) {
-            result.addAll(configsByPrefix.get(configPrefix));
+            for (ConfigEntry entry : configsByPrefix.get(configPrefix)) {
+                if (seenNames.add(entry.getName())) {
+                    result.add(entry);
+                }
+            }
+        }
+
+        // 2. Configs from the factory's configClass module (may be in a different artifact)
+        String configClassName = factoryTypeToConfigClassName.get(factoryType);
+        if (configClassName != null) {
+            String configArtifactId = classToArtifactId.get(configClassName);
+            if (configArtifactId != null && configsByPrefix.containsKey(configArtifactId)) {
+                for (ConfigEntry configEntry : configsByPrefix.get(configArtifactId)) {
+                    if (seenNames.add(configEntry.getName())) {
+                        result.add(configEntry);
+                    }
+                }
+            }
         }
 
         return result;
@@ -461,10 +435,12 @@ public class CatalogGenerator {
             return components;
         }
 
+        CodeScanner codeScanner = new CodeScanner(log);
+
         for (Artifact artifact : artifacts) {
             if (isForageComponent(artifact)) {
                 log.debug("Processing Forage component: " + artifact.getArtifactId());
-                ForageComponent component = createComponentFromArtifact(artifact, project.getParent());
+                ForageComponent component = createComponentFromArtifact(artifact, project.getParent(), codeScanner);
                 components.add(component);
             }
         }
@@ -477,14 +453,13 @@ public class CatalogGenerator {
         return groupId.equals(Constants.FORAGE_GROUP_ID) || groupId.startsWith(Constants.FORAGE_GROUP_ID + ".");
     }
 
-    private ForageComponent createComponentFromArtifact(Artifact artifact, MavenProject rootProject) {
+    private ForageComponent createComponentFromArtifact(
+            Artifact artifact, MavenProject rootProject, CodeScanner codeScanner) {
         ForageComponent component = new ForageComponent();
         component.setArtifactId(artifact.getArtifactId());
         component.setGroupId(artifact.getGroupId());
         component.setVersion(artifact.getVersion());
 
-        // Use single-pass scanning for better performance (Issue 1 & 2 optimizations)
-        CodeScanner codeScanner = new CodeScanner(log);
         ScanResult scanResult = codeScanner.scanAllInOnePass(artifact, rootProject);
 
         component.setBeans(scanResult.getBeans());
@@ -502,7 +477,6 @@ public class CatalogGenerator {
     }
 
     private File generateYamlCatalog(ForageCatalog catalog, File outputDirectory) throws IOException {
-        // For now, generate YAML as formatted JSON (would use YAML mapper in production)
         File outputFile = new File(outputDirectory, "forage-catalog.yaml");
         yamlObjectMapper.writeValue(outputFile, catalog);
         return outputFile;
@@ -511,6 +485,34 @@ public class CatalogGenerator {
     // Setters for configuration
     public void setFormat(String format) {
         this.format = format;
+    }
+
+    /**
+     * Holds both config class mappings built from a single pass over components.
+     */
+    private static class ConfigMappings {
+        /** Maps config class FQN to Config.name() return value. */
+        final Map<String, String> classToConfigName;
+
+        /** Maps config class FQN to the artifact ID of the containing module. */
+        final Map<String, String> classToArtifactId;
+
+        ConfigMappings(Map<String, String> classToConfigName, Map<String, String> classToArtifactId) {
+            this.classToConfigName = classToConfigName;
+            this.classToArtifactId = classToArtifactId;
+        }
+    }
+
+    /**
+     * Holds collected data from component scanning.
+     */
+    private static class CollectedData {
+        final Map<String, ForageFactory> factoryMap = new LinkedHashMap<>();
+        final Map<String, List<ConfigEntry>> configsByPrefix = new HashMap<>();
+        final Map<String, List<BeanWithGav>> beansByComponent = new HashMap<>();
+
+        /** Maps factory type to the config class name from the factory's @ForageFactory annotation. */
+        final Map<String, String> factoryTypeToConfigClassName = new HashMap<>();
     }
 
     /**

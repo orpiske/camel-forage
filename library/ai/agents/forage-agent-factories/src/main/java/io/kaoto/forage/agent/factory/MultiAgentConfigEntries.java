@@ -3,6 +3,7 @@ package io.kaoto.forage.agent.factory;
 import io.kaoto.forage.core.util.config.ConfigEntries;
 import io.kaoto.forage.core.util.config.ConfigEntry;
 import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigTag;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -21,16 +22,51 @@ import java.util.concurrent.ConcurrentHashMap;
  * multi-instance scenarios.
  */
 public final class MultiAgentConfigEntries extends ConfigEntries {
-    public static final ConfigModule MULTI_AGENT_NAMES =
-            ConfigModule.of(MultiAgentConfig.class, "forage.multi.agent.names");
-    public static final ConfigModule MULTI_AGENT_ID_SOURCE =
-            ConfigModule.of(MultiAgentConfig.class, "forage.multi.agent.id.source");
-    public static final ConfigModule MULTI_AGENT_ID_SOURCE_HEADER =
-            ConfigModule.of(MultiAgentConfig.class, "forage.multi.agent.id.source.header");
-    public static final ConfigModule MULTI_AGENT_ID_SOURCE_PROPERTY =
-            ConfigModule.of(MultiAgentConfig.class, "forage.multi.agent.id.source.property");
-    public static final ConfigModule MULTI_AGENT_ID_SOURCE_VARIABLE =
-            ConfigModule.of(MultiAgentConfig.class, "forage.multi.agent.id.source.variable");
+    public static final ConfigModule MULTI_AGENT_NAMES = ConfigModule.of(
+            MultiAgentConfig.class,
+            "forage.multi.agent.names",
+            "Comma-separated list of named agent prefixes for multi-agent setup",
+            "Agent Names",
+            null,
+            "string",
+            false,
+            ConfigTag.COMMON);
+    public static final ConfigModule MULTI_AGENT_ID_SOURCE = ConfigModule.of(
+            MultiAgentConfig.class,
+            "forage.multi.agent.id.source",
+            "Source for extracting agent ID (route-id, header, property, variable)",
+            "ID Source",
+            null,
+            "string",
+            false,
+            ConfigTag.COMMON);
+    public static final ConfigModule MULTI_AGENT_ID_SOURCE_HEADER = ConfigModule.of(
+            MultiAgentConfig.class,
+            "forage.multi.agent.id.source.header",
+            "Exchange header name to extract agent ID from",
+            "ID Source Header",
+            null,
+            "string",
+            false,
+            ConfigTag.ADVANCED);
+    public static final ConfigModule MULTI_AGENT_ID_SOURCE_PROPERTY = ConfigModule.of(
+            MultiAgentConfig.class,
+            "forage.multi.agent.id.source.property",
+            "Exchange property name to extract agent ID from",
+            "ID Source Property",
+            null,
+            "string",
+            false,
+            ConfigTag.ADVANCED);
+    public static final ConfigModule MULTI_AGENT_ID_SOURCE_VARIABLE = ConfigModule.of(
+            MultiAgentConfig.class,
+            "forage.multi.agent.id.source.variable",
+            "Exchange variable name to extract agent ID from",
+            "ID Source Variable",
+            null,
+            "string",
+            false,
+            ConfigTag.ADVANCED);
 
     private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
 

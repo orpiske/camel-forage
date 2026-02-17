@@ -12,7 +12,8 @@ import io.kaoto.forage.jdbc.common.PooledDataSource;
 @ForageBean(
         value = "mysql",
         components = {"camel-sql", "camel-jdbc", "camel-spring-jdbc"},
-        description = "MySQL database")
+        description = "MySQL database",
+        feature = "javax.sql.DataSource")
 public class MysqlJdbc extends PooledDataSource {
 
     @Override

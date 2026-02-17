@@ -27,16 +27,16 @@ public class ForageTestCaseRunner extends DefaultTestCaseRunner {
 
     @Override
     public <T extends TestAction> GherkinTestActionRunner given(TestActionBuilder<T> builder) {
-        if (builder instanceof CamelIntegrationRunCustomizedActionBuilder) {
-            initializeTestAction((CamelIntegrationRunCustomizedActionBuilder<?, ?>) builder);
+        if (builder instanceof CamelIntegrationRunCustomizedActionBuilder<?, ?> camelBuilder) {
+            initializeTestAction(camelBuilder);
         }
         return super.given(builder);
     }
 
     @Override
     public <T extends TestAction> GherkinTestActionRunner when(TestActionBuilder<T> builder) {
-        if (builder instanceof CamelIntegrationRunCustomizedActionBuilder) {
-            initializeTestAction((CamelIntegrationRunCustomizedActionBuilder<?, ?>) builder);
+        if (builder instanceof CamelIntegrationRunCustomizedActionBuilder<?, ?> camelBuilder) {
+            initializeTestAction(camelBuilder);
         }
         return super.when(builder);
     }

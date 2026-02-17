@@ -22,39 +22,37 @@ public class AgentIdSelectorHelper {
     private static AgentSelector create(MultiAgentConfig config) {
         String sourceType = config.multiAgentIdSource();
 
-        switch (sourceType.toLowerCase()) {
-            case MultiAgentConfig.ROUTE_ID:
-                return new RouteIdAgentSelector();
-
-            case MultiAgentConfig.HEADER:
+        return switch (sourceType.toLowerCase()) {
+            case MultiAgentConfig.ROUTE_ID -> new RouteIdAgentSelector();
+            case MultiAgentConfig.HEADER -> {
                 String headerName = config.multiAgentIdSourceHeader();
-                if (headerName == null || headerName.isEmpty()) {
+                if (headerName == null || headerName.isBlank()) {
                     throw new IllegalArgumentException(
                             "Header name must be configured via multi.agent.id.source.header when using header source type");
                 }
-                return new HeaderAgentSelector(headerName);
-
-            case MultiAgentConfig.PROPERTY:
+                yield new HeaderAgentSelector(headerName);
+            }
+            case MultiAgentConfig.PROPERTY -> {
                 String propertyName = config.multiAgentIdSourceProperty();
-                if (propertyName == null || propertyName.isEmpty()) {
+                if (propertyName == null || propertyName.isBlank()) {
                     throw new IllegalArgumentException(
                             "Property name must be configured via multi.agent.id.source.property when using property source type");
                 }
-                return new PropertyAgentSelector(propertyName);
-
-            case MultiAgentConfig.VARIABLE:
+                yield new PropertyAgentSelector(propertyName);
+            }
+            case MultiAgentConfig.VARIABLE -> {
                 String variableName = config.multiAgentIdSourceVariable();
-                if (variableName == null || variableName.isEmpty()) {
+                if (variableName == null || variableName.isBlank()) {
                     throw new IllegalArgumentException(
                             "Variable name must be configured via multi.agent.id.source.variable when using variable source type");
                 }
-                return new VariableAgentSelector(variableName);
-
-            default:
+                yield new VariableAgentSelector(variableName);
+            }
+            default ->
                 throw new IllegalArgumentException("Unknown agent ID source type: " + sourceType
                         + ". Supported types are: " + MultiAgentConfig.ROUTE_ID + ", " + MultiAgentConfig.HEADER + ", "
                         + MultiAgentConfig.PROPERTY + ", " + MultiAgentConfig.VARIABLE);
-        }
+        };
     }
 
     /**
@@ -70,40 +68,37 @@ public class AgentIdSelectorHelper {
             throws UndefinedAgentException {
         String sourceType = config.multiAgentIdSource();
 
-        switch (sourceType.toLowerCase()) {
-            case MultiAgentConfig.ROUTE_ID:
-                String routeId = exchange.getFromRouteId();
-                return UndefinedAgentException.fromRouteId(routeId);
-
-            case MultiAgentConfig.HEADER:
+        return switch (sourceType.toLowerCase()) {
+            case MultiAgentConfig.ROUTE_ID -> UndefinedAgentException.fromRouteId(exchange.getFromRouteId());
+            case MultiAgentConfig.HEADER -> {
                 String headerName = config.multiAgentIdSourceHeader();
                 String headerValue = null;
-                if (headerName != null && !headerName.isEmpty()) {
+                if (headerName != null && !headerName.isBlank()) {
                     headerValue = exchange.getIn().getHeader(headerName, String.class);
                 }
-                return UndefinedAgentException.fromHeader(headerName, headerValue);
-
-            case MultiAgentConfig.PROPERTY:
+                yield UndefinedAgentException.fromHeader(headerName, headerValue);
+            }
+            case MultiAgentConfig.PROPERTY -> {
                 String propertyName = config.multiAgentIdSourceProperty();
                 String propertyValue = null;
-                if (propertyName != null && !propertyName.isEmpty()) {
+                if (propertyName != null && !propertyName.isBlank()) {
                     propertyValue = exchange.getProperty(propertyName, String.class);
                 }
-                return UndefinedAgentException.fromProperty(propertyName, propertyValue);
-
-            case MultiAgentConfig.VARIABLE:
+                yield UndefinedAgentException.fromProperty(propertyName, propertyValue);
+            }
+            case MultiAgentConfig.VARIABLE -> {
                 String variableName = config.multiAgentIdSourceVariable();
                 String variableValue = null;
-                if (variableName != null && !variableName.isEmpty()) {
+                if (variableName != null && !variableName.isBlank()) {
                     variableValue = exchange.getVariable(variableName, String.class);
                 }
-                return UndefinedAgentException.fromVariable(variableName, variableValue);
-
-            default:
+                yield UndefinedAgentException.fromVariable(variableName, variableValue);
+            }
+            default -> {
                 // Fallback to route ID if source type is unknown
-                String fallbackRouteId = exchange.getFromRouteId();
-                return UndefinedAgentException.fromRouteId(fallbackRouteId);
-        }
+                yield UndefinedAgentException.fromRouteId(exchange.getFromRouteId());
+            }
+        };
     }
 
     public static String select(MultiAgentConfig config, Exchange exchange) {

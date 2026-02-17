@@ -28,6 +28,33 @@ public final class GoogleConfigEntries extends ConfigEntries {
             "string",
             true,
             ConfigTag.COMMON);
+    public static final ConfigModule TEMPERATURE = ConfigModule.of(
+            GoogleConfig.class,
+            "forage.google.temperature",
+            "Temperature for response randomness (0.0-2.0)",
+            "Temperature",
+            null,
+            "double",
+            false,
+            ConfigTag.COMMON);
+    public static final ConfigModule TIMEOUT = ConfigModule.of(
+            GoogleConfig.class,
+            "forage.google.timeout",
+            "Request timeout in seconds",
+            "Timeout",
+            null,
+            "integer",
+            false,
+            ConfigTag.ADVANCED);
+    public static final ConfigModule LOG_REQUESTS = ConfigModule.of(
+            GoogleConfig.class,
+            "forage.google.log.requests",
+            "Enable request and response logging",
+            "Log Requests",
+            null,
+            "boolean",
+            false,
+            ConfigTag.ADVANCED);
 
     private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
 
@@ -38,6 +65,9 @@ public final class GoogleConfigEntries extends ConfigEntries {
     static void init() {
         CONFIG_MODULES.put(API_KEY, ConfigEntry.fromModule());
         CONFIG_MODULES.put(MODEL_NAME, ConfigEntry.fromModule());
+        CONFIG_MODULES.put(TEMPERATURE, ConfigEntry.fromModule());
+        CONFIG_MODULES.put(TIMEOUT, ConfigEntry.fromModule());
+        CONFIG_MODULES.put(LOG_REQUESTS, ConfigEntry.fromModule());
     }
 
     public static Map<ConfigModule, ConfigEntry> entries() {

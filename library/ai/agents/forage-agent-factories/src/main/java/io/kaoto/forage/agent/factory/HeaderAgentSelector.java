@@ -16,7 +16,7 @@ public class HeaderAgentSelector implements AgentSelector {
 
     @Override
     public String select(Exchange exchange) {
-        if (headerName == null || headerName.isEmpty()) {
+        if (headerName == null || headerName.isBlank()) {
             return null;
         }
 

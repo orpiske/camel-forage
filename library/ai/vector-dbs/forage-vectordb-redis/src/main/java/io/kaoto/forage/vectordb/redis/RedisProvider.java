@@ -108,19 +108,16 @@ public class RedisProvider implements EmbeddingStoreProvider {
             builder.metadataFieldsName(fieldNames);
         }
 
-        // TODO : figure out how to set the metric type
-        MetricType mt = MetricType.COSINE;
         // Set distance metric
-        switch (distanceMetric.toUpperCase()) {
-            case "L2":
-                mt = MetricType.L2;
-            case "IP":
-                mt = MetricType.IP;
-            default:
-                mt = MetricType.COSINE;
-                LOG.warn("Unknown distance metric: {}, using default (COSINE)", distanceMetric);
-                break;
-        }
+        MetricType mt =
+                switch (distanceMetric.toUpperCase()) {
+                    case "L2" -> MetricType.L2;
+                    case "IP" -> MetricType.IP;
+                    default -> {
+                        LOG.warn("Unknown distance metric: {}, using default (COSINE)", distanceMetric);
+                        yield MetricType.COSINE;
+                    }
+                };
 
         return builder.build();
     }
