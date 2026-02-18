@@ -8,14 +8,11 @@ public final class DataSourceCommonExportHelper {
     /**
      * Utility method, to translate dbKind into {@link io.kaoto.forage.jdbc.common.PooledDataSource}.
      *
-     * <p>
-     *  Examples:
-     *  <ul>
-     *      <li>postgresql -> io.kaoto.forage.jdbc.postgres.PostgresJdbc</li>
-     *      <li>mysql -> io.kaoto.forage.jdbc.mysql.MysqlJdbc</li>
-     *  </ul>
-     *
-     * </p>
+     * <p>Examples:
+     * <ul>
+     *     <li>postgresql -&gt; io.kaoto.forage.jdbc.postgres.PostgresJdbc</li>
+     *     <li>mysql -&gt; io.kaoto.forage.jdbc.mysql.MysqlJdbc</li>
+     * </ul>
      */
     public static String transformDbKindIntoProviderClass(String dbKind) {
         return "io.kaoto.forage.jdbc.%s.%sJdbc"

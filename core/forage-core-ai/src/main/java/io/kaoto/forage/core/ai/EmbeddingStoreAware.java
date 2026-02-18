@@ -5,7 +5,7 @@ import dev.langchain4j.store.embedding.EmbeddingStore;
 
 /**
  * If provider requires access to an EmbeddingStore, use this interface.
- * See example in {@link io.kaoto.forage.vectordb.inmemory.InMemoryStoreProvider}.
+ * See example in {@code io.kaoto.forage.vectordb.inmemory.InMemoryStoreProvider}.
  */
 public interface EmbeddingStoreAware {
 

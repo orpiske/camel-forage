@@ -34,7 +34,7 @@ public final class ExportHelper {
     }
 
     /**
-     * Regexp for See {@link io.kaoto.forage.core.util.config.ConfigStore#readPrefixes(InputStream, String)}
+     * Regexp for {@link io.kaoto.forage.core.util.config.ConfigStore#readPrefixes(Config, String)}
      * to extract all datasource groups from the properties file.
      *
      * <p>From properties
@@ -42,8 +42,7 @@ public final class ExportHelper {
      *     ds1.jdbc.url=jdbc:postgresql://localhost:5432/postgres
      *     ds2.jdbc.url=jdbc:mysql://localhost:3306/test
      * </pre>
-     *  both <Strong>ds1, ds2</Strong> prefixes are extracted.
-     * </p>
+     * both <strong>ds1, ds2</strong> prefixes are extracted.
      * */
     public static final String JDBC_PREFIXES_REGEXP = "(.+).jdbc\\..*";
 

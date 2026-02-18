@@ -9,12 +9,11 @@ import org.citrusframework.spi.Resources;
 
 /**
  * Interface required for special test cases:
- * <p/>
  * <ul>
- *     <li>Start routes once per class - implement {@link #runBeforeAll}</li>. See example {@link io.kaoto.forage.jdbc.MultiTest}.
+ *     <li>Start routes once per class - implement {@link #runBeforeAll}. See example {@code io.kaoto.forage.jdbc.MultiTest}.</li>
  * </ul>
- * <p/>
- * The test class has to register extension like <pre>@ExtendWith(IntegrationTestSetupExtension.class)</pre>
+ *
+ * <p>The test class has to register extension like {@code @ExtendWith(IntegrationTestSetupExtension.class)}
  *
  */
 public interface ForageIntegrationTest extends TestActionSupport {

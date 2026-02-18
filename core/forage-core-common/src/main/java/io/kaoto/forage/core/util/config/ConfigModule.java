@@ -35,8 +35,6 @@ import java.util.Objects;
  *
  * <p>This record is immutable and thread-safe.
  *
- * @param config the configuration class that owns this parameter, must not be null
- * @param name the name of the configuration parameter within the module, must not be null
  * @see ConfigStore
  * @see Config
  * @see ConfigEntry

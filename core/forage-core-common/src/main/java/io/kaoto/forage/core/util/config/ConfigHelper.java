@@ -339,21 +339,18 @@ public final class ConfigHelper {
     /**
      * Returns java regexp usable by {@link io.kaoto.forage.core.util.config.ConfigStore#readPrefixes(Config, String)} (Config)} .
      *
-     * <p>
-     *      In case of regexp based on `jdbc` from
-     *      <pre>
-     *          forage.ds1.jdbc.url=jdbc:postgresql://localhost:5432/postgres
-     *          forage.ds2.jdbc.url=jdbc:mysql://localhost:3306/test
-     *      </pre>
-     *      empty Set is returned, because there is no <Strong>forage.jdbc...</Strong> property (without named prefix).
-     * </p>
-     * <p>
-     *      In case of regexp based on `jdbc` from
-     *      <pre>
-     *          forage.jdbc.url=jdbc:postgresql://localhost:5432/postgres
-     *      </pre>
-     *      <Strong>jdbc</Strong> value is returned.
-     * </p>
+     * <p>In case of regexp based on `jdbc` from
+     * <pre>
+     *     forage.ds1.jdbc.url=jdbc:postgresql://localhost:5432/postgres
+     *     forage.ds2.jdbc.url=jdbc:mysql://localhost:3306/test
+     * </pre>
+     * empty Set is returned, because there is no <strong>forage.jdbc...</strong> property (without named prefix).
+     *
+     * <p>In case of regexp based on `jdbc` from
+     * <pre>
+     *     forage.jdbc.url=jdbc:postgresql://localhost:5432/postgres
+     * </pre>
+     * <strong>jdbc</strong> value is returned.
      */
     public static String getDefaultPropertyRegexp(String prefix) {
         return DEFAULT_PROPERTY_REGEXP.formatted(prefix);
@@ -362,21 +359,18 @@ public final class ConfigHelper {
     /**
      * Returns java regexp usable by {@link io.kaoto.forage.core.util.config.ConfigStore#readPrefixes(Config, String)} (Config)} .
      *
-     * <p>
-     *      In case of regexp based on `jdbc` from
-     *      <pre>
-     *          forage.ds1.jdbc.url=jdbc:postgresql://localhost:5432/postgres
-     *          forage.ds2.jdbc.url=jdbc:mysql://localhost:3306/test
-     *      </pre>
-     *      both <Strong>ds1, ds2</Strong> prefixes are returned.
-     * </p>
-     * <p>
-     *      In case of regexp based on `jdbc` from
-     *      <pre>
-     *          forage.jdbc.url=jdbc:postgresql://localhost:5432/postgres
-     *      </pre>
-     *      empty Set is returned, because there is no named jdbc property.
-     * </p>
+     * <p>In case of regexp based on `jdbc` from
+     * <pre>
+     *     forage.ds1.jdbc.url=jdbc:postgresql://localhost:5432/postgres
+     *     forage.ds2.jdbc.url=jdbc:mysql://localhost:3306/test
+     * </pre>
+     * both <strong>ds1, ds2</strong> prefixes are returned.
+     *
+     * <p>In case of regexp based on `jdbc` from
+     * <pre>
+     *     forage.jdbc.url=jdbc:postgresql://localhost:5432/postgres
+     * </pre>
+     * empty Set is returned, because there is no named jdbc property.
      */
     public static String getNamedPropertyRegexp(String prefix) {
         return NAMED_PROPERTY_REGEXP.formatted(prefix);

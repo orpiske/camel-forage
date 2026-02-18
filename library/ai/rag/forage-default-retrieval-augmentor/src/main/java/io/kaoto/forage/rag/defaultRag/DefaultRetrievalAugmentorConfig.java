@@ -13,12 +13,11 @@ import java.util.Optional;
  * Configuration class for the {@link DefaultRetrievalAugmentorProvider} (default implementation of {@link RetrievalAugmentor})
  *
  * <p>This configuration class manages the settings required to create a default implementation of
- * {@link RetrievalAugmentor}, which is intended to be suitable for the majority of use cases.</p?
+ * {@link RetrievalAugmentor}, which is intended to be suitable for the majority of use cases.
  *
- * <p>An <strong>{@link dev.langchain4j.store.embedding.EmbeddingStore}</strong> and
- * {@link EmbeddingModel}</strong> have to be provided for the successful construction of {@link RetrievalAugmentor}
+ * <p>An {@link dev.langchain4j.store.embedding.EmbeddingStore} and
+ * {@link EmbeddingModel} have to be provided for the successful construction of {@link RetrievalAugmentor}
  * as the part of the agent configuration.
- * </p>
  *
  * <p><strong>Configuration Parameters:</strong>
  * <ul>

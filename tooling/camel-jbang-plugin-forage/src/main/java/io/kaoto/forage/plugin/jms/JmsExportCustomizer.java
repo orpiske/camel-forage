@@ -14,9 +14,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Implementation of export customizer for datasource properties.
  *
- * <p>
- * Adds quarkus or spring-boot runtime dependencies, thus making export command less verbose.
- * </p>
+ * <p>Adds quarkus or spring-boot runtime dependencies, thus making export command less verbose.
  */
 public class JmsExportCustomizer extends AbstractExportCustomizer<ConnectionFactoryConfig> {
     private static final Logger LOG = LoggerFactory.getLogger(JmsExportCustomizer.class);

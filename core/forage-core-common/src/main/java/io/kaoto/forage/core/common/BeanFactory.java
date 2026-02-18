@@ -6,10 +6,8 @@ import org.apache.camel.CamelContextAware;
 
 /**
  * Factory interface for creating and configuring beans within the Forage ecosystem.
- * <p>
- * Implementations of this interface are automatically discovered via ServiceLoader mechanism
+ * <p>Implementations of this interface are automatically discovered via ServiceLoader mechanism
  * and are called during Camel context initialization to configure beans.
- * </p>
  */
 public interface BeanFactory extends CamelContextAware {
 
