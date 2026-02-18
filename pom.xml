@@ -9,6 +9,8 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Forage</name>
+    <url>https://github.com/KaotoIO/forage</url>
+    <description>A plugin extension for Apache Camel that provides opinionated bean factories</description>
 
     <properties>
         <camel.version>4.17.0</camel.version>
