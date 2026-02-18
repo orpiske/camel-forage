@@ -220,9 +220,9 @@ public class DashscopeConfig implements Config {
      *
      * <p><strong>Value Range:</strong> 0.0 to 2.0
      * <ul>
-     *   <li><strong>Values < 1.0</strong> - Encourage repetition</li>
+     *   <li><strong>Values &lt; 1.0</strong> - Encourage repetition</li>
      *   <li><strong>1.0</strong> - No penalty (default)</li>
-     *   <li><strong>Values > 1.0</strong> - Discourage repetition</li>
+     *   <li><strong>Values &gt; 1.0</strong> - Discourage repetition</li>
      * </ul>
      *
      * @return the repetition penalty value, or null if not configured (uses service default)

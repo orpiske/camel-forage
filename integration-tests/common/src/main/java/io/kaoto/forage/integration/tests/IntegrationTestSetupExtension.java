@@ -16,16 +16,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * JUni5 extension, responsible for:
- * <p/>
+ * JUnit5 extension, responsible for:
  * <ul>
- * <li>Copying the test resource files into working directory.</li>
+ *   <li>Copying the test resource files into working directory.</li>
+ *   <li>Starting tests for all runtimes. This is implemented by {@link org.junit.jupiter.api.extension.TestTemplateInvocationContextProvider}.
+ *       Each run puts value into system properties with key {@link IntegrationTestSetupExtension#RUNTIME_PROPERTY}.
+ *       There are 3 values: null, "--runtime=spring-boot" and "--runtime=quarkus".</li>
  * </ul>
- * <li>Starting tests for all runtimes. This is implemented by {@link org.junit.jupiter.api.extension.TestTemplateInvocationContextProvider}.
- * Each run puts value into system properties with key {@link IntegrationTestSetupExtension#RUNTIME_PROPERTY}.
- * There are 3 values: null, "--runtime=spring-boot" and "--runtime=quarkus".</li>
- * <p/>
- * Test class should be annotated with
+ *
+ * <p>Test class should be annotated with:
  * <ul>
  *     <li>@CitrusSupport</li>
  *     <li>@Testcontainers</li>

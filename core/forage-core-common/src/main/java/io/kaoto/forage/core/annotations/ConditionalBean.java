@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * Defines a bean that is conditionally registered based on configuration.
  *
- * This annotation is used within {@link ConditionalBeans} to declare individual beans
+ * This annotation is used within {@link ConditionalBeanGroup} to declare individual beans
  * that are automatically created when certain configuration options are enabled.
  *
  */

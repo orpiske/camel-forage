@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  * Provider for creating Ollama embedding models with configurable parameters.
  *
  * <p>This provider creates instances of {@link OllamaEmbeddingModel} using configuration
- * values managed by {@link OllamaConfig}. The configuration supports environment
+ * values managed by {@link OllamaEmbedddingConfig}. The configuration supports environment
  * variables, system properties, and configuration files for flexible deployment.
  *
  * <p><strong>Configuration:</strong>

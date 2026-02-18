@@ -13,7 +13,7 @@ public class ForageRun extends Run {
 
     /**
      * This method is used only for the camel run command with runtime=main
-     * All other runtimes extends dependencies by interface {@link org.apache.camel.dsl.jbang.core.common.PluginExporter)
+     * All other runtimes extends dependencies by interface {@link org.apache.camel.dsl.jbang.core.common.PluginExporter}
      * from {@link io.kaoto.forage.plugin.ForagePlugin}
      */
     @Override

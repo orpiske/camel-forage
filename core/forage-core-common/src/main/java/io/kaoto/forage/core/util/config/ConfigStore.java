@@ -135,16 +135,13 @@ public final class ConfigStore {
     /**
      * Utility method to read common prefixes from the {@link Config}, defined by the regexp.
      *
-     * <p>
-     *     Regexp has to contain one group, which is extracted.
-     *     For the regexp <pre>"(.+).jdbc\\..*"</pre> from the properties:
-     *      <pre>
-     *          ds1.jdbc.url=jdbc:postgresql://localhost:5432/postgres
-     *          ds2.jdbc.url=jdbc:mysql://localhost:3306/test
-     *      </pre>
-     *      both <Strong>ds1, ds2</Strong> prefixes are extracted.
-     *      </p>
-     * </p>
+     * <p>Regexp has to contain one group, which is extracted.
+     * For the regexp <pre>"(.+).jdbc\\..*"</pre> from the properties:
+     * <pre>
+     *     ds1.jdbc.url=jdbc:postgresql://localhost:5432/postgres
+     *     ds2.jdbc.url=jdbc:mysql://localhost:3306/test
+     * </pre>
+     * both <strong>ds1, ds2</strong> prefixes are extracted.
      *
      * @return If there is no group extracted in the whole properties file, null is return. Else prefixes defined by
      * the regexp in a set.

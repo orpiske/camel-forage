@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import org.jline.utils.Log;
 
 /**
- * Helper class for all export customizers. Follow the example implementation of {@link io.kaoto.forage.plugin.jms.JmsExportCustomizer#}
+ * Helper class for all export customizers. Follow the example implementation of {@link io.kaoto.forage.plugin.jms.JmsExportCustomizer}.
  */
 public abstract class AbstractExportCustomizer<T extends Config> implements ExportCustomizer {
 
@@ -66,22 +66,18 @@ public abstract class AbstractExportCustomizer<T extends Config> implements Expo
     /**
      * Return set of all values for a specific property.
      *
-     *  <p>
-     *      In case of entry jdbc-kind from
-     *      <pre>
-     *           ds1.jdbc.kind=postgresql
-     *           ds2.jdbc.kind=mysql
-     *       </pre>
-     *       both <Strong>postgresql and mysql</Strong> are returned.
-     *  </p>
+     * <p>In case of entry jdbc-kind from
+     * <pre>
+     *     ds1.jdbc.kind=postgresql
+     *     ds2.jdbc.kind=mysql
+     * </pre>
+     * both <strong>postgresql and mysql</strong> are returned.
      *
-     *  <p>
-     *      In case of entry jdbc-kind from
-     *      <pre>
-     *           jdbc.kind=postgresql
-     *       </pre>
-     *       <Strong>postgresql</Strong> is returned.
-     *  </p>
+     * <p>In case of entry jdbc-kind from
+     * <pre>
+     *     jdbc.kind=postgresql
+     * </pre>
+     * <strong>postgresql</strong> is returned.
      */
     protected Set<String> readAllValuesFromProperty(ConfigModule entry) {
 

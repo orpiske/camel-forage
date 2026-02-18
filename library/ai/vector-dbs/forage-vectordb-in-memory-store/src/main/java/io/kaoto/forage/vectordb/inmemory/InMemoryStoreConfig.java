@@ -11,17 +11,17 @@ import java.util.Optional;
 /**
  * Configuration class for the {@link dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore}.
  *
- * An {@link EmbeddingStore} that stores embeddings in memory.
- * <p>
+ * <p>An {@link EmbeddingStore} that stores embeddings in memory.
  * Uses a brute force approach by iterating over all embeddings to find the best matches.
- * <p>
- * This store can be persisted using the {@link dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore#serializeToJson()} and {@link dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore#serializeToFile(Path)} methods.
- * <p>
- * It can also be recreated from JSON or a file using the {@link dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore#fromJson(String)} and {@link dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore#fromFile(Path)} methods.
  *
- * <p>An {@link dev.langchain4j.model.embedding.EmbeddingModel}</strong> have to be provided for the successful construction of {@link RetrievalAugmentor}
- * as the part of the agent configuration.
- * </p>
+ * <p>This store can be persisted using the {@code InMemoryEmbeddingStore#serializeToJson()} and
+ * {@code InMemoryEmbeddingStore#serializeToFile(Path)} methods.
+ *
+ * <p>It can also be recreated from JSON or a file using the {@code InMemoryEmbeddingStore#fromJson(String)}
+ * and {@code InMemoryEmbeddingStore#fromFile(Path)} methods.
+ *
+ * <p>An {@link dev.langchain4j.model.embedding.EmbeddingModel EmbeddingModel} has to be provided for the
+ * successful construction of a retrieval augmentor as part of the agent configuration.
  *
  * <p><strong>Configuration Parameters:</strong>
  * <ul>
