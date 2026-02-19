@@ -55,7 +55,7 @@ public class ForageJdbcProcessor {
 
         Map<String, DataSourceFactoryConfig> configs = prefixes.isEmpty()
                 ? Collections.singletonMap("dataSource", new DataSourceFactoryConfig())
-                : prefixes.stream().collect(Collectors.toMap(n -> n, n -> new DataSourceFactoryConfig(n)));
+                : prefixes.stream().collect(Collectors.toMap(n -> n, DataSourceFactoryConfig::new));
 
         for (Map.Entry<String, DataSourceFactoryConfig> entry : configs.entrySet()) {
             if (StringUtils.isNotBlank(entry.getValue().aggregationRepositoryName())) {

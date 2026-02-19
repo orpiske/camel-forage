@@ -127,7 +127,7 @@ public class Neo4jFileConfigTest {
         Neo4jProvider provider = new Neo4jProvider();
         org.assertj.core.api.Assertions.assertThat(provider).isNotNull();
 
-        assertThrows(Exception.class, () -> provider.create(), "Expected an exception on connecting to Neo4j");
+        assertThrows(Exception.class, provider::create, "Expected an exception on connecting to Neo4j");
         LOG.info("Successfully created Neo4j provider");
     }
 }

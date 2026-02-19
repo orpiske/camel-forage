@@ -106,9 +106,7 @@ public class PgVectorFileConfigTest {
         org.assertj.core.api.Assertions.assertThat(provider).isNotNull();
 
         assertThrows(
-                RuntimeException.class,
-                () -> provider.create(),
-                "Expected a runtime exception on connecting to PGVector");
+                RuntimeException.class, provider::create, "Expected a runtime exception on connecting to PGVector");
         LOG.info("Successfully created PgVector provider");
     }
 }

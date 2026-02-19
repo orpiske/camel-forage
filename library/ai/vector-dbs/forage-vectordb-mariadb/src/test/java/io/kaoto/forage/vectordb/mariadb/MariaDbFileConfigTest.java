@@ -103,10 +103,7 @@ public class MariaDbFileConfigTest {
         MariaDbProvider provider = new MariaDbProvider();
         org.assertj.core.api.Assertions.assertThat(provider).isNotNull();
 
-        assertThrows(
-                RuntimeException.class,
-                () -> provider.create(),
-                "Expected a runtime exception on connecting to MariaDB");
+        assertThrows(RuntimeException.class, provider::create, "Expected a runtime exception on connecting to MariaDB");
         LOG.info("Successfully created MariaDB provider");
     }
 }

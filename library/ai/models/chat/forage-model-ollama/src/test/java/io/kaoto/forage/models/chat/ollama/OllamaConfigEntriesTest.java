@@ -72,7 +72,7 @@ class OllamaConfigEntriesTest {
             assertThat(entries).isNotEmpty();
 
             // Should throw UnsupportedOperationException when trying to modify
-            assertThatThrownBy(() -> entries.clear()).isInstanceOf(UnsupportedOperationException.class);
+            assertThatThrownBy(entries::clear).isInstanceOf(UnsupportedOperationException.class);
         }
 
         @Test
