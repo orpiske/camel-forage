@@ -25,6 +25,8 @@ import org.testcontainers.utility.DockerImageName;
  *   <li>All standard chat memory operations</li>
  * </ul>
  *
+ * All actual tests are inherited from ChatMemoryBeanProviderTCK
+ *
  * @since 1.0
  */
 @Testcontainers(disabledWithoutDocker = true)
@@ -71,12 +73,6 @@ class RedisMemoryTCKTest extends ChatMemoryBeanProviderTCK {
     @Override
     protected ChatMemoryBeanProvider createChatMemoryFactory() {
         return new RedisMemoryBeanProvider();
-    }
-
-    @Test
-    void demonstratesRedisTCKUsage() {
-        // This test exists to demonstrate that the TCK is working with Redis
-        // All actual tests are inherited from ChatMemoryFactoryTCK
     }
 
     @Test

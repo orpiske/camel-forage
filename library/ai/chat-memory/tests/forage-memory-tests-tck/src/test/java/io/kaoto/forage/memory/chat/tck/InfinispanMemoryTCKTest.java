@@ -26,6 +26,8 @@ import org.testcontainers.utility.DockerImageName;
  *   <li>Distributed caching capabilities</li>
  * </ul>
  *
+ *  All actual tests are inherited from ChatMemoryBeanProviderTCK
+ *
  * @since 1.0
  */
 @Testcontainers(disabledWithoutDocker = true)
@@ -77,12 +79,6 @@ class InfinispanMemoryTCKTest extends ChatMemoryBeanProviderTCK {
     @Override
     protected ChatMemoryBeanProvider createChatMemoryFactory() {
         return new InfinispanMemoryBeanProvider();
-    }
-
-    @Test
-    void demonstratesInfinispanTCKUsage() {
-        // This test exists to demonstrate that the TCK is working with Infinispan
-        // All actual tests are inherited from ChatMemoryFactoryTCK
     }
 
     @Test
