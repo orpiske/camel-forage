@@ -41,7 +41,7 @@ public class ScannedFactory {
     public ScannedFactory(String name, String component, String description, String factoryType, String className) {
         this(
                 name,
-                component != null && !component.isEmpty() ? Arrays.asList(component) : List.of(),
+                component != null && !component.isEmpty() ? List.of(component) : List.of(),
                 description,
                 factoryType,
                 className,
