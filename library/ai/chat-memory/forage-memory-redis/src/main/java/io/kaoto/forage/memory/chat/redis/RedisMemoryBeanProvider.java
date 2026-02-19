@@ -4,6 +4,7 @@ import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import io.kaoto.forage.core.ai.ChatMemoryBeanProvider;
 import io.kaoto.forage.core.annotations.ForageBean;
+import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.JedisPool;
@@ -71,7 +72,7 @@ public class RedisMemoryBeanProvider implements ChatMemoryBeanProvider {
             poolConfig.setTestOnBorrow(CONFIG.poolTestOnBorrow());
             poolConfig.setTestOnReturn(CONFIG.poolTestOnReturn());
             poolConfig.setTestWhileIdle(CONFIG.poolTestWhileIdle());
-            poolConfig.setMaxWaitMillis(CONFIG.poolMaxWaitMillis());
+            poolConfig.setMaxWait(Duration.ofMillis(CONFIG.poolMaxWaitMillis()));
 
             LOG.debug(
                     "Redis pool configuration: maxTotal={}, maxIdle={}, minIdle={}, testOnBorrow={}, testOnReturn={}, testWhileIdle={}, maxWaitMillis={}",
@@ -81,7 +82,7 @@ public class RedisMemoryBeanProvider implements ChatMemoryBeanProvider {
                     poolConfig.getTestOnBorrow(),
                     poolConfig.getTestOnReturn(),
                     poolConfig.getTestWhileIdle(),
-                    poolConfig.getMaxWaitMillis());
+                    poolConfig.getMaxWaitDuration().toMillis());
 
             JEDIS_POOL = new JedisPool(
                     poolConfig, CONFIG.host(), CONFIG.port(), CONFIG.timeout(), CONFIG.password(), CONFIG.database());
