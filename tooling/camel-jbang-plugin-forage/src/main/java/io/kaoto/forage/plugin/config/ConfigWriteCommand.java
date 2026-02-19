@@ -427,11 +427,7 @@ public class ConfigWriteCommand extends CamelCommand {
      * Merges new forage dependencies with existing ones without removing existing dependencies.
      */
     private void updateDependencies(File propertiesFile, DependencyInfo newDeps) throws IOException {
-        Map<String, Set<String>> existingDeps = new LinkedHashMap<>();
-        existingDeps.put(CAMEL_JBANG_DEPENDENCIES, new LinkedHashSet<>());
-        existingDeps.put(CAMEL_JBANG_DEPENDENCIES_MAIN, new LinkedHashSet<>());
-        existingDeps.put(CAMEL_JBANG_DEPENDENCIES_SPRING_BOOT, new LinkedHashSet<>());
-        existingDeps.put(CAMEL_JBANG_DEPENDENCIES_QUARKUS, new LinkedHashSet<>());
+        final Map<String, Set<String>> existingDeps = newDependencyMap();
 
         List<String> lines = new ArrayList<>();
         Set<String> dependencyKeysFound = new HashSet<>();
@@ -519,6 +515,15 @@ public class ConfigWriteCommand extends CamelCommand {
             }
             fos.write(content.toString().getBytes(StandardCharsets.UTF_8));
         }
+    }
+
+    private static Map<String, Set<String>> newDependencyMap() {
+        Map<String, Set<String>> existingDeps = new LinkedHashMap<>();
+        existingDeps.put(CAMEL_JBANG_DEPENDENCIES, new LinkedHashSet<>());
+        existingDeps.put(CAMEL_JBANG_DEPENDENCIES_MAIN, new LinkedHashSet<>());
+        existingDeps.put(CAMEL_JBANG_DEPENDENCIES_SPRING_BOOT, new LinkedHashSet<>());
+        existingDeps.put(CAMEL_JBANG_DEPENDENCIES_QUARKUS, new LinkedHashSet<>());
+        return existingDeps;
     }
 
     private String getFactoryDisplayName(String factoryTypeKey) {
@@ -614,23 +619,7 @@ public class ConfigWriteCommand extends CamelCommand {
         Set<String> allDeletedFactoryTypeKeys = new HashSet<>();
 
         // Determine which properties files to scan based on strategy
-        Set<File> propertiesFilesToScan = new HashSet<>();
-        if ("application".equalsIgnoreCase(strategy)) {
-            File appProps = new File(directory, "application.properties");
-            if (appProps.exists()) {
-                propertiesFilesToScan.add(appProps);
-            }
-        } else {
-            for (ForageCatalog.FactoryMetadata metadata : catalog.getAllFactories()) {
-                String propertiesFileName = getPropertiesFileName(metadata.factoryTypeKey());
-                if (propertiesFileName != null) {
-                    File propertiesFile = new File(directory, propertiesFileName);
-                    if (propertiesFile.exists()) {
-                        propertiesFilesToScan.add(propertiesFile);
-                    }
-                }
-            }
-        }
+        final Set<File> propertiesFilesToScan = determineScanableProperties();
 
         // Delete instance configuration from all relevant files
         for (File propertiesFile : propertiesFilesToScan) {
@@ -672,6 +661,27 @@ public class ConfigWriteCommand extends CamelCommand {
         printer().println(OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(output));
 
         return 0;
+    }
+
+    private Set<File> determineScanableProperties() {
+        Set<File> propertiesFilesToScan = new HashSet<>();
+        if ("application".equalsIgnoreCase(strategy)) {
+            File appProps = new File(directory, "application.properties");
+            if (appProps.exists()) {
+                propertiesFilesToScan.add(appProps);
+            }
+        } else {
+            for (ForageCatalog.FactoryMetadata metadata : catalog.getAllFactories()) {
+                String propertiesFileName = getPropertiesFileName(metadata.factoryTypeKey());
+                if (propertiesFileName != null) {
+                    File propertiesFile = new File(directory, propertiesFileName);
+                    if (propertiesFile.exists()) {
+                        propertiesFilesToScan.add(propertiesFile);
+                    }
+                }
+            }
+        }
+        return propertiesFilesToScan;
     }
 
     // Property key suffixes that contain the bean kind (e.g., *.db.kind, *.kind)
@@ -784,23 +794,7 @@ public class ConfigWriteCommand extends CamelCommand {
     private Set<String> findConfiguredTypes() throws IOException {
         Set<String> configuredTypes = new HashSet<>();
 
-        Set<File> propertiesFilesToScan = new HashSet<>();
-        if ("application".equalsIgnoreCase(strategy)) {
-            File appProps = new File(directory, "application.properties");
-            if (appProps.exists()) {
-                propertiesFilesToScan.add(appProps);
-            }
-        } else {
-            for (ForageCatalog.FactoryMetadata metadata : catalog.getAllFactories()) {
-                String propertiesFileName = getPropertiesFileName(metadata.factoryTypeKey());
-                if (propertiesFileName != null) {
-                    File propertiesFile = new File(directory, propertiesFileName);
-                    if (propertiesFile.exists()) {
-                        propertiesFilesToScan.add(propertiesFile);
-                    }
-                }
-            }
-        }
+        final Set<File> propertiesFilesToScan = determineScanableProperties();
 
         for (File propertiesFile : propertiesFilesToScan) {
             List<String> lines = java.nio.file.Files.readAllLines(propertiesFile.toPath(), StandardCharsets.UTF_8);
@@ -905,11 +899,7 @@ public class ConfigWriteCommand extends CamelCommand {
             throws IOException {
         List<String> lines = java.nio.file.Files.readAllLines(appPropertiesFile.toPath(), StandardCharsets.UTF_8);
 
-        Map<String, Set<String>> dependencyProperties = new LinkedHashMap<>();
-        dependencyProperties.put(CAMEL_JBANG_DEPENDENCIES, new LinkedHashSet<>());
-        dependencyProperties.put(CAMEL_JBANG_DEPENDENCIES_MAIN, new LinkedHashSet<>());
-        dependencyProperties.put(CAMEL_JBANG_DEPENDENCIES_SPRING_BOOT, new LinkedHashSet<>());
-        dependencyProperties.put(CAMEL_JBANG_DEPENDENCIES_QUARKUS, new LinkedHashSet<>());
+        final Map<String, Set<String>> dependencyProperties = newDependencyMap();
 
         Set<String> foundDependencyKeys = new HashSet<>();
         Set<String> removedGavs = new HashSet<>();
