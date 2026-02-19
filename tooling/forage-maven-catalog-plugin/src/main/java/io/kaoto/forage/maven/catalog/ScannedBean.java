@@ -1,7 +1,6 @@
 package io.kaoto.forage.maven.catalog;
 
 import io.kaoto.forage.catalog.model.ForageBean;
-import java.util.Arrays;
 import java.util.List;
 
 /**
