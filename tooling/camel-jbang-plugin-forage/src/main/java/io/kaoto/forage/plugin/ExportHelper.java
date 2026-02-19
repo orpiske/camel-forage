@@ -19,7 +19,7 @@ public final class ExportHelper {
 
         private final String fileName;
 
-        private ResourceType(String fileName) {
+        ResourceType(String fileName) {
 
             this.fileName = fileName;
         }
