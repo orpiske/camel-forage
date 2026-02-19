@@ -94,6 +94,5 @@ public class AzureEventHubsFileConfigTest {
                 RuntimeException.class,
                 provider::create,
                 "Expected a runtime exception on connecting to Azure Event Hubs");
-        LOG.info("Successfully created Azure Event Hubs provider");
     }
 }

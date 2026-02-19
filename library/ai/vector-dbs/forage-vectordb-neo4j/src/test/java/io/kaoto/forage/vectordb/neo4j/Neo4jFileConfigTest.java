@@ -11,6 +11,7 @@ import java.nio.file.StandardCopyOption;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.neo4j.driver.exceptions.ServiceUnavailableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,7 +128,8 @@ public class Neo4jFileConfigTest {
         Neo4jProvider provider = new Neo4jProvider();
         org.assertj.core.api.Assertions.assertThat(provider).isNotNull();
 
-        assertThrows(Exception.class, provider::create, "Expected an exception on connecting to Neo4j");
+        assertThrows(
+                ServiceUnavailableException.class, provider::create, "Expected an exception on connecting to Neo4j");
         LOG.info("Successfully created Neo4j provider");
     }
 }

@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 /**
  * Unit test for Redis vector database using file-based configuration.
@@ -99,7 +100,7 @@ public class RedisFileConfigTest {
         RedisProvider provider = new RedisProvider();
         org.assertj.core.api.Assertions.assertThat(provider).isNotNull();
 
-        assertThrows(Exception.class, provider::create, "Expected an exception on connecting to Redis");
+        assertThrows(JedisConnectionException.class, provider::create, "Expected an exception on connecting to Redis");
         LOG.info("Successfully created Redis provider");
     }
 }

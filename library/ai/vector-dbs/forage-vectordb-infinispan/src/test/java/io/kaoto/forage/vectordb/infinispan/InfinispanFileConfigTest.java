@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import org.infinispan.client.hotrod.exceptions.TransportException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -111,7 +112,7 @@ public class InfinispanFileConfigTest {
         InfinispanProvider provider = new InfinispanProvider();
         org.assertj.core.api.Assertions.assertThat(provider).isNotNull();
 
-        assertThrows(Exception.class, provider::create, "Expected an exception on connecting to Infinispan");
+        assertThrows(TransportException.class, provider::create, "Expected an exception on connecting to Infinispan");
         LOG.info("Successfully created Infinispan provider");
     }
 }
