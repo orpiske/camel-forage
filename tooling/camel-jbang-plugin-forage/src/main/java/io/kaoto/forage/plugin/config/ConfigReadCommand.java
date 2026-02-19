@@ -117,20 +117,7 @@ public class ConfigReadCommand extends CamelCommand {
         List<File> result = new ArrayList<>();
 
         // Determine which files to search based on strategy
-        Set<String> targetFileNames = new java.util.HashSet<>();
-
-        if ("application".equalsIgnoreCase(strategy)) {
-            // Only search in application.properties
-            targetFileNames.add("application.properties");
-        } else {
-            // Get properties file names from the catalog
-            for (ForageCatalog.FactoryMetadata metadata : catalog.getAllFactories()) {
-                String propsFile = metadata.propertiesFileName();
-                if (propsFile != null && !propsFile.isEmpty()) {
-                    targetFileNames.add(propsFile);
-                }
-            }
-        }
+        final Set<String> targetFileNames = determineTargetFileNames();
 
         // Search for matching properties files
         try (Stream<Path> paths = Files.walk(dir.toPath())) {
@@ -153,6 +140,24 @@ public class ConfigReadCommand extends CamelCommand {
         }
 
         return result;
+    }
+
+    private Set<String> determineTargetFileNames() {
+        Set<String> targetFileNames = new java.util.HashSet<>();
+
+        if ("application".equalsIgnoreCase(strategy)) {
+            // Only search in application.properties
+            targetFileNames.add("application.properties");
+        } else {
+            // Get properties file names from the catalog
+            for (ForageCatalog.FactoryMetadata metadata : catalog.getAllFactories()) {
+                String propsFile = metadata.propertiesFileName();
+                if (propsFile != null && !propsFile.isEmpty()) {
+                    targetFileNames.add(propsFile);
+                }
+            }
+        }
+        return targetFileNames;
     }
 
     private List<BeanInfo> parsePropertiesFile(File file) throws IOException {

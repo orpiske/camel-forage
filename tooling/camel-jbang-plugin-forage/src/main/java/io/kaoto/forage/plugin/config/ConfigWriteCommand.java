@@ -559,6 +559,19 @@ public class ConfigWriteCommand extends CamelCommand {
         List<String> lines = java.nio.file.Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
 
         // Track which properties need to be updated vs appended
+        final List<String> updatedLines = computeUpdatableProperties(newProperties, lines);
+
+        // Write the updated content
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            StringBuilder content = new StringBuilder();
+            for (String line : updatedLines) {
+                content.append(line).append("\n");
+            }
+            fos.write(content.toString().getBytes(StandardCharsets.UTF_8));
+        }
+    }
+
+    private static List<String> computeUpdatableProperties(Map<String, String> newProperties, List<String> lines) {
         Map<String, String> propsToUpdate = new LinkedHashMap<>(newProperties);
         Set<String> updatedKeys = new HashSet<>();
 
@@ -598,15 +611,7 @@ public class ConfigWriteCommand extends CamelCommand {
                 updatedLines.add(entry.getKey() + "=" + entry.getValue());
             }
         }
-
-        // Write the updated content
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            StringBuilder content = new StringBuilder();
-            for (String line : updatedLines) {
-                content.append(line).append("\n");
-            }
-            fos.write(content.toString().getBytes(StandardCharsets.UTF_8));
-        }
+        return updatedLines;
     }
 
     private int handleDelete() throws IOException {
@@ -750,6 +755,21 @@ public class ConfigWriteCommand extends CamelCommand {
         }
 
         // Filter out lines with keys to remove, preserving order
+        final List<String> updatedLines = computeRemovableLines(lines, deletedPropertyKeys);
+
+        // Write the updated content
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            StringBuilder content = new StringBuilder();
+            for (String line : updatedLines) {
+                content.append(line).append("\n");
+            }
+            fos.write(content.toString().getBytes(StandardCharsets.UTF_8));
+        }
+
+        return new DeletedConfigInfo(deletedPropertyKeys, deletedTypes, deletedFactoryTypeKeys);
+    }
+
+    private static List<String> computeRemovableLines(List<String> lines, Set<String> deletedPropertyKeys) {
         List<String> updatedLines = new ArrayList<>();
         for (String line : lines) {
             String trimmed = line.trim();
@@ -771,17 +791,7 @@ public class ConfigWriteCommand extends CamelCommand {
                 updatedLines.add(line);
             }
         }
-
-        // Write the updated content
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            StringBuilder content = new StringBuilder();
-            for (String line : updatedLines) {
-                content.append(line).append("\n");
-            }
-            fos.write(content.toString().getBytes(StandardCharsets.UTF_8));
-        }
-
-        return new DeletedConfigInfo(deletedPropertyKeys, deletedTypes, deletedFactoryTypeKeys);
+        return updatedLines;
     }
 
     /**
