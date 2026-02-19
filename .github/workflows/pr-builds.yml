@@ -22,6 +22,7 @@ on:
       - jbang-catalog.json
       - Makefile
       - LICENSE
+      - jreleaser.yml
 
 env:
   PROJECTS: ${{ github.workspace }}
