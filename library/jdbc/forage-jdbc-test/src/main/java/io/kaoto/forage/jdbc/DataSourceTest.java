@@ -18,9 +18,6 @@ public abstract class DataSourceTest extends ForageJdbcTest {
 
         setUpPoolConfiguration();
         setUpTransactionConfiguration();
-
-        //        setUpAggregationConfiguration();
-        //        setUpIdempotentConfiguration();
     }
 
     @Test

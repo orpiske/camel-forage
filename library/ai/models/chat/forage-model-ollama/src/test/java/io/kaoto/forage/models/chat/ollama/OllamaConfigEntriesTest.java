@@ -26,11 +26,6 @@ import org.junit.jupiter.api.Test;
 @DisplayName("OllamaConfigEntries Pattern Tests")
 class OllamaConfigEntriesTest {
 
-    //    @BeforeEach
-    //    void setUp() {
-    //        clearSystemProperties();
-    //    }
-
     @Nested
     @DisplayName("Static ConfigModule Field Tests")
     class StaticConfigModuleTests {
