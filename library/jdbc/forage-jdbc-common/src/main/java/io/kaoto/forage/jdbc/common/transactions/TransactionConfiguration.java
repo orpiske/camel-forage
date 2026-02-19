@@ -19,7 +19,7 @@ public class TransactionConfiguration {
     private static final Logger log = LoggerFactory.getLogger(TransactionConfiguration.class);
 
     private final DataSourceFactoryConfig config;
-    private String transactionNodeId;
+    private final String transactionNodeId;
 
     public TransactionConfiguration(DataSourceFactoryConfig config, String id) {
         this.config = config;
