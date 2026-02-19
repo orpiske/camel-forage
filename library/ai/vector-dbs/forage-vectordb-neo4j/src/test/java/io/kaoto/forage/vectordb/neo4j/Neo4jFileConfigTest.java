@@ -1,9 +1,8 @@
 package io.kaoto.forage.vectordb.neo4j;
 
 import static org.assertj.core.api.Fail.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.store.embedding.EmbeddingStore;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -127,13 +126,8 @@ public class Neo4jFileConfigTest {
         LOG.info("Testing Neo4j provider instantiation");
         Neo4jProvider provider = new Neo4jProvider();
         org.assertj.core.api.Assertions.assertThat(provider).isNotNull();
-        try {
-            EmbeddingStore<TextSegment> neo4jboo = provider.create();
-        } catch (org.neo4j.driver.exceptions.ServiceUnavailableException sue) {
-            LOG.info("Expected to catch RuntimeException creating Neo4j Embedding Store and did successfully...");
-        } catch (Exception e) {
-            fail("Caught exception trying to create Neo4j Embedding Store {}", e);
-        }
+
+        assertThrows(Exception.class, () -> provider.create(), "Expected an exception on connecting to Neo4j");
         LOG.info("Successfully created Neo4j provider");
     }
 }

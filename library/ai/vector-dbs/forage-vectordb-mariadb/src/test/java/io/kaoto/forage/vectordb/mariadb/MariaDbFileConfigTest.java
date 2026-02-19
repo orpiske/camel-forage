@@ -1,9 +1,8 @@
 package io.kaoto.forage.vectordb.mariadb;
 
 import static org.assertj.core.api.Fail.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.store.embedding.EmbeddingStore;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -102,18 +101,12 @@ public class MariaDbFileConfigTest {
     public void shouldCreateMariaDbProviderInstance() {
         LOG.info("Testing MariaDB provider instantiation");
         MariaDbProvider provider = new MariaDbProvider();
-        try {
-            // Attempt to create embedding store with file-based configuration
-            // This may fail due to connection issues, which is expected in unit tests
-            EmbeddingStore<TextSegment> embeddingStore = provider.create();
-        } catch (RuntimeException re) {
-            // Expected when database connection fails in test environment
-            LOG.info("Successfully caught RuntimeException when creating MariaDB embedding store");
-        } catch (Exception e) {
-            fail("Caught exception trying to create MariaDB embedding store {}", e);
-        }
-        // Verify provider was created successfully
         org.assertj.core.api.Assertions.assertThat(provider).isNotNull();
+
+        assertThrows(
+                RuntimeException.class,
+                () -> provider.create(),
+                "Expected a runtime exception on connecting to MariaDB");
         LOG.info("Successfully created MariaDB provider");
     }
 }

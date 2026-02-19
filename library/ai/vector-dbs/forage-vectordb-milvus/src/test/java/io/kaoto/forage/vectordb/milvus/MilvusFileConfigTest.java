@@ -1,9 +1,8 @@
 package io.kaoto.forage.vectordb.milvus;
 
 import static org.assertj.core.api.Fail.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.store.embedding.EmbeddingStore;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -117,13 +116,11 @@ public class MilvusFileConfigTest {
         LOG.info("Testing Milvus provider instantiation");
         MilvusProvider provider = new MilvusProvider();
         org.assertj.core.api.Assertions.assertThat(provider).isNotNull();
-        try {
-            EmbeddingStore<TextSegment> milv = provider.create();
-        } catch (RuntimeException re) {
-            LOG.info("Expected to catch RuntimeException creating Milvus Embedding Store and did succesfully...");
-        } catch (Exception e) {
-            fail("Caught exception trying to create Milvus Embedding Store {}", e);
-        }
+
+        assertThrows(
+                RuntimeException.class,
+                () -> provider.create(),
+                "Expected a runtime exception on connecting to Milvus");
         LOG.info("Successfully created Milvus provider");
     }
 }

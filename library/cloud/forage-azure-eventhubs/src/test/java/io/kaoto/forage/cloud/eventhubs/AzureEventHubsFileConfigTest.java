@@ -1,8 +1,8 @@
 package io.kaoto.forage.cloud.eventhubs;
 
 import static org.assertj.core.api.Fail.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.azure.messaging.eventhubs.EventHubProducerAsyncClient;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -89,14 +89,11 @@ public class AzureEventHubsFileConfigTest {
         LOG.info("Testing Azure Event Hubs provider instantiation");
         AzureEventHubsProvider provider = new AzureEventHubsProvider();
         org.assertj.core.api.Assertions.assertThat(provider).isNotNull();
-        try {
-            EventHubProducerAsyncClient client = provider.create();
-        } catch (RuntimeException re) {
-            LOG.info(
-                    "Expected to catch RuntimeException creating Azure Event Hubs Producer Client and did successfully...");
-        } catch (Exception e) {
-            fail("Caught exception trying to create Azure Event Hubs Producer Client {}", e);
-        }
+
+        assertThrows(
+                RuntimeException.class,
+                () -> provider.create(),
+                "Expected a runtime exception on connecting to Azure Event Hubs");
         LOG.info("Successfully created Azure Event Hubs provider");
     }
 }
