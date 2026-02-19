@@ -9,6 +9,7 @@ import io.kaoto.forage.jms.common.PooledConnectionFactory;
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.JMSException;
 import jakarta.jms.XAConnectionFactory;
+import java.net.URI;
 
 /**
  * IBM MQ implementation extending PooledConnectionFactory.
@@ -81,18 +82,7 @@ public class IbmMqJms extends PooledConnectionFactory {
             int portNum = uri.getPort();
             String port = portNum > 0 ? String.valueOf(portNum) : "1414";
 
-            String path = uri.getPath();
-            if (path == null || path.isEmpty()) {
-                throw new IllegalArgumentException(
-                        "Invalid IBM MQ broker URL: channel and queue manager are missing. Expected: mq://host:port/channel/queueManager");
-            }
-
-            // Remove leading slash and split
-            String[] pathParts = path.substring(1).split("/");
-            if (pathParts.length < 2) {
-                throw new IllegalArgumentException(
-                        "Invalid IBM MQ broker URL: expected both channel and queue manager in path. Expected: mq://host:port/channel/queueManager");
-            }
+            final String[] pathParts = extractPathPartFromURI(uri);
 
             String channel = pathParts[0];
             String queueManager = pathParts[1];
@@ -106,5 +96,21 @@ public class IbmMqJms extends PooledConnectionFactory {
             throw new IllegalArgumentException(
                     "Invalid IBM MQ broker URL: failed to parse URI. Expected: mq://host:port/channel/queueManager", e);
         }
+    }
+
+    private static String[] extractPathPartFromURI(URI uri) {
+        String path = uri.getPath();
+        if (path == null || path.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Invalid IBM MQ broker URL: channel and queue manager are missing. Expected: mq://host:port/channel/queueManager");
+        }
+
+        // Remove leading slash and split
+        String[] pathParts = path.substring(1).split("/");
+        if (pathParts.length < 2) {
+            throw new IllegalArgumentException(
+                    "Invalid IBM MQ broker URL: expected both channel and queue manager in path. Expected: mq://host:port/channel/queueManager");
+        }
+        return pathParts;
     }
 }
