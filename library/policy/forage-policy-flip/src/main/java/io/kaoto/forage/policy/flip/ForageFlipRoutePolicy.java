@@ -107,7 +107,7 @@ public class ForageFlipRoutePolicy extends RoutePolicySupport {
                     }
                 });
             } catch (Exception e) {
-                LOG.warn("Failed to stop initially inactive route '{}': {}", route.getId(), e.getMessage());
+                LOG.warn("Error stopping initially inactive route '{}': {}", route.getId(), e.getMessage());
             }
         } else {
             LOG.info("Route '{}' starting as initially active", route.getId());
