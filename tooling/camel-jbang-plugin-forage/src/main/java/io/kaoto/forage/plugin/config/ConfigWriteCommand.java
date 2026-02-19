@@ -120,7 +120,7 @@ public class ConfigWriteCommand extends CamelCommand {
     }
 
     private Map<String, String> parseJsonInput(String json) throws JsonProcessingException {
-        return OBJECT_MAPPER.readValue(json, new TypeReference<Map<String, String>>() {});
+        return OBJECT_MAPPER.readValue(json, new TypeReference<>() {});
     }
 
     private int writeConfiguration(Map<String, String> configMap) throws IOException {
