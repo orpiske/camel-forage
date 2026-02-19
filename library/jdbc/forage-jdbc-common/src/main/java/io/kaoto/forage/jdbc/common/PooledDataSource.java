@@ -31,7 +31,7 @@ public abstract class PooledDataSource implements DataSourceProvider, ForageIdRe
      *
      * @return the JDBC driver class name
      */
-    protected abstract Class getConnectionProviderClass();
+    protected abstract Class<?> getConnectionProviderClass();
 
     @Override
     public DataSource create(String id) {

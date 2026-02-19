@@ -41,7 +41,7 @@ public class JmsIbmMqTest implements ForageIntegrationTest {
     private static final String MQSC_FILE_CONTAINER_PATH = "/etc/mqm/" + MQSC_COMMAND_FILE_NAME;
 
     @Container
-    static GenericContainer ibmmq = new GenericContainer<>(DockerImageName.parse(IBMMQ_IMAGE_NAME))
+    static GenericContainer<?> ibmmq = new GenericContainer<>(DockerImageName.parse(IBMMQ_IMAGE_NAME))
             .withExposedPorts(IBMMQ_PORT)
             .withEnv(Map.of("LICENSE", "accept", "MQ_QMGR_NAME", QUEUE_MANAGER_NAME))
             .withCopyToContainer(Transferable.of(PASSWORD), "/run/secrets/mqAdminPassword")

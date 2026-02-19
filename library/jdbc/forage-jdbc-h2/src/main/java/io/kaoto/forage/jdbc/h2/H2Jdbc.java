@@ -17,7 +17,7 @@ import org.h2.jdbcx.JdbcDataSource;
 public class H2Jdbc extends PooledDataSource {
 
     @Override
-    protected Class getConnectionProviderClass() {
+    protected Class<?> getConnectionProviderClass() {
         if (getConfig().transactionEnabled()) {
             return JdbcDataSource.class;
         } else {

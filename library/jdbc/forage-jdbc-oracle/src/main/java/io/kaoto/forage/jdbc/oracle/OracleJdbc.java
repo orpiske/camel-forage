@@ -17,7 +17,7 @@ import oracle.jdbc.xa.OracleXADataSource;
 public class OracleJdbc extends PooledDataSource {
 
     @Override
-    protected Class getConnectionProviderClass() {
+    protected Class<?> getConnectionProviderClass() {
         if (getConfig().transactionEnabled()) {
             return OracleXADataSource.class;
         } else {

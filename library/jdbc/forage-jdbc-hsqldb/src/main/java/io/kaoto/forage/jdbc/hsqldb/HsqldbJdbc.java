@@ -17,7 +17,7 @@ import org.hsqldb.jdbc.pool.JDBCXADataSource;
 public class HsqldbJdbc extends PooledDataSource {
 
     @Override
-    protected Class getConnectionProviderClass() {
+    protected Class<?> getConnectionProviderClass() {
         if (getConfig().transactionEnabled()) {
             return JDBCXADataSource.class;
         } else {
