@@ -116,7 +116,6 @@ public final class ForageCatalog {
             }
 
             if (factoryTypeKey != null) {
-                final String finalFactoryTypeKey = factoryTypeKey;
 
                 FactoryMetadata metadata = new FactoryMetadata(
                         factoryName, factoryType, propertiesFile, prefixPropertyName, factoryTypeKey, configEntries);
@@ -138,7 +137,7 @@ public final class ForageCatalog {
                             for (ForageBean bean : beans) {
                                 String beanName = bean.getName();
                                 if (beanName != null && !beanName.isEmpty()) {
-                                    beanNameToFactoryKey.put(beanName.toLowerCase(), finalFactoryTypeKey);
+                                    beanNameToFactoryKey.put(beanName.toLowerCase(), factoryTypeKey);
                                     beanNameToFeature.put(beanName.toLowerCase(), featureName);
 
                                     // Store bean GAV

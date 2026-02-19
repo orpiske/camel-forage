@@ -191,7 +191,7 @@ public class TestDataSourceCommand extends CamelCommand {
     private DataSourceProvider createDataSourceProvider(String dbKind, ClassLoader classLoader) throws Exception {
         Set<Class<? extends DataSourceProvider>> providers = findImplementations(classLoader);
 
-        DataSourceProvider dataSourceProvider = providers.stream()
+        return providers.stream()
                 .filter(dsProvider -> dsProvider.getName().toLowerCase().contains(dbKind.toLowerCase()))
                 .map(dsProvider -> {
                     try {
@@ -202,8 +202,6 @@ public class TestDataSourceCommand extends CamelCommand {
                 })
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No implementation found for " + dbKind));
-
-        return dataSourceProvider;
     }
 
     /**

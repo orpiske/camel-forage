@@ -42,64 +42,50 @@ public abstract class ForageTransactionManagementAutoConfiguration {
     @ConditionalOnMissingBean
     @Bean("PROPAGATION_REQUIRED")
     public SpringTransactionPolicy propagationRequired(JtaTransactionManager jtaTransactionManager) {
-        SpringTransactionPolicy springTransactionPolicy =
-                createSpringBootTransactionPolicy(jtaTransactionManager, "PROPAGATION_REQUIRED");
 
-        return springTransactionPolicy;
+        return createSpringBootTransactionPolicy(jtaTransactionManager, "PROPAGATION_REQUIRED");
     }
 
     @ConditionalOnMissingBean
     @Bean("NESTED")
     public SpringTransactionPolicy nested(JtaTransactionManager jtaTransactionManager) {
-        SpringTransactionPolicy springTransactionPolicy =
-                createSpringBootTransactionPolicy(jtaTransactionManager, "PROPAGATION_NESTED");
 
-        return springTransactionPolicy;
+        return createSpringBootTransactionPolicy(jtaTransactionManager, "PROPAGATION_NESTED");
     }
 
     @ConditionalOnMissingBean
     @Bean("MANDATORY")
     public SpringTransactionPolicy mandatory(JtaTransactionManager jtaTransactionManager) {
-        SpringTransactionPolicy springTransactionPolicy =
-                createSpringBootTransactionPolicy(jtaTransactionManager, "PROPAGATION_MANDATORY");
 
-        return springTransactionPolicy;
+        return createSpringBootTransactionPolicy(jtaTransactionManager, "PROPAGATION_MANDATORY");
     }
 
     @ConditionalOnMissingBean
     @Bean("NEVER")
     public SpringTransactionPolicy never(JtaTransactionManager jtaTransactionManager) {
-        SpringTransactionPolicy springTransactionPolicy =
-                createSpringBootTransactionPolicy(jtaTransactionManager, "PROPAGATION_NEVER");
 
-        return springTransactionPolicy;
+        return createSpringBootTransactionPolicy(jtaTransactionManager, "PROPAGATION_NEVER");
     }
 
     @ConditionalOnMissingBean
     @Bean("NOT_SUPPORTED")
     public SpringTransactionPolicy notSupported(JtaTransactionManager jtaTransactionManager) {
-        SpringTransactionPolicy springTransactionPolicy =
-                createSpringBootTransactionPolicy(jtaTransactionManager, "PROPAGATION_NOT_SUPPORTED");
 
-        return springTransactionPolicy;
+        return createSpringBootTransactionPolicy(jtaTransactionManager, "PROPAGATION_NOT_SUPPORTED");
     }
 
     @ConditionalOnMissingBean
     @Bean("REQUIRES_NEW")
     public SpringTransactionPolicy requiresNew(JtaTransactionManager jtaTransactionManager) {
-        SpringTransactionPolicy springTransactionPolicy =
-                createSpringBootTransactionPolicy(jtaTransactionManager, "PROPAGATION_REQUIRES_NEW");
 
-        return springTransactionPolicy;
+        return createSpringBootTransactionPolicy(jtaTransactionManager, "PROPAGATION_REQUIRES_NEW");
     }
 
     @ConditionalOnMissingBean
     @Bean("SUPPORTS")
     public SpringTransactionPolicy supports(JtaTransactionManager jtaTransactionManager) {
-        SpringTransactionPolicy springTransactionPolicy =
-                createSpringBootTransactionPolicy(jtaTransactionManager, "PROPAGATION_SUPPORTS");
 
-        return springTransactionPolicy;
+        return createSpringBootTransactionPolicy(jtaTransactionManager, "PROPAGATION_SUPPORTS");
     }
 
     private static SpringTransactionPolicy createSpringBootTransactionPolicy(
