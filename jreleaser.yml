@@ -1,0 +1,32 @@
+project:
+  name: forage
+  description: Forage
+  longDescription: A plugin extension for Apache Camel that provides opinionated bean factories
+  authors:
+    - The Kaoto Development Team
+  license: Apache-2.0
+  languages:
+    java:
+      groupId: io.kaoto.forage
+      version: 17
+  links:
+    homepage: https://kaoto.io
+    bugTracker: https://github.com/KaotoIO/forage/issues
+  inceptionYear: 2025
+  tags:
+    - 'camel'
+    - 'integration'
+    - 'java'
+    - 'kaoto'
+    - 'ai'
+
+release:
+  github:
+    owner: KaotoIO
+    overwrite: false
+    skipTag: true
+    issues:
+      enabled: true
+    update:
+      enabled: true
+
