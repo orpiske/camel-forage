@@ -1,7 +1,5 @@
 package io.kaoto.forage.policy.factory;
 
-import io.kaoto.forage.core.annotations.ForageBean;
-import io.kaoto.forage.core.policy.RoutePolicyProvider;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -10,6 +8,8 @@ import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.kaoto.forage.core.annotations.ForageBean;
+import io.kaoto.forage.core.policy.RoutePolicyProvider;
 
 /**
  * Registry of RoutePolicyProvider instances discovered via ServiceLoader.

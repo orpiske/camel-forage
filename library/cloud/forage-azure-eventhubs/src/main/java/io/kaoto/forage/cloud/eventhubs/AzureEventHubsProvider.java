@@ -1,11 +1,11 @@
 package io.kaoto.forage.cloud.eventhubs;
 
+import io.kaoto.forage.core.annotations.ForageBean;
+import io.kaoto.forage.core.cloud.EventHubProducerProvider;
 import com.azure.core.credential.TokenCredential;
 import com.azure.identity.DefaultAzureCredentialBuilder;
 import com.azure.messaging.eventhubs.EventHubClientBuilder;
 import com.azure.messaging.eventhubs.EventHubProducerAsyncClient;
-import io.kaoto.forage.core.annotations.ForageBean;
-import io.kaoto.forage.core.cloud.EventHubProducerProvider;
 
 @ForageBean(
         value = "azure-eventhubs",

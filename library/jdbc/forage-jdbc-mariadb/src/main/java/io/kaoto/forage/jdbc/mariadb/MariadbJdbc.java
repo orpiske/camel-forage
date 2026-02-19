@@ -1,9 +1,9 @@
 package io.kaoto.forage.jdbc.mariadb;
 
-import io.kaoto.forage.core.annotations.ForageBean;
-import io.kaoto.forage.jdbc.common.PooledDataSource;
 import org.mariadb.jdbc.Driver;
 import org.mariadb.jdbc.MariaDbDataSource;
+import io.kaoto.forage.core.annotations.ForageBean;
+import io.kaoto.forage.jdbc.common.PooledDataSource;
 
 /**
  * MariaDB implementation extending PooledJdbc.

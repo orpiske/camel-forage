@@ -1,12 +1,17 @@
 package io.kaoto.forage.models.embeddings.ollama;
 
-import static io.kaoto.forage.models.embeddings.ollama.OllamaEmbeddingConfigEntries.*;
-
+import java.time.Duration;
+import java.util.Optional;
 import io.kaoto.forage.core.util.config.Config;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigStore;
-import java.time.Duration;
-import java.util.Optional;
+
+import static io.kaoto.forage.models.embeddings.ollama.OllamaEmbeddingConfigEntries.BASE_URL;
+import static io.kaoto.forage.models.embeddings.ollama.OllamaEmbeddingConfigEntries.LOG_REQUESTS;
+import static io.kaoto.forage.models.embeddings.ollama.OllamaEmbeddingConfigEntries.LOG_RESPONSES;
+import static io.kaoto.forage.models.embeddings.ollama.OllamaEmbeddingConfigEntries.MAX_RETRIES;
+import static io.kaoto.forage.models.embeddings.ollama.OllamaEmbeddingConfigEntries.MODEL_NAME;
+import static io.kaoto.forage.models.embeddings.ollama.OllamaEmbeddingConfigEntries.TIMEOUT;
 
 /**
  * Configuration class for Ollama Embedding model integration in the Forage framework.

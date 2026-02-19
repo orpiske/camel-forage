@@ -1,11 +1,12 @@
 package io.kaoto.forage.jdbc.common.aggregation;
 
-import io.kaoto.forage.jdbc.common.DataSourceFactoryConfig;
 import jakarta.transaction.TransactionManager;
-import java.util.function.Consumer;
 import javax.sql.DataSource;
+
+import java.util.function.Consumer;
 import org.apache.camel.processor.aggregate.jdbc.JdbcAggregationRepository;
 import org.springframework.transaction.jta.JtaTransactionManager;
+import io.kaoto.forage.jdbc.common.DataSourceFactoryConfig;
 
 public class ForageAggregationRepository extends JdbcAggregationRepository {
 

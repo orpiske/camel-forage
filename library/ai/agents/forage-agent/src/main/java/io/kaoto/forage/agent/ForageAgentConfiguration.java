@@ -1,10 +1,10 @@
 package io.kaoto.forage.agent;
 
-import dev.langchain4j.guardrail.InputGuardrail;
-import dev.langchain4j.guardrail.OutputGuardrail;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.camel.component.langchain4j.agent.api.AgentConfiguration;
+import dev.langchain4j.guardrail.InputGuardrail;
+import dev.langchain4j.guardrail.OutputGuardrail;
 
 /**
  * Extended agent configuration that supports guardrail instances in addition to classes.

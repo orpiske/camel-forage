@@ -1,18 +1,18 @@
 package io.kaoto.forage.agent.factory;
 
+import java.util.List;
+import java.util.Optional;
+import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.ConfigHelper;
+import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigStore;
+
 import static io.kaoto.forage.agent.factory.AgentFactoryConfigEntries.GUARDRAILS_INPUT_CLASSES;
 import static io.kaoto.forage.agent.factory.AgentFactoryConfigEntries.GUARDRAILS_OUTPUT_CLASSES;
 import static io.kaoto.forage.agent.factory.AgentFactoryConfigEntries.PROVIDER_AGENT_CLASS;
 import static io.kaoto.forage.agent.factory.AgentFactoryConfigEntries.PROVIDER_FEATURES;
 import static io.kaoto.forage.agent.factory.AgentFactoryConfigEntries.PROVIDER_FEATURES_MEMORY_FACTORY_CLASS;
 import static io.kaoto.forage.agent.factory.AgentFactoryConfigEntries.PROVIDER_MODEL_FACTORY_CLASS;
-
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigHelper;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Configuration class for individual agent instances within the Camel Forage framework.

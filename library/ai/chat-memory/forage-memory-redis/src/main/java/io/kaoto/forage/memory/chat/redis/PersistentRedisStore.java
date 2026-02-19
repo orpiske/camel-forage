@@ -1,15 +1,15 @@
 package io.kaoto.forage.memory.chat.redis;
 
-import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.data.message.ChatMessageDeserializer;
-import dev.langchain4j.data.message.ChatMessageSerializer;
-import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.ChatMessageDeserializer;
+import dev.langchain4j.data.message.ChatMessageSerializer;
+import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.exceptions.JedisException;

@@ -1,13 +1,14 @@
 package io.kaoto.forage.rag.defaultRag;
 
-import static io.kaoto.forage.rag.defaultRag.DefaultRetrievalAugmentorConfigEntries.*;
-
-import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.rag.RetrievalAugmentor;
+import java.util.Optional;
 import io.kaoto.forage.core.util.config.Config;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigStore;
-import java.util.Optional;
+import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.rag.RetrievalAugmentor;
+
+import static io.kaoto.forage.rag.defaultRag.DefaultRetrievalAugmentorConfigEntries.MAX_RESULTS;
+import static io.kaoto.forage.rag.defaultRag.DefaultRetrievalAugmentorConfigEntries.MIN_SCORE;
 
 /**
  * Configuration class for the {@link DefaultRetrievalAugmentorProvider} (default implementation of {@link RetrievalAugmentor})

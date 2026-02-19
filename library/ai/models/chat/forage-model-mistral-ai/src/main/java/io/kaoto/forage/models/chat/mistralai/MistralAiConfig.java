@@ -1,5 +1,11 @@
 package io.kaoto.forage.models.chat.mistralai;
 
+import java.util.Optional;
+import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.MissingConfigException;
+
 import static io.kaoto.forage.models.chat.mistralai.MistralAiConfigEntries.API_KEY;
 import static io.kaoto.forage.models.chat.mistralai.MistralAiConfigEntries.LOG_REQUESTS_AND_RESPONSES;
 import static io.kaoto.forage.models.chat.mistralai.MistralAiConfigEntries.MAX_RETRIES;
@@ -9,12 +15,6 @@ import static io.kaoto.forage.models.chat.mistralai.MistralAiConfigEntries.RANDO
 import static io.kaoto.forage.models.chat.mistralai.MistralAiConfigEntries.TEMPERATURE;
 import static io.kaoto.forage.models.chat.mistralai.MistralAiConfigEntries.TIMEOUT;
 import static io.kaoto.forage.models.chat.mistralai.MistralAiConfigEntries.TOP_P;
-
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.core.util.config.MissingConfigException;
-import java.util.Optional;
 
 /**
  * Configuration class for MistralAI integration in the Camel Forage framework.

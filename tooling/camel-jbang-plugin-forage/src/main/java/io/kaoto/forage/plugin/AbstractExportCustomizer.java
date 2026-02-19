@@ -1,16 +1,16 @@
 package io.kaoto.forage.plugin;
 
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.jline.utils.Log;
 import io.kaoto.forage.core.common.ExportCustomizer;
 import io.kaoto.forage.core.common.RuntimeType;
 import io.kaoto.forage.core.util.config.Config;
 import io.kaoto.forage.core.util.config.ConfigHelper;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigStore;
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import org.jline.utils.Log;
 
 /**
  * Helper class for all export customizers. Follow the example implementation of {@link io.kaoto.forage.plugin.jms.JmsExportCustomizer}.

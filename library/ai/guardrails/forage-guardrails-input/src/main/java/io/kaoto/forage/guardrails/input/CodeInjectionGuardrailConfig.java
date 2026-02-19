@@ -1,15 +1,16 @@
 package io.kaoto.forage.guardrails.input;
 
-import static io.kaoto.forage.guardrails.input.CodeInjectionGuardrailConfigEntries.*;
-
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 import org.apache.camel.component.langchain4j.agent.api.guardrails.CodeInjectionGuardrail.InjectionType;
+import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigStore;
+
+import static io.kaoto.forage.guardrails.input.CodeInjectionGuardrailConfigEntries.DETECT_TYPES;
+import static io.kaoto.forage.guardrails.input.CodeInjectionGuardrailConfigEntries.STRICT;
 
 /**
  * Configuration class for code injection guardrail.

@@ -1,5 +1,12 @@
 package io.kaoto.forage.jdbc.common;
 
+import java.util.Optional;
+import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.MissingConfigException;
+import io.kaoto.forage.jdbc.common.idempotent.ForageJdbcMessageIdRepository;
+
 import static io.kaoto.forage.jdbc.common.DataSourceFactoryConfigEntries.ACQUISITION_TIMEOUT_SECONDS;
 import static io.kaoto.forage.jdbc.common.DataSourceFactoryConfigEntries.AGGREGATION_REPOSITORY_ALLOW_SERIALIZED_HEADERS;
 import static io.kaoto.forage.jdbc.common.DataSourceFactoryConfigEntries.AGGREGATION_REPOSITORY_DEAD_LETTER_URI;
@@ -38,13 +45,6 @@ import static io.kaoto.forage.jdbc.common.DataSourceFactoryConfigEntries.TRANSAC
 import static io.kaoto.forage.jdbc.common.DataSourceFactoryConfigEntries.TRANSACTION_XA_RESOURCE_ORPHAN_FILTERS;
 import static io.kaoto.forage.jdbc.common.DataSourceFactoryConfigEntries.USERNAME;
 import static io.kaoto.forage.jdbc.common.DataSourceFactoryConfigEntries.VALIDATION_TIMEOUT_SECONDS;
-
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.core.util.config.MissingConfigException;
-import io.kaoto.forage.jdbc.common.idempotent.ForageJdbcMessageIdRepository;
-import java.util.Optional;
 
 /**
  * Configuration for data source factory with JDBC connection settings and pool parameters.

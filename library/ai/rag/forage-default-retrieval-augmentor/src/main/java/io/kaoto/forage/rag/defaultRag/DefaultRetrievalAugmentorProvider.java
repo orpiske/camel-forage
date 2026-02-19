@@ -1,11 +1,7 @@
 package io.kaoto.forage.rag.defaultRag;
 
-import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.rag.DefaultRetrievalAugmentor;
-import dev.langchain4j.rag.RetrievalAugmentor;
-import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
-import dev.langchain4j.store.embedding.EmbeddingStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import io.kaoto.forage.core.ai.EmbeddingModelAware;
 import io.kaoto.forage.core.ai.EmbeddingStoreAware;
 import io.kaoto.forage.core.ai.RetrievalAugmentorProvider;
@@ -13,8 +9,12 @@ import io.kaoto.forage.core.annotations.ForageBean;
 import io.kaoto.forage.core.util.config.Config;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigStore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import dev.langchain4j.data.segment.TextSegment;
+import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.rag.DefaultRetrievalAugmentor;
+import dev.langchain4j.rag.RetrievalAugmentor;
+import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
+import dev.langchain4j.store.embedding.EmbeddingStore;
 
 /**
  * This provider creates instance of {@link DefaultRetrievalAugmentorProvider}

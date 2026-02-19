@@ -1,11 +1,11 @@
 package io.kaoto.forage.vectordb.inmemory;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import io.kaoto.forage.core.util.config.ConfigStore;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for faultRetrievalAugmentor focusing on configuration source precedence.

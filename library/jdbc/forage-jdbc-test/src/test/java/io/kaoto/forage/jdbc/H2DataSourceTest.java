@@ -1,10 +1,10 @@
 package io.kaoto.forage.jdbc;
 
-import io.kaoto.forage.core.jdbc.DataSourceProvider;
-import io.kaoto.forage.jdbc.h2.H2Jdbc;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.assertj.core.api.Assertions;
+import io.kaoto.forage.core.jdbc.DataSourceProvider;
+import io.kaoto.forage.jdbc.h2.H2Jdbc;
 
 public class H2DataSourceTest extends DataSourceTest {
 

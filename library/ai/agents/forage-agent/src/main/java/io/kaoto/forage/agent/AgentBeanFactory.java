@@ -1,14 +1,13 @@
 package io.kaoto.forage.agent;
 
-import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.guardrail.InputGuardrail;
-import dev.langchain4j.guardrail.OutputGuardrail;
-import dev.langchain4j.memory.chat.ChatMemoryProvider;
-import dev.langchain4j.memory.chat.MessageWindowChatMemory;
-import dev.langchain4j.model.chat.ChatModel;
-import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.rag.RetrievalAugmentor;
-import dev.langchain4j.store.embedding.EmbeddingStore;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ServiceLoader;
+import java.util.Set;
+import org.apache.camel.CamelContext;
+import org.apache.camel.component.langchain4j.agent.api.Agent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import io.kaoto.forage.agent.factory.ConfigurationAware;
 import io.kaoto.forage.core.ai.ChatMemoryBeanProvider;
 import io.kaoto.forage.core.ai.EmbeddingModelAware;
@@ -25,14 +24,15 @@ import io.kaoto.forage.core.guardrails.InputGuardrailProvider;
 import io.kaoto.forage.core.guardrails.OutputGuardrailProvider;
 import io.kaoto.forage.core.util.config.ConfigHelper;
 import io.kaoto.forage.core.util.config.ConfigStore;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ServiceLoader;
-import java.util.Set;
-import org.apache.camel.CamelContext;
-import org.apache.camel.component.langchain4j.agent.api.Agent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import dev.langchain4j.data.segment.TextSegment;
+import dev.langchain4j.guardrail.InputGuardrail;
+import dev.langchain4j.guardrail.OutputGuardrail;
+import dev.langchain4j.memory.chat.ChatMemoryProvider;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.rag.RetrievalAugmentor;
+import dev.langchain4j.store.embedding.EmbeddingStore;
 
 /**
  * BeanFactory that registers Agent beans into the CamelContext registry.

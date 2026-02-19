@@ -1,10 +1,10 @@
 package io.kaoto.forage.agent.simple;
 
+import java.util.List;
 import dev.langchain4j.data.message.Content;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.service.V;
-import java.util.List;
 
 public interface ForageAgentWithoutMemory {
 

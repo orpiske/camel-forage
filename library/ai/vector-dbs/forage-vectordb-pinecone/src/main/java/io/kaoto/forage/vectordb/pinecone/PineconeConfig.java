@@ -1,5 +1,12 @@
 package io.kaoto.forage.vectordb.pinecone;
 
+import java.util.Optional;
+import org.openapitools.db_control.client.model.DeletionProtection;
+import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.MissingConfigException;
+
 import static io.kaoto.forage.vectordb.pinecone.PineconeConfigEntries.API_KEY;
 import static io.kaoto.forage.vectordb.pinecone.PineconeConfigEntries.CLOUD;
 import static io.kaoto.forage.vectordb.pinecone.PineconeConfigEntries.DELETION_PROTECTION;
@@ -8,13 +15,6 @@ import static io.kaoto.forage.vectordb.pinecone.PineconeConfigEntries.INDEX;
 import static io.kaoto.forage.vectordb.pinecone.PineconeConfigEntries.METADATA_TEXT_KEY;
 import static io.kaoto.forage.vectordb.pinecone.PineconeConfigEntries.NAME_SPACE;
 import static io.kaoto.forage.vectordb.pinecone.PineconeConfigEntries.REGION;
-
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.core.util.config.MissingConfigException;
-import java.util.Optional;
-import org.openapitools.db_control.client.model.DeletionProtection;
 
 public class PineconeConfig implements Config {
 

@@ -1,8 +1,5 @@
 package io.kaoto.forage.jdbc;
 
-import io.kaoto.forage.integration.tests.ForageIntegrationTest;
-import io.kaoto.forage.integration.tests.ForageTestCaseRunner;
-import io.kaoto.forage.integration.tests.IntegrationTestSetupExtension;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -18,16 +15,20 @@ import org.citrusframework.junit.jupiter.CitrusSupport;
 import org.citrusframework.spi.Resource;
 import org.citrusframework.spi.Resources;
 import org.eclipse.microprofile.config.ConfigProvider;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import io.kaoto.forage.integration.tests.ForageIntegrationTest;
+import io.kaoto.forage.integration.tests.ForageTestCaseRunner;
+import io.kaoto.forage.integration.tests.IntegrationTestSetupExtension;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 @CitrusSupport
 @Testcontainers

@@ -1,10 +1,10 @@
 package io.kaoto.forage.policy.flip;
 
+import java.util.Optional;
 import io.kaoto.forage.core.util.config.Config;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigStore;
 import io.kaoto.forage.core.util.config.MissingConfigException;
-import java.util.Optional;
 
 /**
  * Configuration class for the flip route policy.

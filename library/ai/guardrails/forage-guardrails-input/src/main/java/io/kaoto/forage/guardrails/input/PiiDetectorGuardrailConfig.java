@@ -1,15 +1,16 @@
 package io.kaoto.forage.guardrails.input;
 
-import static io.kaoto.forage.guardrails.input.PiiDetectorGuardrailConfigEntries.*;
-
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 import org.apache.camel.component.langchain4j.agent.api.guardrails.PiiDetectorGuardrail.PiiType;
+import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigStore;
+
+import static io.kaoto.forage.guardrails.input.PiiDetectorGuardrailConfigEntries.BLOCK_ON_DETECTION;
+import static io.kaoto.forage.guardrails.input.PiiDetectorGuardrailConfigEntries.DETECT_TYPES;
 
 /**
  * Configuration class for PII detector guardrail.

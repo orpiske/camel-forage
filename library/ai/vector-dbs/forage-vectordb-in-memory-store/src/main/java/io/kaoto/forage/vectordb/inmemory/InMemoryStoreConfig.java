@@ -1,12 +1,14 @@
 package io.kaoto.forage.vectordb.inmemory;
 
-import static io.kaoto.forage.vectordb.inmemory.InMemoryStoreConfigEntries.*;
-
-import dev.langchain4j.store.embedding.EmbeddingStore;
+import java.util.Optional;
 import io.kaoto.forage.core.util.config.Config;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigStore;
-import java.util.Optional;
+import dev.langchain4j.store.embedding.EmbeddingStore;
+
+import static io.kaoto.forage.vectordb.inmemory.InMemoryStoreConfigEntries.FILE_SOURCE;
+import static io.kaoto.forage.vectordb.inmemory.InMemoryStoreConfigEntries.MAX_SIZE;
+import static io.kaoto.forage.vectordb.inmemory.InMemoryStoreConfigEntries.OVERLAP_SIZE;
 
 /**
  * Configuration class for the {@link dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore}.

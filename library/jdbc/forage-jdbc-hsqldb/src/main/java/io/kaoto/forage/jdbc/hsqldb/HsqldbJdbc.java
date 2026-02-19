@@ -1,9 +1,9 @@
 package io.kaoto.forage.jdbc.hsqldb;
 
-import io.kaoto.forage.core.annotations.ForageBean;
-import io.kaoto.forage.jdbc.common.PooledDataSource;
 import org.hsqldb.jdbc.JDBCDriver;
 import org.hsqldb.jdbc.pool.JDBCXADataSource;
+import io.kaoto.forage.core.annotations.ForageBean;
+import io.kaoto.forage.jdbc.common.PooledDataSource;
 
 /**
  * HSQLDB implementation extending PooledJdbc.

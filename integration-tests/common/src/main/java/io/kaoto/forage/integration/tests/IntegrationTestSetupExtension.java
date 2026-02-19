@@ -1,19 +1,20 @@
 package io.kaoto.forage.integration.tests;
 
-import io.kaoto.forage.plugin.ExportHelper;
 import java.util.ArrayList;
 import java.util.Map;
 import org.citrusframework.TestActionBuilder;
 import org.citrusframework.camel.actions.CamelActionBuilder;
 import org.citrusframework.context.TestContext;
 import org.citrusframework.junit.jupiter.CitrusExtensionHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import io.kaoto.forage.plugin.ExportHelper;
+
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * JUnit5 extension, responsible for:

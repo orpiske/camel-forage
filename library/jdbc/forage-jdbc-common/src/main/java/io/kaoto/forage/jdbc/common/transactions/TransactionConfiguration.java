@@ -1,5 +1,11 @@
 package io.kaoto.forage.jdbc.common.transactions;
 
+import java.util.Arrays;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import io.agroal.narayana.LocalXAResource;
+import io.kaoto.forage.jdbc.common.DataSourceFactoryConfig;
 import com.arjuna.ats.arjuna.common.CoordinatorEnvironmentBean;
 import com.arjuna.ats.arjuna.common.CoreEnvironmentBean;
 import com.arjuna.ats.arjuna.common.CoreEnvironmentBeanException;
@@ -7,12 +13,6 @@ import com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean;
 import com.arjuna.ats.arjuna.common.RecoveryEnvironmentBean;
 import com.arjuna.ats.jta.common.JTAEnvironmentBean;
 import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
-import io.agroal.narayana.LocalXAResource;
-import io.kaoto.forage.jdbc.common.DataSourceFactoryConfig;
-import java.util.Arrays;
-import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class TransactionConfiguration {
 

@@ -199,8 +199,16 @@
                             <palantirJavaFormat>
                                 <version>${palantir-format.version}</version>
                             </palantirJavaFormat>
-                            <removeUnusedImports/>
-                            <formatAnnotations/>
+                            <removeUnusedImports />
+                            <formatAnnotations />
+                            <forbidWildcardImports />
+                            <excludes>
+                                <exclude>**/*.properties</exclude>
+                            </excludes>
+                            <importOrder>
+                                <wildcardsLast>true</wildcardsLast>
+                                <order>jakarta|javax,org.w3c|org.xml,java|org|io|,,\#,org.junit|org.mockito|\#org.assertj|\#org.junit|\#org.mockito</order>
+                            </importOrder>
                         </java>
                     </configuration>
                     <executions>

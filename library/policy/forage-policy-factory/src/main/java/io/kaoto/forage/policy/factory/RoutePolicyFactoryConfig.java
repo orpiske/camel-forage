@@ -1,9 +1,9 @@
 package io.kaoto.forage.policy.factory;
 
+import java.util.Optional;
 import io.kaoto.forage.core.util.config.Config;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigStore;
-import java.util.Optional;
 
 /**
  * Configuration class for the route policy factory.

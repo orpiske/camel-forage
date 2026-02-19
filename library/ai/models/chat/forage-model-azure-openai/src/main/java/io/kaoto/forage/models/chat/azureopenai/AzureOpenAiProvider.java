@@ -1,13 +1,13 @@
 package io.kaoto.forage.models.chat.azureopenai;
 
-import static java.time.Duration.ofSeconds;
-
-import dev.langchain4j.model.azure.AzureOpenAiChatModel;
-import dev.langchain4j.model.chat.ChatModel;
-import io.kaoto.forage.core.ai.ModelProvider;
-import io.kaoto.forage.core.annotations.ForageBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.kaoto.forage.core.ai.ModelProvider;
+import io.kaoto.forage.core.annotations.ForageBean;
+import dev.langchain4j.model.azure.AzureOpenAiChatModel;
+import dev.langchain4j.model.chat.ChatModel;
+
+import static java.time.Duration.ofSeconds;
 
 /**
  * Provider for creating Azure OpenAI chat models

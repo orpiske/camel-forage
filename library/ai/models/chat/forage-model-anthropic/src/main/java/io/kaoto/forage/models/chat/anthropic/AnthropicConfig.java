@@ -1,5 +1,13 @@
 package io.kaoto.forage.models.chat.anthropic;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.MissingConfigException;
+
 import static io.kaoto.forage.models.chat.anthropic.AnthropicConfigEntries.API_KEY;
 import static io.kaoto.forage.models.chat.anthropic.AnthropicConfigEntries.LOG_REQUESTS_AND_RESPONSES;
 import static io.kaoto.forage.models.chat.anthropic.AnthropicConfigEntries.MAX_RETRIES;
@@ -10,14 +18,6 @@ import static io.kaoto.forage.models.chat.anthropic.AnthropicConfigEntries.TEMPE
 import static io.kaoto.forage.models.chat.anthropic.AnthropicConfigEntries.TIMEOUT;
 import static io.kaoto.forage.models.chat.anthropic.AnthropicConfigEntries.TOP_K;
 import static io.kaoto.forage.models.chat.anthropic.AnthropicConfigEntries.TOP_P;
-
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.core.util.config.MissingConfigException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Configuration class for Anthropic Claude integration in the Forage framework.

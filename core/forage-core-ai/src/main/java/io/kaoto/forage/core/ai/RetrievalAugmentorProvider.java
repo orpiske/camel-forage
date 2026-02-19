@@ -1,7 +1,7 @@
 package io.kaoto.forage.core.ai;
 
-import dev.langchain4j.rag.RetrievalAugmentor;
 import io.kaoto.forage.core.common.BeanProvider;
+import dev.langchain4j.rag.RetrievalAugmentor;
 
 /**
  * Provider interface for creating RetrievalAugmentor

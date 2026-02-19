@@ -1,14 +1,15 @@
 package io.kaoto.forage.memory.chat.tck;
 
-import io.kaoto.forage.core.ai.ChatMemoryBeanProvider;
-import io.kaoto.forage.memory.chat.infinispan.InfinispanMemoryBeanProvider;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import io.kaoto.forage.core.ai.ChatMemoryBeanProvider;
+import io.kaoto.forage.memory.chat.infinispan.InfinispanMemoryBeanProvider;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test for InfinispanMemoryFactory using the ChatMemoryFactoryTCK with testcontainers.

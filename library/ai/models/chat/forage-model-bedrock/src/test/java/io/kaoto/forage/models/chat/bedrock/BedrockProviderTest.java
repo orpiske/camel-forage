@@ -1,12 +1,12 @@
 package io.kaoto.forage.models.chat.bedrock;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import dev.langchain4j.model.chat.ChatModel;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Integration tests for BedrockProvider.

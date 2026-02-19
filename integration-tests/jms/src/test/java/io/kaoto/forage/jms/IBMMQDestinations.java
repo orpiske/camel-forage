@@ -1,14 +1,14 @@
 package io.kaoto.forage.jms;
 
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Set;
 import com.ibm.mq.MQException;
 import com.ibm.mq.MQQueueManager;
 import com.ibm.mq.constants.MQConstants;
 import com.ibm.mq.headers.MQDataException;
 import com.ibm.mq.headers.pcf.PCFMessage;
 import com.ibm.mq.headers.pcf.PCFMessageAgent;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Set;
 
 /**
  * IBM MQ queries have to be created before starting the routes.

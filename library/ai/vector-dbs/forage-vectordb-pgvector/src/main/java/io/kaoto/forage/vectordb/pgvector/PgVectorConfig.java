@@ -1,5 +1,13 @@
 package io.kaoto.forage.vectordb.pgvector;
 
+import java.util.Optional;
+import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.MissingConfigException;
+import dev.langchain4j.store.embedding.pgvector.DefaultMetadataStorageConfig;
+import dev.langchain4j.store.embedding.pgvector.MetadataStorageConfig;
+
 import static io.kaoto.forage.vectordb.pgvector.PgVectorConfigEntries.CREATE_TABLE;
 import static io.kaoto.forage.vectordb.pgvector.PgVectorConfigEntries.DATABASE;
 import static io.kaoto.forage.vectordb.pgvector.PgVectorConfigEntries.DIMENSION;
@@ -11,14 +19,6 @@ import static io.kaoto.forage.vectordb.pgvector.PgVectorConfigEntries.PORT;
 import static io.kaoto.forage.vectordb.pgvector.PgVectorConfigEntries.TABLE;
 import static io.kaoto.forage.vectordb.pgvector.PgVectorConfigEntries.USER;
 import static io.kaoto.forage.vectordb.pgvector.PgVectorConfigEntries.USE_INDEX;
-
-import dev.langchain4j.store.embedding.pgvector.DefaultMetadataStorageConfig;
-import dev.langchain4j.store.embedding.pgvector.MetadataStorageConfig;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.core.util.config.MissingConfigException;
-import java.util.Optional;
 
 public class PgVectorConfig implements Config {
 

@@ -1,9 +1,9 @@
 package io.kaoto.forage.jdbc.h2;
 
-import io.kaoto.forage.core.annotations.ForageBean;
-import io.kaoto.forage.jdbc.common.PooledDataSource;
 import org.h2.Driver;
 import org.h2.jdbcx.JdbcDataSource;
+import io.kaoto.forage.core.annotations.ForageBean;
+import io.kaoto.forage.jdbc.common.PooledDataSource;
 
 /**
  * H2 Database implementation extending PooledJdbc.

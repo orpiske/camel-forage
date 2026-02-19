@@ -1,7 +1,5 @@
 package io.kaoto.forage.policy.schedule;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -9,11 +7,13 @@ import java.util.EnumSet;
 import java.util.Set;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Unit tests for ForageScheduleRoutePolicy.

@@ -1,10 +1,9 @@
 package io.kaoto.forage.models.chat.bedrock;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for BedrockConfig focusing on named/prefixed configuration support.

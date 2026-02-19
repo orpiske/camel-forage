@@ -1,5 +1,14 @@
 package io.kaoto.forage.vectordb.weaviate;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
+import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.MissingConfigException;
+
 import static io.kaoto.forage.vectordb.weaviate.WeaviateConfigEntries.API_KEY;
 import static io.kaoto.forage.vectordb.weaviate.WeaviateConfigEntries.AVOID_DUPS;
 import static io.kaoto.forage.vectordb.weaviate.WeaviateConfigEntries.CONSISTENCY_LEVEL;
@@ -13,15 +22,6 @@ import static io.kaoto.forage.vectordb.weaviate.WeaviateConfigEntries.SCHEME;
 import static io.kaoto.forage.vectordb.weaviate.WeaviateConfigEntries.SECURED_GRPC;
 import static io.kaoto.forage.vectordb.weaviate.WeaviateConfigEntries.TEXT_FIELD_NAME;
 import static io.kaoto.forage.vectordb.weaviate.WeaviateConfigEntries.USE_GRPC_FOR_INSERTS;
-
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.core.util.config.MissingConfigException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
 
 public class WeaviateConfig implements Config {
 

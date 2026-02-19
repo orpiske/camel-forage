@@ -1,5 +1,13 @@
 package io.kaoto.forage.memory.chat.infinispan;
 
+import java.util.Optional;
+import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigStore;
+
 import static io.kaoto.forage.memory.chat.infinispan.InfinispanConfigEntries.CACHE_NAME;
 import static io.kaoto.forage.memory.chat.infinispan.InfinispanConfigEntries.CONNECTION_TIMEOUT;
 import static io.kaoto.forage.memory.chat.infinispan.InfinispanConfigEntries.MAX_RETRIES;
@@ -12,14 +20,6 @@ import static io.kaoto.forage.memory.chat.infinispan.InfinispanConfigEntries.SAS
 import static io.kaoto.forage.memory.chat.infinispan.InfinispanConfigEntries.SERVER_LIST;
 import static io.kaoto.forage.memory.chat.infinispan.InfinispanConfigEntries.SOCKET_TIMEOUT;
 import static io.kaoto.forage.memory.chat.infinispan.InfinispanConfigEntries.USERNAME;
-
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import java.util.Optional;
-import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Configuration class for Infinispan-based chat memory storage in the Forage framework.

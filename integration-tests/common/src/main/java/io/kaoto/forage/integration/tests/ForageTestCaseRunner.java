@@ -1,6 +1,5 @@
 package io.kaoto.forage.integration.tests;
 
-import io.kaoto.forage.plugin.ExportHelper;
 import org.citrusframework.DefaultTestCaseRunner;
 import org.citrusframework.GherkinTestActionRunner;
 import org.citrusframework.TestAction;
@@ -10,6 +9,7 @@ import org.citrusframework.actions.camel.CamelIntegrationRunCustomizedActionBuil
 import org.citrusframework.context.TestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.kaoto.forage.plugin.ExportHelper;
 
 /**
  * Custom test case runner takes care of the quarkus version used by citrus framework

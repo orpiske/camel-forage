@@ -1,15 +1,15 @@
 package io.kaoto.forage.models.chat.ollama;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import io.kaoto.forage.core.util.config.ConfigEntry;
-import io.kaoto.forage.core.util.config.ConfigModule;
 import java.util.Map;
 import java.util.Optional;
+import io.kaoto.forage.core.util.config.ConfigEntry;
+import io.kaoto.forage.core.util.config.ConfigModule;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests for OllamaConfigEntries focusing on the ConfigEntries pattern implementation.

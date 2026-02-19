@@ -1,14 +1,14 @@
 package io.kaoto.forage.models.embeddings.ollama;
 
-import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.model.ollama.OllamaChatModel;
-import dev.langchain4j.model.ollama.OllamaEmbeddingModel;
-import io.kaoto.forage.core.ai.EmbeddingModelProvider;
-import io.kaoto.forage.core.ai.ModelProvider;
-import io.kaoto.forage.core.annotations.ForageBean;
 import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.kaoto.forage.core.ai.EmbeddingModelProvider;
+import io.kaoto.forage.core.ai.ModelProvider;
+import io.kaoto.forage.core.annotations.ForageBean;
+import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.ollama.OllamaChatModel;
+import dev.langchain4j.model.ollama.OllamaEmbeddingModel;
 
 /**
  * Provider for creating Ollama embedding models with configurable parameters.

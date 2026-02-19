@@ -1,8 +1,5 @@
 package io.kaoto.forage.policy.factory;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import io.kaoto.forage.core.policy.RoutePolicyProvider;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,11 +9,14 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.spi.RoutePolicy;
 import org.apache.camel.support.RoutePolicySupport;
+import io.kaoto.forage.core.policy.RoutePolicyProvider;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Unit tests for DefaultCamelForageRoutePolicyFactory.

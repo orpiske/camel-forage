@@ -1,13 +1,13 @@
 package io.kaoto.forage.models.embeddings.ollama;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import io.kaoto.forage.core.util.config.ConfigStore;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import io.kaoto.forage.core.util.config.ConfigStore;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for OllamaConfig focusing on configuration source precedence.

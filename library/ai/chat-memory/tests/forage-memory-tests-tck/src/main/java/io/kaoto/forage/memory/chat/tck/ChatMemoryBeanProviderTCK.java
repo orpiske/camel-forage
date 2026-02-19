@@ -1,16 +1,16 @@
 package io.kaoto.forage.memory.chat.tck;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-
+import java.util.List;
+import io.kaoto.forage.core.ai.ChatMemoryBeanProvider;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
-import io.kaoto.forage.core.ai.ChatMemoryBeanProvider;
-import java.util.List;
+
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 /**
  * Technology Compatibility Kit (TCK) for testing ChatMemoryFactory implementations.

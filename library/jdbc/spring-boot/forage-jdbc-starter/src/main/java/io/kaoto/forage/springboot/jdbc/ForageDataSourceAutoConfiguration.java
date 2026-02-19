@@ -1,5 +1,21 @@
 package io.kaoto.forage.springboot.jdbc;
 
+import jakarta.annotation.PostConstruct;
+import javax.sql.DataSource;
+
+import java.util.List;
+import java.util.ServiceLoader;
+import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import io.agroal.api.AgroalDataSource;
 import io.agroal.springframework.boot.AgroalDataSourceAutoConfiguration;
 import io.kaoto.forage.core.annotations.FactoryType;
@@ -21,21 +37,6 @@ import io.kaoto.forage.jdbc.common.ForageDataSource;
 import io.kaoto.forage.jdbc.common.aggregation.ForageAggregationRepository;
 import io.kaoto.forage.jdbc.common.idempotent.ForageIdRepository;
 import io.kaoto.forage.jdbc.common.idempotent.ForageJdbcMessageIdRepository;
-import jakarta.annotation.PostConstruct;
-import java.util.List;
-import java.util.ServiceLoader;
-import java.util.Set;
-import javax.sql.DataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * Auto-configuration for Forage DataSource creation using ServiceLoader discovery.

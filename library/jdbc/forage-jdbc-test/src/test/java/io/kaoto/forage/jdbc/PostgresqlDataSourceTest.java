@@ -1,7 +1,5 @@
 package io.kaoto.forage.jdbc;
 
-import io.kaoto.forage.core.jdbc.DataSourceProvider;
-import io.kaoto.forage.jdbc.postgresql.PostgresqlJdbc;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.assertj.core.api.Assertions;
@@ -9,6 +7,8 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import io.kaoto.forage.core.jdbc.DataSourceProvider;
+import io.kaoto.forage.jdbc.postgresql.PostgresqlJdbc;
 
 @Testcontainers(disabledWithoutDocker = true)
 public class PostgresqlDataSourceTest extends DataSourceTest {

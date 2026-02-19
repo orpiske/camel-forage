@@ -1,9 +1,9 @@
 package io.kaoto.forage.agent.factory;
 
-import io.kaoto.forage.core.exceptions.UndefinedAgentException;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.kaoto.forage.core.exceptions.UndefinedAgentException;
 
 /**
  * Helper class for creating the appropriate agent selector implementation based on string identifiers.

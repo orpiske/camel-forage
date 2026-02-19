@@ -1,14 +1,14 @@
 package io.kaoto.forage.policy.flip;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Unit tests for ForageFlipRoutePolicy.

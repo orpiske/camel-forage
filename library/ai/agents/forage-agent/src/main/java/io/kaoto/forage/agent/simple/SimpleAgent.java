@@ -1,18 +1,18 @@
 package io.kaoto.forage.agent.simple;
 
-import dev.langchain4j.data.message.Content;
-import dev.langchain4j.guardrail.InputGuardrail;
-import dev.langchain4j.guardrail.OutputGuardrail;
-import dev.langchain4j.service.AiServices;
-import dev.langchain4j.service.tool.ToolProvider;
-import io.kaoto.forage.agent.ForageAgentConfiguration;
-import io.kaoto.forage.agent.factory.ConfigurationAware;
 import java.util.List;
 import org.apache.camel.component.langchain4j.agent.api.Agent;
 import org.apache.camel.component.langchain4j.agent.api.AgentConfiguration;
 import org.apache.camel.component.langchain4j.agent.api.AiAgentBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.kaoto.forage.agent.ForageAgentConfiguration;
+import io.kaoto.forage.agent.factory.ConfigurationAware;
+import dev.langchain4j.data.message.Content;
+import dev.langchain4j.guardrail.InputGuardrail;
+import dev.langchain4j.guardrail.OutputGuardrail;
+import dev.langchain4j.service.AiServices;
+import dev.langchain4j.service.tool.ToolProvider;
 
 /**
  * Simple implementation of an AI agent that provides basic chat functionality

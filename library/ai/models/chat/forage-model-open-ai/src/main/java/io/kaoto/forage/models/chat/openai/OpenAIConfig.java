@@ -1,5 +1,12 @@
 package io.kaoto.forage.models.chat.openai;
 
+import java.time.Duration;
+import java.util.Optional;
+import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.MissingConfigException;
+
 import static io.kaoto.forage.models.chat.openai.OpenAIConfigEntries.API_KEY;
 import static io.kaoto.forage.models.chat.openai.OpenAIConfigEntries.BASE_URL;
 import static io.kaoto.forage.models.chat.openai.OpenAIConfigEntries.FREQUENCY_PENALTY;
@@ -12,13 +19,6 @@ import static io.kaoto.forage.models.chat.openai.OpenAIConfigEntries.PRESENCE_PE
 import static io.kaoto.forage.models.chat.openai.OpenAIConfigEntries.TEMPERATURE;
 import static io.kaoto.forage.models.chat.openai.OpenAIConfigEntries.TIMEOUT;
 import static io.kaoto.forage.models.chat.openai.OpenAIConfigEntries.TOP_P;
-
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.core.util.config.MissingConfigException;
-import java.time.Duration;
-import java.util.Optional;
 
 /**
  * Configuration class for OpenAI model integration in the Forage framework.

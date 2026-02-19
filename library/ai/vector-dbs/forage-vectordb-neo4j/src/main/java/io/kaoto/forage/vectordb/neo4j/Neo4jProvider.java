@@ -1,12 +1,12 @@
 package io.kaoto.forage.vectordb.neo4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import io.kaoto.forage.core.ai.EmbeddingStoreProvider;
+import io.kaoto.forage.core.annotations.ForageBean;
 import dev.langchain4j.community.store.embedding.neo4j.Neo4jEmbeddingStore;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
-import io.kaoto.forage.core.ai.EmbeddingStoreProvider;
-import io.kaoto.forage.core.annotations.ForageBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Provider for creating Neo4j embedding stores with configurable parameters.

@@ -1,16 +1,16 @@
 package io.kaoto.forage.models.chat.bedrock;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import dev.langchain4j.model.chat.ChatModel;
-import io.kaoto.forage.core.ai.ModelProvider;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.stream.StreamSupport;
+import io.kaoto.forage.core.ai.ModelProvider;
+import dev.langchain4j.model.chat.ChatModel;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for BedrockProvider focusing on ServiceLoader discovery mechanisms.

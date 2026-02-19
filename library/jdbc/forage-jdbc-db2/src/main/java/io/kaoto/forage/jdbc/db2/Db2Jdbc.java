@@ -1,9 +1,9 @@
 package io.kaoto.forage.jdbc.db2;
 
-import com.ibm.db2.jcc.DB2Driver;
-import com.ibm.db2.jcc.DB2XADataSource;
 import io.kaoto.forage.core.annotations.ForageBean;
 import io.kaoto.forage.jdbc.common.PooledDataSource;
+import com.ibm.db2.jcc.DB2Driver;
+import com.ibm.db2.jcc.DB2XADataSource;
 
 /**
  * IBM DB2 implementation extending PooledJdbc.

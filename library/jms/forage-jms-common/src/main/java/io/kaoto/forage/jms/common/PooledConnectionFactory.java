@@ -1,12 +1,13 @@
 package io.kaoto.forage.jms.common;
 
-import io.kaoto.forage.core.jms.ConnectionFactoryProvider;
-import io.kaoto.forage.jms.common.transactions.TransactionConfiguration;
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.XAConnectionFactory;
+
 import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.kaoto.forage.core.jms.ConnectionFactoryProvider;
+import io.kaoto.forage.jms.common.transactions.TransactionConfiguration;
 
 /**
  * Abstract base class for pooled JMS implementations using pooled-jms connection pooling.

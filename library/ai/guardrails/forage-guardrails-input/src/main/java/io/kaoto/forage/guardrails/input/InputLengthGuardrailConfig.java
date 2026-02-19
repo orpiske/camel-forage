@@ -1,11 +1,12 @@
 package io.kaoto.forage.guardrails.input;
 
-import static io.kaoto.forage.guardrails.input.InputLengthGuardrailConfigEntries.*;
-
+import java.util.Optional;
 import io.kaoto.forage.core.util.config.Config;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigStore;
-import java.util.Optional;
+
+import static io.kaoto.forage.guardrails.input.InputLengthGuardrailConfigEntries.MAX_CHARS;
+import static io.kaoto.forage.guardrails.input.InputLengthGuardrailConfigEntries.MIN_CHARS;
 
 /**
  * Configuration class for input length guardrail.

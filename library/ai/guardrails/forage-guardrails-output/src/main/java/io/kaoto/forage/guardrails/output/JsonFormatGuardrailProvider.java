@@ -1,12 +1,12 @@
 package io.kaoto.forage.guardrails.output;
 
-import dev.langchain4j.guardrail.OutputGuardrail;
-import io.kaoto.forage.core.annotations.ForageBean;
-import io.kaoto.forage.core.guardrails.OutputGuardrailProvider;
 import java.util.Arrays;
 import org.apache.camel.component.langchain4j.agent.api.guardrails.JsonFormatGuardrail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.kaoto.forage.core.annotations.ForageBean;
+import io.kaoto.forage.core.guardrails.OutputGuardrailProvider;
+import dev.langchain4j.guardrail.OutputGuardrail;
 
 /**
  * Provider for creating JsonFormatGuardrail instances.

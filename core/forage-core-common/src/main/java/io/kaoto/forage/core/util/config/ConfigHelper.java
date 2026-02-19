@@ -1,7 +1,5 @@
 package io.kaoto.forage.core.util.config;
 
-import io.kaoto.forage.core.common.RuntimeType;
-import io.smallrye.config.SmallRyeConfig;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
@@ -12,6 +10,8 @@ import java.util.Optional;
 import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.kaoto.forage.core.common.RuntimeType;
+import io.smallrye.config.SmallRyeConfig;
 
 /**
  * Utility class for configuration value processing and transformation in the Forage framework.

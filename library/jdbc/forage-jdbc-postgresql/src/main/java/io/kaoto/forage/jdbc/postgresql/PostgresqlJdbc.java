@@ -1,9 +1,9 @@
 package io.kaoto.forage.jdbc.postgresql;
 
-import io.kaoto.forage.core.annotations.ForageBean;
-import io.kaoto.forage.jdbc.common.PooledDataSource;
 import org.postgresql.Driver;
 import org.postgresql.xa.PGXADataSource;
+import io.kaoto.forage.core.annotations.ForageBean;
+import io.kaoto.forage.jdbc.common.PooledDataSource;
 
 /**
  * PostgreSQL implementation extending PooledJdbc.

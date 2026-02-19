@@ -1,14 +1,16 @@
 package io.kaoto.forage.guardrails.input;
 
-import static io.kaoto.forage.guardrails.input.KeywordFilterGuardrailConfigEntries.*;
-
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigStore;
+
+import static io.kaoto.forage.guardrails.input.KeywordFilterGuardrailConfigEntries.BLOCKED_WORDS;
+import static io.kaoto.forage.guardrails.input.KeywordFilterGuardrailConfigEntries.CASE_SENSITIVE;
+import static io.kaoto.forage.guardrails.input.KeywordFilterGuardrailConfigEntries.WHOLE_WORD_MATCH;
 
 /**
  * Configuration class for keyword filter guardrail.
