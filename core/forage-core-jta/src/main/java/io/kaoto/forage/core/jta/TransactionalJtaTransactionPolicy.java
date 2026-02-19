@@ -14,7 +14,7 @@ public abstract class TransactionalJtaTransactionPolicy extends JtaTransactionPo
 
     private static final Logger LOG = LoggerFactory.getLogger(TransactionalJtaTransactionPolicy.class);
 
-    private jakarta.transaction.TransactionManager transactionManager =
+    private final jakarta.transaction.TransactionManager transactionManager =
             com.arjuna.ats.jta.TransactionManager.transactionManager();
 
     protected void runWithTransaction(final Runnable runnable, final boolean isNew) throws Throwable {

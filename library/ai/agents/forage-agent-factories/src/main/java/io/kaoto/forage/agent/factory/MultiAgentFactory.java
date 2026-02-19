@@ -32,7 +32,7 @@ public class MultiAgentFactory implements AgentFactory {
 
     private record AgentPair(AgentFactoryConfig agentFactoryConfig, Agent agent) {}
 
-    private Map<String, AgentPair> agents = new ConcurrentHashMap<>();
+    private final Map<String, AgentPair> agents = new ConcurrentHashMap<>();
 
     public MultiAgentFactory() {
         LOG.trace("Creating MultiAgentFactory");
