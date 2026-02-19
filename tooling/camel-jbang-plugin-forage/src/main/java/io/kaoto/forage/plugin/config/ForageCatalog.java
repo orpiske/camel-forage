@@ -360,10 +360,7 @@ public final class ForageCatalog {
      */
     public Optional<String> findFactoryTypeKeyForPropertyPrefix(String propertyPrefix) {
         Optional<String> beanNameOpt = findBeanNameForPropertyPrefix(propertyPrefix);
-        if (beanNameOpt.isPresent()) {
-            return findFactoryTypeKeyForBeanName(beanNameOpt.get());
-        }
-        return Optional.empty();
+        return beanNameOpt.flatMap(this::findFactoryTypeKeyForBeanName);
     }
 
     /**
