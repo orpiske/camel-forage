@@ -39,7 +39,6 @@ public class SimpleAgent implements Agent, ConfigurationAware {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public String chat(AiAgentBody<?> aiAgentBody, ToolProvider toolProvider) {
         LOG.debug("Chatting using ForageAgent");
 
