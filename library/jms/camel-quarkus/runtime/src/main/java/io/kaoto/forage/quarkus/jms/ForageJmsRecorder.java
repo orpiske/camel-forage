@@ -1,10 +1,11 @@
 package io.kaoto.forage.quarkus.jms;
 
+import jakarta.jms.ConnectionFactory;
+
+import org.jboss.logging.Logger;
 import io.kaoto.forage.jms.ibmmq.IbmMqJms;
 import io.quarkus.runtime.RuntimeValue;
 import io.quarkus.runtime.annotations.Recorder;
-import jakarta.jms.ConnectionFactory;
-import org.jboss.logging.Logger;
 
 /**
  * Aggregation repository is created via Recorder

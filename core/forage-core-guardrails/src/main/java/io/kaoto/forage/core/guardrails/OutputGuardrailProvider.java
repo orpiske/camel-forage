@@ -1,7 +1,7 @@
 package io.kaoto.forage.core.guardrails;
 
-import dev.langchain4j.guardrail.OutputGuardrail;
 import io.kaoto.forage.core.common.BeanProvider;
+import dev.langchain4j.guardrail.OutputGuardrail;
 
 /**
  * Provider interface for creating output guardrails.

@@ -1,17 +1,18 @@
 package io.kaoto.forage.jdbc;
 
-import io.kaoto.forage.core.jdbc.DataSourceProvider;
-import io.kaoto.forage.jdbc.oracle.OracleJdbc;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import io.kaoto.forage.core.jdbc.DataSourceProvider;
+import io.kaoto.forage.jdbc.oracle.OracleJdbc;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 
 @Testcontainers(disabledWithoutDocker = true)
 @DisabledIfSystemProperty(named = "ci.env.name", matches = ".*", disabledReason = "Slow or flaky on GitHub action")

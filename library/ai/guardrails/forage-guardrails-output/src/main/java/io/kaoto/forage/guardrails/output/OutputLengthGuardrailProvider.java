@@ -1,11 +1,11 @@
 package io.kaoto.forage.guardrails.output;
 
-import dev.langchain4j.guardrail.OutputGuardrail;
-import io.kaoto.forage.core.annotations.ForageBean;
-import io.kaoto.forage.core.guardrails.OutputGuardrailProvider;
 import org.apache.camel.component.langchain4j.agent.api.guardrails.OutputLengthGuardrail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.kaoto.forage.core.annotations.ForageBean;
+import io.kaoto.forage.core.guardrails.OutputGuardrailProvider;
+import dev.langchain4j.guardrail.OutputGuardrail;
 
 /**
  * Provider for creating OutputLengthGuardrail instances.

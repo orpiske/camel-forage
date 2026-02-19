@@ -1,8 +1,8 @@
 package io.kaoto.forage.integration.tests.suites;
 
+import org.slf4j.Logger;
 import io.kaoto.forage.integration.tests.IntegrationTestSetupExtension;
 import io.kaoto.forage.plugin.ExportHelper;
-import org.slf4j.Logger;
 
 /**
  * Helper class for Suites.

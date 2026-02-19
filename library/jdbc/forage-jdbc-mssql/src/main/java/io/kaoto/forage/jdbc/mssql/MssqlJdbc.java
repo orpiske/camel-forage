@@ -1,9 +1,9 @@
 package io.kaoto.forage.jdbc.mssql;
 
-import com.microsoft.sqlserver.jdbc.SQLServerDriver;
-import com.microsoft.sqlserver.jdbc.SQLServerXADataSource;
 import io.kaoto.forage.core.annotations.ForageBean;
 import io.kaoto.forage.jdbc.common.PooledDataSource;
+import com.microsoft.sqlserver.jdbc.SQLServerDriver;
+import com.microsoft.sqlserver.jdbc.SQLServerXADataSource;
 
 /**
  * Microsoft SQL Server implementation extending PooledJdbc.

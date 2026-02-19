@@ -1,11 +1,13 @@
 package io.kaoto.forage.guardrails.output;
 
-import static io.kaoto.forage.guardrails.output.OutputLengthGuardrailConfigEntries.*;
-
+import java.util.Optional;
 import io.kaoto.forage.core.util.config.Config;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigStore;
-import java.util.Optional;
+
+import static io.kaoto.forage.guardrails.output.OutputLengthGuardrailConfigEntries.MAX_CHARS;
+import static io.kaoto.forage.guardrails.output.OutputLengthGuardrailConfigEntries.MIN_CHARS;
+import static io.kaoto.forage.guardrails.output.OutputLengthGuardrailConfigEntries.TRUNCATE_ON_OVERFLOW;
 
 /**
  * Configuration class for output length guardrail.

@@ -1,7 +1,7 @@
 package io.kaoto.forage.core.cloud;
 
-import com.azure.messaging.eventhubs.EventHubProducerAsyncClient;
 import io.kaoto.forage.core.common.BeanProvider;
+import com.azure.messaging.eventhubs.EventHubProducerAsyncClient;
 
 public interface EventHubProducerProvider extends BeanProvider<EventHubProducerAsyncClient> {
 

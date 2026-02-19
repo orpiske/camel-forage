@@ -1,10 +1,10 @@
 package io.kaoto.forage.vectordb.milvus;
 
-import dev.langchain4j.store.embedding.milvus.MilvusEmbeddingStore;
-import io.kaoto.forage.core.ai.EmbeddingStoreProvider;
-import io.kaoto.forage.core.annotations.ForageBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.kaoto.forage.core.ai.EmbeddingStoreProvider;
+import io.kaoto.forage.core.annotations.ForageBean;
+import dev.langchain4j.store.embedding.milvus.MilvusEmbeddingStore;
 
 /**
  * Provider for creating Milvus embedding stores within the Camel Forage framework.

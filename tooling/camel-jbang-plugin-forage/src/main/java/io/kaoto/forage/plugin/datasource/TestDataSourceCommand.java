@@ -1,11 +1,7 @@
 package io.kaoto.forage.plugin.datasource;
 
-import io.kaoto.forage.core.jdbc.DataSourceProvider;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.jdbc.common.DataSourceFactoryConfig;
-import io.kaoto.forage.jdbc.common.DataSourceFactoryConfigEntries;
-import io.kaoto.forage.plugin.result.ConnectionTestResult;
+import javax.sql.DataSource;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -17,7 +13,6 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import javax.sql.DataSource;
 import org.apache.camel.dsl.jbang.core.commands.CamelCommand;
 import org.apache.camel.dsl.jbang.core.commands.CamelJBangMain;
 import org.apache.camel.main.download.DependencyDownloaderClassLoader;
@@ -27,6 +22,12 @@ import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
+import io.kaoto.forage.core.jdbc.DataSourceProvider;
+import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.jdbc.common.DataSourceFactoryConfig;
+import io.kaoto.forage.jdbc.common.DataSourceFactoryConfigEntries;
+import io.kaoto.forage.plugin.result.ConnectionTestResult;
 import picocli.CommandLine;
 
 /**

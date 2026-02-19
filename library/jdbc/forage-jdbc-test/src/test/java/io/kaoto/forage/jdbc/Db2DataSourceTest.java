@@ -1,20 +1,21 @@
 package io.kaoto.forage.jdbc;
 
-import io.kaoto.forage.core.jdbc.DataSourceProvider;
-import io.kaoto.forage.jdbc.db2.Db2Jdbc;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
-import org.junit.jupiter.api.condition.DisabledOnOs;
-import org.junit.jupiter.api.condition.OS;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import io.kaoto.forage.core.jdbc.DataSourceProvider;
+import io.kaoto.forage.jdbc.db2.Db2Jdbc;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 @Testcontainers(disabledWithoutDocker = true)
 @DisabledOnOs(OS.MAC) // The test is really slow on mac

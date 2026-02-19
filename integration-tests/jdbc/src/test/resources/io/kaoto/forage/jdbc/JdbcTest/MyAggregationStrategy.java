@@ -1,12 +1,11 @@
 package io.kaoto.forage.jdbc.test;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.camel.AggregationStrategy;
 import org.apache.camel.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Custom Aggregation Strategy that collects exchange bodies into a List.

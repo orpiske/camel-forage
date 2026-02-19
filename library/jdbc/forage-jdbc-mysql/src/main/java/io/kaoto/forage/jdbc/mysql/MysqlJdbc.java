@@ -1,9 +1,9 @@
 package io.kaoto.forage.jdbc.mysql;
 
-import com.mysql.cj.jdbc.Driver;
-import com.mysql.cj.jdbc.MysqlXADataSource;
 import io.kaoto.forage.core.annotations.ForageBean;
 import io.kaoto.forage.jdbc.common.PooledDataSource;
+import com.mysql.cj.jdbc.Driver;
+import com.mysql.cj.jdbc.MysqlXADataSource;
 
 /**
  * MySQL implementation extending PooledJdbc.

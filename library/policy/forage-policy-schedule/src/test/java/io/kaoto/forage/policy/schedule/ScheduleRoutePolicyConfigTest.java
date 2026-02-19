@@ -1,15 +1,15 @@
 package io.kaoto.forage.policy.schedule;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.EnumSet;
 import java.util.Set;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Unit tests for ScheduleRoutePolicyConfig.

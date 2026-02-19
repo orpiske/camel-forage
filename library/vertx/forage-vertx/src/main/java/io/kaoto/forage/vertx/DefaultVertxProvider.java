@@ -1,14 +1,14 @@
 package io.kaoto.forage.vertx;
 
-import io.kaoto.forage.core.annotations.ForageBean;
-import io.kaoto.forage.core.vertx.VertxProvider;
-import io.vertx.core.Vertx;
-import io.vertx.core.VertxOptions;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.kaoto.forage.core.annotations.ForageBean;
+import io.kaoto.forage.core.vertx.VertxProvider;
+import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
 
 /**
  * Provider for creating Vert.x instances with configurable parameters.

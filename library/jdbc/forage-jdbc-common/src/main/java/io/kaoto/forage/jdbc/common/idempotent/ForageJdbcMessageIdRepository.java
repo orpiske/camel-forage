@@ -1,11 +1,12 @@
 package io.kaoto.forage.jdbc.common.idempotent;
 
-import io.kaoto.forage.jdbc.common.DataSourceFactoryConfig;
 import javax.sql.DataSource;
+
 import org.apache.camel.processor.idempotent.jdbc.JdbcMessageIdRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.jta.JtaTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
+import io.kaoto.forage.jdbc.common.DataSourceFactoryConfig;
 
 public class ForageJdbcMessageIdRepository extends JdbcMessageIdRepository {
 

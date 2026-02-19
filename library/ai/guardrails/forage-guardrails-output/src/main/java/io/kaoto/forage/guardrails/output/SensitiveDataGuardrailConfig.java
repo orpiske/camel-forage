@@ -1,16 +1,18 @@
 package io.kaoto.forage.guardrails.output;
 
-import static io.kaoto.forage.guardrails.output.SensitiveDataGuardrailConfigEntries.*;
-
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 import org.apache.camel.component.langchain4j.agent.api.guardrails.SensitiveDataOutputGuardrail.Action;
 import org.apache.camel.component.langchain4j.agent.api.guardrails.SensitiveDataOutputGuardrail.SensitiveDataType;
+import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigStore;
+
+import static io.kaoto.forage.guardrails.output.SensitiveDataGuardrailConfigEntries.ACTION;
+import static io.kaoto.forage.guardrails.output.SensitiveDataGuardrailConfigEntries.DETECT_TYPES;
+import static io.kaoto.forage.guardrails.output.SensitiveDataGuardrailConfigEntries.REDACTION_TEXT;
 
 /**
  * Configuration class for sensitive data output guardrail.

@@ -1,15 +1,15 @@
 package io.kaoto.forage.policy.factory;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import io.kaoto.forage.core.policy.RoutePolicyProvider;
 import java.util.Collection;
 import java.util.Optional;
 import org.apache.camel.spi.RoutePolicy;
+import io.kaoto.forage.core.policy.RoutePolicyProvider;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Unit tests for RoutePolicyRegistry focusing on provider discovery and lookup.

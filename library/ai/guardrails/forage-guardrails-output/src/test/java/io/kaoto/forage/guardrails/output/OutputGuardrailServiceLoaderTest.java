@@ -1,15 +1,15 @@
 package io.kaoto.forage.guardrails.output;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import dev.langchain4j.guardrail.OutputGuardrail;
-import io.kaoto.forage.core.guardrails.OutputGuardrailProvider;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.stream.StreamSupport;
+import io.kaoto.forage.core.guardrails.OutputGuardrailProvider;
+import dev.langchain4j.guardrail.OutputGuardrail;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for OutputGuardrailProvider ServiceLoader discovery.

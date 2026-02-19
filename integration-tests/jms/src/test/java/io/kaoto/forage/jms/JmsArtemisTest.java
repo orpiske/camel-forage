@@ -1,21 +1,22 @@
 package io.kaoto.forage.jms;
 
-import io.kaoto.forage.integration.tests.ForageIntegrationTest;
-import io.kaoto.forage.integration.tests.ForageTestCaseRunner;
-import io.kaoto.forage.integration.tests.IntegrationTestSetupExtension;
 import java.util.Collections;
 import java.util.function.Consumer;
 import org.citrusframework.annotations.CitrusTest;
 import org.citrusframework.junit.jupiter.CitrusSupport;
 import org.eclipse.microprofile.config.ConfigProvider;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.activemq.ArtemisContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import io.kaoto.forage.integration.tests.ForageIntegrationTest;
+import io.kaoto.forage.integration.tests.ForageTestCaseRunner;
+import io.kaoto.forage.integration.tests.IntegrationTestSetupExtension;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 @CitrusSupport
 @Testcontainers

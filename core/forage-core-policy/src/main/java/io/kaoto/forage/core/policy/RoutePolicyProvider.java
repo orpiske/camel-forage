@@ -1,7 +1,7 @@
 package io.kaoto.forage.core.policy;
 
-import io.kaoto.forage.core.common.BeanProvider;
 import org.apache.camel.spi.RoutePolicy;
+import io.kaoto.forage.core.common.BeanProvider;
 
 /**
  * Provider interface for creating RoutePolicy instances.

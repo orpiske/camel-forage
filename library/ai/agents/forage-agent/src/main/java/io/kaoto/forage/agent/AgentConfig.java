@@ -1,15 +1,43 @@
 package io.kaoto.forage.agent;
 
-import static io.kaoto.forage.agent.AgentConfigEntries.*;
-
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigStore;
+
+import static io.kaoto.forage.agent.AgentConfigEntries.API_KEY;
+import static io.kaoto.forage.agent.AgentConfigEntries.BASE_URL;
+import static io.kaoto.forage.agent.AgentConfigEntries.DEFAULT_RAG_MAX_RESULTS;
+import static io.kaoto.forage.agent.AgentConfigEntries.DEFAULT_RAG_MIN_SCORE;
+import static io.kaoto.forage.agent.AgentConfigEntries.DEPLOYMENT_NAME;
+import static io.kaoto.forage.agent.AgentConfigEntries.EMBEDDING_MODEL_BASE_URL;
+import static io.kaoto.forage.agent.AgentConfigEntries.EMBEDDING_MODEL_MAX_RETRIES;
+import static io.kaoto.forage.agent.AgentConfigEntries.EMBEDDING_MODEL_MODEL_NAME;
+import static io.kaoto.forage.agent.AgentConfigEntries.EMBEDDING_MODEL_TIMEOUT;
+import static io.kaoto.forage.agent.AgentConfigEntries.EMBEDDING_STORE_FILE_SOURCE;
+import static io.kaoto.forage.agent.AgentConfigEntries.EMBEDDING_STORE_MAX_SIZE;
+import static io.kaoto.forage.agent.AgentConfigEntries.EMBEDDING_STORE_OVERLAP_SIZE;
+import static io.kaoto.forage.agent.AgentConfigEntries.ENDPOINT;
+import static io.kaoto.forage.agent.AgentConfigEntries.FEATURES;
+import static io.kaoto.forage.agent.AgentConfigEntries.LOG_REQUESTS;
+import static io.kaoto.forage.agent.AgentConfigEntries.LOG_RESPONSES;
+import static io.kaoto.forage.agent.AgentConfigEntries.MAX_TOKENS;
+import static io.kaoto.forage.agent.AgentConfigEntries.MEMORY_INFINISPAN_CACHE_NAME;
+import static io.kaoto.forage.agent.AgentConfigEntries.MEMORY_INFINISPAN_SERVER_LIST;
+import static io.kaoto.forage.agent.AgentConfigEntries.MEMORY_KIND;
+import static io.kaoto.forage.agent.AgentConfigEntries.MEMORY_MAX_MESSAGES;
+import static io.kaoto.forage.agent.AgentConfigEntries.MEMORY_REDIS_HOST;
+import static io.kaoto.forage.agent.AgentConfigEntries.MEMORY_REDIS_PASSWORD;
+import static io.kaoto.forage.agent.AgentConfigEntries.MEMORY_REDIS_PORT;
+import static io.kaoto.forage.agent.AgentConfigEntries.MODEL_KIND;
+import static io.kaoto.forage.agent.AgentConfigEntries.MODEL_NAME;
+import static io.kaoto.forage.agent.AgentConfigEntries.TEMPERATURE;
+import static io.kaoto.forage.agent.AgentConfigEntries.TOP_K;
+import static io.kaoto.forage.agent.AgentConfigEntries.TOP_P;
 
 /**
  * Unified configuration class for agent factory.

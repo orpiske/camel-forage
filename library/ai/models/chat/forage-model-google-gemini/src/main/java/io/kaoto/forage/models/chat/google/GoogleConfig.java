@@ -1,16 +1,16 @@
 package io.kaoto.forage.models.chat.google;
 
+import java.util.Optional;
+import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.MissingConfigException;
+
 import static io.kaoto.forage.models.chat.google.GoogleConfigEntries.API_KEY;
 import static io.kaoto.forage.models.chat.google.GoogleConfigEntries.LOG_REQUESTS;
 import static io.kaoto.forage.models.chat.google.GoogleConfigEntries.MODEL_NAME;
 import static io.kaoto.forage.models.chat.google.GoogleConfigEntries.TEMPERATURE;
 import static io.kaoto.forage.models.chat.google.GoogleConfigEntries.TIMEOUT;
-
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.core.util.config.MissingConfigException;
-import java.util.Optional;
 
 /**
  * Configuration class for Google Gemini AI model integration in the Forage framework.

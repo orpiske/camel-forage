@@ -1,13 +1,13 @@
 package io.kaoto.forage.springboot.common.jta;
 
-import com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionSynchronizationRegistryImple;
-import com.arjuna.ats.internal.jta.transaction.arjunacore.UserTransactionImple;
 import org.apache.camel.spring.spi.SpringTransactionPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.jta.JtaTransactionManager;
+import com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionSynchronizationRegistryImple;
+import com.arjuna.ats.internal.jta.transaction.arjunacore.UserTransactionImple;
 
 /**
  * Base auto-configuration for JTA transaction management in Forage Spring Boot applications.

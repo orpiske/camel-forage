@@ -1,11 +1,11 @@
 package io.kaoto.forage.memory.chat.messagewindow;
 
-import dev.langchain4j.memory.chat.ChatMemoryProvider;
-import dev.langchain4j.memory.chat.MessageWindowChatMemory;
-import io.kaoto.forage.core.ai.ChatMemoryBeanProvider;
-import io.kaoto.forage.core.annotations.ForageBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.kaoto.forage.core.ai.ChatMemoryBeanProvider;
+import io.kaoto.forage.core.annotations.ForageBean;
+import dev.langchain4j.memory.chat.ChatMemoryProvider;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 
 @ForageBean(
         value = "message-window",

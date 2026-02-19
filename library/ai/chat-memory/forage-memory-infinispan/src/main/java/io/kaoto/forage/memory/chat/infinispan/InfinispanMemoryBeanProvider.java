@@ -1,14 +1,14 @@
 package io.kaoto.forage.memory.chat.infinispan;
 
-import dev.langchain4j.memory.chat.ChatMemoryProvider;
-import dev.langchain4j.memory.chat.MessageWindowChatMemory;
-import io.kaoto.forage.core.ai.ChatMemoryBeanProvider;
-import io.kaoto.forage.core.annotations.ForageBean;
 import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.kaoto.forage.core.ai.ChatMemoryBeanProvider;
+import io.kaoto.forage.core.annotations.ForageBean;
+import dev.langchain4j.memory.chat.ChatMemoryProvider;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 
 /**
  * Infinispan-based implementation of {@link ChatMemoryBeanProvider} that creates chat memory providers

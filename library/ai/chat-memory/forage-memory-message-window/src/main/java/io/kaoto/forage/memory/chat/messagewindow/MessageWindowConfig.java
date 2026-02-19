@@ -1,9 +1,9 @@
 package io.kaoto.forage.memory.chat.messagewindow;
 
+import java.util.Optional;
 import io.kaoto.forage.core.util.config.Config;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigStore;
-import java.util.Optional;
 
 public class MessageWindowConfig implements Config {
 

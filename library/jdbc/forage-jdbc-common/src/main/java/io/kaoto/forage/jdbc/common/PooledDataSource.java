@@ -1,5 +1,10 @@
 package io.kaoto.forage.jdbc.common;
 
+import javax.sql.DataSource;
+
+import java.time.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import io.agroal.api.AgroalDataSource;
 import io.agroal.api.configuration.AgroalDataSourceConfiguration;
 import io.agroal.api.configuration.supplier.AgroalConnectionFactoryConfigurationSupplier;
@@ -12,10 +17,6 @@ import io.agroal.narayana.NarayanaTransactionIntegration;
 import io.kaoto.forage.core.jdbc.DataSourceProvider;
 import io.kaoto.forage.jdbc.common.idempotent.ForageIdRepository;
 import io.kaoto.forage.jdbc.common.transactions.TransactionConfiguration;
-import java.time.Duration;
-import javax.sql.DataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Abstract base class for pooled JDBC implementations using Agroal connection pooling.

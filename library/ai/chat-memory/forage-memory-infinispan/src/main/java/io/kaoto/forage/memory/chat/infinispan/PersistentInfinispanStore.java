@@ -1,9 +1,5 @@
 package io.kaoto.forage.memory.chat.infinispan;
 
-import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.data.message.ChatMessageDeserializer;
-import dev.langchain4j.data.message.ChatMessageSerializer;
-import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -11,6 +7,10 @@ import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.ChatMessageDeserializer;
+import dev.langchain4j.data.message.ChatMessageSerializer;
+import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 
 /**
  * Infinispan-based implementation of {@link ChatMemoryStore} that provides persistent storage

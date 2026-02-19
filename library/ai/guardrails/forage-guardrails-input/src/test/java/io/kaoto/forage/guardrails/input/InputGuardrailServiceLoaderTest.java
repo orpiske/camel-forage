@@ -1,15 +1,15 @@
 package io.kaoto.forage.guardrails.input;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import dev.langchain4j.guardrail.InputGuardrail;
-import io.kaoto.forage.core.guardrails.InputGuardrailProvider;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.stream.StreamSupport;
+import io.kaoto.forage.core.guardrails.InputGuardrailProvider;
+import dev.langchain4j.guardrail.InputGuardrail;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for InputGuardrailProvider ServiceLoader discovery.

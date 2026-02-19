@@ -1,12 +1,12 @@
 package io.kaoto.forage.vectordb.infinispan;
 
-import dev.langchain4j.store.embedding.infinispan.InfinispanEmbeddingStore;
-import io.kaoto.forage.core.ai.EmbeddingStoreProvider;
-import io.kaoto.forage.core.annotations.ForageBean;
 import org.infinispan.client.hotrod.configuration.ClientIntelligence;
 import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.kaoto.forage.core.ai.EmbeddingStoreProvider;
+import io.kaoto.forage.core.annotations.ForageBean;
+import dev.langchain4j.store.embedding.infinispan.InfinispanEmbeddingStore;
 
 /**
  * Provider for creating Infinispan embedding stores within the Camel Forage framework.

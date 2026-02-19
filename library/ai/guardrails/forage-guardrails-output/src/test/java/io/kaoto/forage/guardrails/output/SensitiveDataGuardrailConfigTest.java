@@ -1,12 +1,12 @@
 package io.kaoto.forage.guardrails.output;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.apache.camel.component.langchain4j.agent.api.guardrails.SensitiveDataOutputGuardrail.Action;
 import org.apache.camel.component.langchain4j.agent.api.guardrails.SensitiveDataOutputGuardrail.SensitiveDataType;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for SensitiveDataGuardrailConfig.

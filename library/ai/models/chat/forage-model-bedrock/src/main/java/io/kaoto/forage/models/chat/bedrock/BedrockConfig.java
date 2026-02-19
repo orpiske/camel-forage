@@ -1,5 +1,11 @@
 package io.kaoto.forage.models.chat.bedrock;
 
+import java.util.Optional;
+import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.MissingConfigException;
+
 import static io.kaoto.forage.models.chat.bedrock.BedrockConfigEntries.ACCESS_KEY_ID;
 import static io.kaoto.forage.models.chat.bedrock.BedrockConfigEntries.MAX_TOKENS;
 import static io.kaoto.forage.models.chat.bedrock.BedrockConfigEntries.MODEL_ID;
@@ -7,12 +13,6 @@ import static io.kaoto.forage.models.chat.bedrock.BedrockConfigEntries.REGION;
 import static io.kaoto.forage.models.chat.bedrock.BedrockConfigEntries.SECRET_ACCESS_KEY;
 import static io.kaoto.forage.models.chat.bedrock.BedrockConfigEntries.TEMPERATURE;
 import static io.kaoto.forage.models.chat.bedrock.BedrockConfigEntries.TOP_P;
-
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.core.util.config.MissingConfigException;
-import java.util.Optional;
 
 /**
  * Configuration class for Amazon Bedrock model integration in the Forage framework.

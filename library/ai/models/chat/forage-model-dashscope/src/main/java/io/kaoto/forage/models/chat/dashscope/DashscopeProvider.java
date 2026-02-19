@@ -1,10 +1,10 @@
 package io.kaoto.forage.models.chat.dashscope;
 
-import dev.langchain4j.model.chat.ChatModel;
-import io.kaoto.forage.core.ai.ModelProvider;
-import io.kaoto.forage.core.annotations.ForageBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.kaoto.forage.core.ai.ModelProvider;
+import io.kaoto.forage.core.annotations.ForageBean;
+import dev.langchain4j.model.chat.ChatModel;
 
 /**
  * Provider for creating Dashscope Qwen chat models.

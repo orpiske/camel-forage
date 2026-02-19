@@ -1,10 +1,10 @@
 package io.kaoto.forage.policy.flip;
 
-import io.kaoto.forage.core.annotations.ForageBean;
-import io.kaoto.forage.core.policy.RoutePolicyProvider;
 import org.apache.camel.spi.RoutePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.kaoto.forage.core.annotations.ForageBean;
+import io.kaoto.forage.core.policy.RoutePolicyProvider;
 
 /**
  * Provider for creating flip route policies.

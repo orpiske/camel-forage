@@ -1,10 +1,10 @@
 package io.kaoto.forage.vectordb.pgvector;
 
-import dev.langchain4j.store.embedding.pgvector.PgVectorEmbeddingStore;
-import io.kaoto.forage.core.ai.EmbeddingStoreProvider;
-import io.kaoto.forage.core.annotations.ForageBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.kaoto.forage.core.ai.EmbeddingStoreProvider;
+import io.kaoto.forage.core.annotations.ForageBean;
+import dev.langchain4j.store.embedding.pgvector.PgVectorEmbeddingStore;
 
 /**
  * Provider for creating pgvector embedding stores within the Forage framework.

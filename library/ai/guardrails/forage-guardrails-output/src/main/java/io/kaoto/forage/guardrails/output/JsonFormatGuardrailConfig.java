@@ -1,12 +1,14 @@
 package io.kaoto.forage.guardrails.output;
 
-import static io.kaoto.forage.guardrails.output.JsonFormatGuardrailConfigEntries.*;
-
+import java.util.Arrays;
+import java.util.Optional;
 import io.kaoto.forage.core.util.config.Config;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigStore;
-import java.util.Arrays;
-import java.util.Optional;
+
+import static io.kaoto.forage.guardrails.output.JsonFormatGuardrailConfigEntries.ALLOW_ARRAY;
+import static io.kaoto.forage.guardrails.output.JsonFormatGuardrailConfigEntries.EXTRACT_JSON;
+import static io.kaoto.forage.guardrails.output.JsonFormatGuardrailConfigEntries.REQUIRED_FIELDS;
 
 /**
  * Configuration class for JSON format guardrail.

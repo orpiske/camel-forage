@@ -1,8 +1,5 @@
 package io.kaoto.forage.springboot.common;
 
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
 import java.lang.reflect.Constructor;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -14,6 +11,9 @@ import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.util.StringUtils;
+import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigStore;
 
 /**
  * Condition that matches when a specific ConfigModule property matches the expected criteria.

@@ -1,17 +1,17 @@
 package io.kaoto.forage.vectordb.chroma;
 
+import java.time.Duration;
+import java.util.Optional;
+import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.MissingConfigException;
+
 import static io.kaoto.forage.vectordb.chroma.ChromaConfigEntries.COLLECTION_NAME;
 import static io.kaoto.forage.vectordb.chroma.ChromaConfigEntries.LOG_REQUESTS;
 import static io.kaoto.forage.vectordb.chroma.ChromaConfigEntries.LOG_RESPONSES;
 import static io.kaoto.forage.vectordb.chroma.ChromaConfigEntries.TIMEOUT;
 import static io.kaoto.forage.vectordb.chroma.ChromaConfigEntries.URL;
-
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.core.util.config.MissingConfigException;
-import java.time.Duration;
-import java.util.Optional;
 
 /**
  * Configuration class for Chroma vector database integration in the Forage framework.

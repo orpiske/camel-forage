@@ -1,7 +1,7 @@
 package io.kaoto.forage.core.guardrails;
 
-import dev.langchain4j.guardrail.InputGuardrail;
 import io.kaoto.forage.core.common.BeanProvider;
+import dev.langchain4j.guardrail.InputGuardrail;
 
 /**
  * Provider interface for creating input guardrails.

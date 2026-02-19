@@ -1,8 +1,8 @@
 package io.kaoto.forage.catalog.model;
 
+import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.List;
 
 /**
  * Represents a group of beans that are conditionally registered when a boolean config entry is enabled.

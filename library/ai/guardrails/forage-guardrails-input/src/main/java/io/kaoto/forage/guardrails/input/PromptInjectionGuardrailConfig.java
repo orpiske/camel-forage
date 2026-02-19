@@ -1,11 +1,11 @@
 package io.kaoto.forage.guardrails.input;
 
-import static io.kaoto.forage.guardrails.input.PromptInjectionGuardrailConfigEntries.*;
-
+import java.util.Optional;
 import io.kaoto.forage.core.util.config.Config;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigStore;
-import java.util.Optional;
+
+import static io.kaoto.forage.guardrails.input.PromptInjectionGuardrailConfigEntries.STRICT;
 
 /**
  * Configuration class for prompt injection guardrail.

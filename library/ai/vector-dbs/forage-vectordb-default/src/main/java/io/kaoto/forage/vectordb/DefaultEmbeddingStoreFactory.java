@@ -1,11 +1,11 @@
 package io.kaoto.forage.vectordb;
 
-import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.store.embedding.EmbeddingStore;
-import io.kaoto.forage.core.ai.EmbeddingStoreProvider;
 import java.util.ServiceLoader;
 import org.apache.camel.CamelContext;
 import org.apache.camel.component.langchain4j.embeddingstore.EmbeddingStoreFactory;
+import io.kaoto.forage.core.ai.EmbeddingStoreProvider;
+import dev.langchain4j.data.segment.TextSegment;
+import dev.langchain4j.store.embedding.EmbeddingStore;
 
 public class DefaultEmbeddingStoreFactory implements EmbeddingStoreFactory {
     private CamelContext camelContext;

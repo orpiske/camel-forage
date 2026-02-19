@@ -1,5 +1,11 @@
 package io.kaoto.forage.models.chat.dashscope;
 
+import java.util.Optional;
+import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.MissingConfigException;
+
 import static io.kaoto.forage.models.chat.dashscope.DashscopeConfigEntries.API_KEY;
 import static io.kaoto.forage.models.chat.dashscope.DashscopeConfigEntries.ENABLE_SEARCH;
 import static io.kaoto.forage.models.chat.dashscope.DashscopeConfigEntries.LOG_REQUESTS_AND_RESPONSES;
@@ -12,12 +18,6 @@ import static io.kaoto.forage.models.chat.dashscope.DashscopeConfigEntries.TEMPE
 import static io.kaoto.forage.models.chat.dashscope.DashscopeConfigEntries.TIMEOUT;
 import static io.kaoto.forage.models.chat.dashscope.DashscopeConfigEntries.TOP_K;
 import static io.kaoto.forage.models.chat.dashscope.DashscopeConfigEntries.TOP_P;
-
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.core.util.config.MissingConfigException;
-import java.util.Optional;
 
 /**
  * Configuration class for Alibaba Dashscope Qwen integration in the Forage framework.

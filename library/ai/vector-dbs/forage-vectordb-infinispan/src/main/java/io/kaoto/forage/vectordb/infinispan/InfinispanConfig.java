@@ -1,5 +1,11 @@
 package io.kaoto.forage.vectordb.infinispan;
 
+import java.util.Optional;
+import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.MissingConfigException;
+
 import static io.kaoto.forage.vectordb.infinispan.InfinispanConfigEntries.CACHE_CONFIG;
 import static io.kaoto.forage.vectordb.infinispan.InfinispanConfigEntries.CACHE_NAME;
 import static io.kaoto.forage.vectordb.infinispan.InfinispanConfigEntries.CREATE_CACHE;
@@ -15,12 +21,6 @@ import static io.kaoto.forage.vectordb.infinispan.InfinispanConfigEntries.PORT;
 import static io.kaoto.forage.vectordb.infinispan.InfinispanConfigEntries.REGISTER_SCHEMA;
 import static io.kaoto.forage.vectordb.infinispan.InfinispanConfigEntries.SIMILARITY;
 import static io.kaoto.forage.vectordb.infinispan.InfinispanConfigEntries.USERNAME;
-
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.core.util.config.MissingConfigException;
-import java.util.Optional;
 
 /**
  * Configuration class for Infinispan vector database integration in the Camel Forage framework.

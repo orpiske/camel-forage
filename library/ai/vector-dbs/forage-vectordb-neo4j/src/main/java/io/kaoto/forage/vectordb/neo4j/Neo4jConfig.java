@@ -1,5 +1,12 @@
 package io.kaoto.forage.vectordb.neo4j;
 
+import java.time.Duration;
+import java.util.Optional;
+import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.MissingConfigException;
+
 import static io.kaoto.forage.vectordb.neo4j.Neo4jConfigEntries.AUTO_CREATE_FULL_TEXT;
 import static io.kaoto.forage.vectordb.neo4j.Neo4jConfigEntries.AWAIT_INDEX_TIMEOUT;
 import static io.kaoto.forage.vectordb.neo4j.Neo4jConfigEntries.CONNECTION_ACQUISITION_TIMEOUT;
@@ -23,13 +30,6 @@ import static io.kaoto.forage.vectordb.neo4j.Neo4jConfigEntries.TEXT_PROPERTY;
 import static io.kaoto.forage.vectordb.neo4j.Neo4jConfigEntries.URI;
 import static io.kaoto.forage.vectordb.neo4j.Neo4jConfigEntries.USER;
 import static io.kaoto.forage.vectordb.neo4j.Neo4jConfigEntries.WITH_ENCRYPTION;
-
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.core.util.config.MissingConfigException;
-import java.time.Duration;
-import java.util.Optional;
 
 /**
  * Configuration class for Neo4j vector database integration in the Camel Forage framework.

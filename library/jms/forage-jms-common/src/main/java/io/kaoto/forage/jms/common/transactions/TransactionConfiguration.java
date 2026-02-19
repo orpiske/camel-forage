@@ -1,13 +1,13 @@
 package io.kaoto.forage.jms.common.transactions;
 
+import java.util.Arrays;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import io.kaoto.forage.jms.common.ConnectionFactoryConfig;
 import com.arjuna.ats.arjuna.common.CoreEnvironmentBeanException;
 import com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean;
 import com.arjuna.ats.arjuna.common.RecoveryEnvironmentBean;
 import com.arjuna.ats.internal.arjuna.objectstore.VolatileStore;
-import io.kaoto.forage.jms.common.ConnectionFactoryConfig;
-import java.util.Arrays;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Manages Narayana transaction manager configuration for JMS operations.

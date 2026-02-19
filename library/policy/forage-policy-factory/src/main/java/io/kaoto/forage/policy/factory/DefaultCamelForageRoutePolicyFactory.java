@@ -1,6 +1,5 @@
 package io.kaoto.forage.policy.factory;
 
-import io.kaoto.forage.core.policy.RoutePolicyProvider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -10,6 +9,7 @@ import org.apache.camel.spi.RoutePolicy;
 import org.apache.camel.spi.RoutePolicyFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import io.kaoto.forage.core.policy.RoutePolicyProvider;
 
 /**
  * Default implementation of Camel's RoutePolicyFactory that delegates to
