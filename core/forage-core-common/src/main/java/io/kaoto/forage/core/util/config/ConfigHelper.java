@@ -142,7 +142,9 @@ public final class ConfigHelper {
                 }
             } catch (ClassNotFoundException e) {
                 // This is expected if not an SpringBoot environment
-                LOG.trace("This ClassNotFoundException is expected if the runtime environment is not a Spring boot one", e);
+                LOG.trace(
+                        "This ClassNotFoundException is expected if the runtime environment is not a Spring boot one",
+                        e);
             } catch (Exception e) {
                 // Not the one we are expecting, but can also indicate something is off
                 LOG.trace("This could be expected if the runtime environment is not a Spring boot one", e);

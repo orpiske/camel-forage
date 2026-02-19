@@ -17,7 +17,7 @@ import org.mariadb.jdbc.MariaDbDataSource;
 public class MariadbJdbc extends PooledDataSource {
 
     @Override
-    protected Class getConnectionProviderClass() {
+    protected Class<?> getConnectionProviderClass() {
         if (getConfig().transactionEnabled()) {
             return MariaDbDataSource.class;
         } else {

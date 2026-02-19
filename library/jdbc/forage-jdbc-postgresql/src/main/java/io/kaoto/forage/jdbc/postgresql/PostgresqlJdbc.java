@@ -17,7 +17,7 @@ import org.postgresql.xa.PGXADataSource;
 public class PostgresqlJdbc extends PooledDataSource {
 
     @Override
-    protected Class getConnectionProviderClass() {
+    protected Class<?> getConnectionProviderClass() {
         if (getConfig().transactionEnabled()) {
             return PGXADataSource.class;
         } else {

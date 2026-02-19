@@ -17,7 +17,7 @@ import io.kaoto.forage.jdbc.common.PooledDataSource;
 public class Db2Jdbc extends PooledDataSource {
 
     @Override
-    protected Class getConnectionProviderClass() {
+    protected Class<?> getConnectionProviderClass() {
         if (getConfig().transactionEnabled()) {
             return DB2XADataSource.class;
         } else {
