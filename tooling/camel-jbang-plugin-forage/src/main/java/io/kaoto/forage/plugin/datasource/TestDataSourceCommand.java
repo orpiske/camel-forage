@@ -316,7 +316,7 @@ public class TestDataSourceCommand extends CamelCommand {
                         .setVersion(databaseProductVersion)
                         .setDriver(driverName)
                         .setUrl(url)
-                        .setUser(userName != null ? userName : null);
+                        .setUser(userName);
             } else {
                 printer().println("");
                 printer().println("Connection Details:");
