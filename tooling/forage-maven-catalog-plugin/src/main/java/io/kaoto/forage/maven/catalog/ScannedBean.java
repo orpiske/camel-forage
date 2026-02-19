@@ -33,7 +33,7 @@ public class ScannedBean {
     public ScannedBean(String name, String component, String description, String className, String feature) {
         this(
                 name,
-                component != null && !component.isEmpty() ? Arrays.asList(component) : List.of(),
+                component != null && !component.isEmpty() ? List.of(component) : List.of(),
                 description,
                 className,
                 feature);
