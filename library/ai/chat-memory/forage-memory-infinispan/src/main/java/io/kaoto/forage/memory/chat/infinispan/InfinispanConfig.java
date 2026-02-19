@@ -322,6 +322,8 @@ public class InfinispanConfig implements Config {
                 "Configuring Infinispan connection pool: maxActive={}, maxIdle={}, maxTotal={}, minIdle={}, maxWait={}ms",
                 poolMaxActive(),
                 poolMinIdle(),
+                poolMaxWait(),
+                poolMinIdle(),
                 poolMaxWait());
         builder.connectionPool()
                 .maxActive(poolMaxActive())
