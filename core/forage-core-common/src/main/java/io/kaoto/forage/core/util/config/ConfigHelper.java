@@ -81,7 +81,7 @@ public final class ConfigHelper {
         return runtime;
     }
 
-    public static Optional<String> getSpringBootProperty(String propertyName) {
+    static Optional<String> getSpringBootProperty(String propertyName) {
         Properties springBootProps = ConfigHelper.getSpringBootConfig();
         if (springBootProps != null) {
             LOG.info("Loading {} from Spring Boot", propertyName);
@@ -90,22 +90,22 @@ public final class ConfigHelper {
                 return Optional.of(propertyValue);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
-    public static Optional<String> getQuarkusProperty(String propertyName) {
+    static Optional<String> getQuarkusProperty(String propertyName) {
         SmallRyeConfig config = ConfigHelper.getQuarkusConfig();
         if (config != null) {
             LOG.info("Loading {} from Quarkus", propertyName);
             Optional<String> quarkusValue = config.getOptionalValue(propertyName, String.class);
-            if (quarkusValue != null) {
+            if (quarkusValue.isPresent()) {
                 return quarkusValue;
             }
         }
-        return null;
+        return Optional.empty();
     }
 
-    public static Optional<String> getCamelMainProperty(String propertyName) {
+    static Optional<String> getCamelMainProperty(String propertyName) {
         Properties camelMainProps = ConfigHelper.getCamelMainConfig();
         if (camelMainProps != null) {
             LOG.info("Loading {} from Camel main", propertyName);
@@ -114,7 +114,7 @@ public final class ConfigHelper {
                 return Optional.of(mainPropertyValue);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     private static boolean classExists(String className) {
