@@ -261,11 +261,7 @@ public class ConfigReadCommand extends CamelCommand {
         // Could be a bean-specific property like "forage.google.api.key" (for agent factory)
         // Try to match using the catalog's property prefix mapping
         Optional<String> factoryTypeOpt = catalog.findFactoryTypeKeyForPropertyPrefix(firstPart);
-        if (factoryTypeOpt.isPresent()) {
-            return new ParsedProperty(factoryTypeOpt.get(), null, null, key);
-        }
-
-        return null;
+        return factoryTypeOpt.map(s -> new ParsedProperty(s, null, null, key)).orElse(null);
     }
 
     /**

@@ -793,12 +793,9 @@ public class CodeScanner {
 
             // If not found in imports, it might be in the same package
             Optional<String> packageName = cu.getPackageDeclaration().map(pd -> pd.getNameAsString());
-            if (packageName.isPresent()) {
-                return packageName.get() + "." + simpleClassName;
-            }
+            return packageName.map(s -> s + "." + simpleClassName).orElse(simpleClassName);
 
             // Last resort: return as-is (might be fully qualified already)
-            return simpleClassName;
         }
 
         return null;
@@ -870,11 +867,7 @@ public class CodeScanner {
         Optional<String> packageName = cu.getPackageDeclaration().map(pd -> pd.getNameAsString());
         String className = classDecl.getNameAsString();
 
-        if (packageName.isPresent()) {
-            return packageName.get() + "." + className;
-        } else {
-            return className;
-        }
+        return packageName.map(s -> s + "." + className).orElse(className);
     }
 
     /**
