@@ -23,6 +23,12 @@ public class ArtemisJms extends PooledConnectionFactory {
     protected ConnectionFactory createConnectionFactory(ConnectionFactoryConfig config) {
         ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(config.brokerUrl());
 
+        setupConnection(config, connectionFactory);
+
+        return connectionFactory;
+    }
+
+    private static void setupConnection(ConnectionFactoryConfig config, ActiveMQConnectionFactory connectionFactory) {
         if (config.username() != null) {
             connectionFactory.setUser(config.username());
         }
@@ -32,24 +38,14 @@ public class ArtemisJms extends PooledConnectionFactory {
         if (config.clientId() != null) {
             connectionFactory.setClientID(config.clientId());
         }
-
-        return (ConnectionFactory) connectionFactory;
     }
 
     @Override
     protected XAConnectionFactory createXAConnectionFactory(ConnectionFactoryConfig config) {
         ActiveMQXAConnectionFactory xaConnectionFactory = new ActiveMQXAConnectionFactory(config.brokerUrl());
 
-        if (config.username() != null) {
-            xaConnectionFactory.setUser(config.username());
-        }
-        if (config.password() != null) {
-            xaConnectionFactory.setPassword(config.password());
-        }
-        if (config.clientId() != null) {
-            xaConnectionFactory.setClientID(config.clientId());
-        }
+        setupConnection(config, xaConnectionFactory);
 
-        return (XAConnectionFactory) xaConnectionFactory;
+        return xaConnectionFactory;
     }
 }
