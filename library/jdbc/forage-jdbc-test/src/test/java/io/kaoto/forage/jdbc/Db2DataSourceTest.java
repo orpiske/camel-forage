@@ -56,7 +56,7 @@ public class Db2DataSourceTest extends DataSourceTest {
     }
 
     @Test
-    public void testDefaultTransactedDataSource() throws Exception {
+    public void testDefaultTransactedDataSource() {
         // XA Transactions do not work with db2 docker image
     }
 }

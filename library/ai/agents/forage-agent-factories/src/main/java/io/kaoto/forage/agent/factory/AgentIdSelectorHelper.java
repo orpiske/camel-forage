@@ -62,10 +62,8 @@ public class AgentIdSelectorHelper {
      * @param config   The MultiAgentConfig containing the source type configuration
      * @param exchange The Exchange from which to extract the agent ID value
      * @return
-     * @throws UndefinedAgentException Always throws - this method never returns normally
      */
-    public static UndefinedAgentException newUndefinedAgentException(MultiAgentConfig config, Exchange exchange)
-            throws UndefinedAgentException {
+    public static UndefinedAgentException newUndefinedAgentException(MultiAgentConfig config, Exchange exchange) {
         String sourceType = config.multiAgentIdSource();
 
         return switch (sourceType.toLowerCase()) {

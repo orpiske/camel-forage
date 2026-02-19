@@ -47,7 +47,7 @@ public abstract class TransactionalJtaTransactionPolicy extends JtaTransactionPo
         }
     }
 
-    protected final void rollback(boolean isNew) throws Exception {
+    protected final void rollback(boolean isNew) {
         try {
             if (isNew) {
                 transactionManager.rollback();

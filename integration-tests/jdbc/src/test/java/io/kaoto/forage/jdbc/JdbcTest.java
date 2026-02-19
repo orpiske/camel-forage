@@ -124,8 +124,7 @@ public class JdbcTest implements ForageIntegrationTest {
 
     @Test
     @CitrusTest()
-    public void idempotentTest(@CitrusResource GherkinTestActionRunner runner)
-            throws IOException, InterruptedException {
+    public void idempotentTest(@CitrusResource GherkinTestActionRunner runner) throws IOException {
         Files.createDirectories(INPUT_FOLDER);
 
         // create a temp file with content `A`

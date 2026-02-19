@@ -12,7 +12,7 @@ public class ForageCommand extends CamelCommand {
     }
 
     @Override
-    public Integer doCall() throws Exception {
+    public Integer doCall() {
         //        new CommandLine(this).execute("--help");
         printer().println("Hello from Forage!");
         return 0;

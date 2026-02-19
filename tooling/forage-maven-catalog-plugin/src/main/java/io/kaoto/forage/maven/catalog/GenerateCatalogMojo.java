@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -53,7 +52,7 @@ public class GenerateCatalogMojo extends AbstractMojo {
     protected File baseDir;
 
     @Override
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    public void execute() throws MojoExecutionException {
         getLog().info("Generating Forage component catalog...");
 
         try {

@@ -48,7 +48,7 @@ public class OracleDataSourceTest extends DataSourceTest {
     }
 
     @Test
-    public void testDefaultTransactedDataSource() throws Exception {
+    public void testDefaultTransactedDataSource() {
         // XA Transactions do not work with oracle-free docker image
     }
 }

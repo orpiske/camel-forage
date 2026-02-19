@@ -12,7 +12,7 @@ public class ConfigCommand extends CamelCommand {
     }
 
     @Override
-    public Integer doCall() throws Exception {
+    public Integer doCall() {
         new CommandLine(this).execute("--help");
         return 0;
     }

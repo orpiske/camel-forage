@@ -3,7 +3,6 @@ package io.kaoto.forage.models.embeddings.ollama;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.kaoto.forage.core.util.config.ConfigStore;
-import java.io.IOException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +30,7 @@ class EmbeddingOllamaConfigurationSourcesTest {
 
     @Test
     @DisplayName("Should load from configuration file only")
-    void shouldLoadFromConfigurationFileOnly() throws IOException {
+    void shouldLoadFromConfigurationFileOnly() {
         OllamaEmbedddingConfig config = new OllamaEmbedddingConfig();
 
         assertThat(config.baseUrl()).isEqualTo("testUrl");
