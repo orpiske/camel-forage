@@ -67,8 +67,9 @@ public class IntegrationTestSetupExtension implements BeforeEachCallback, AfterA
 
             ForageTestCaseRunner runner = (ForageTestCaseRunner) CitrusExtensionHelper.getTestRunner(context);
 
-            LOG.info("Running 'runBeforeAll' setup for class: %s"
-                    .formatted(context.getRequiredTestClass().getName()));
+            LOG.info(
+                    "Running 'runBeforeAll' setup for class: {}",
+                    context.getRequiredTestClass().getName());
             String integrationName = forageTest.runBeforeAll(runner, closeables::add);
             if (integrationName == null) {
                 LOG.warn(
@@ -82,8 +83,9 @@ public class IntegrationTestSetupExtension implements BeforeEachCallback, AfterA
     @Override
     public void afterAll(ExtensionContext context) {
         previousTestContext = null;
-        LOG.info("Running 'afterAll' setup for class: %s"
-                .formatted(context.getRequiredTestClass().getName()));
+        LOG.info(
+                "Running 'afterAll' setup for class: {}",
+                context.getRequiredTestClass().getName());
         closeables.forEach(c -> {
             try {
                 c.close();
