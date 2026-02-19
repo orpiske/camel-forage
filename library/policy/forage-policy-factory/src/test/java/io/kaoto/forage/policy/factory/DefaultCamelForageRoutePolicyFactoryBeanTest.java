@@ -2,6 +2,7 @@ package io.kaoto.forage.policy.factory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.kaoto.forage.core.ForageContextServicePlugin;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.junit.jupiter.api.AfterEach;
