@@ -81,11 +81,10 @@ public class DefaultVertxProvider implements VertxProvider {
 
         if (clustered != null && clustered) {
             try {
-                Vertx vertx = Vertx.clusteredVertx(options)
+                return Vertx.clusteredVertx(options)
                         .toCompletionStage()
                         .toCompletableFuture()
                         .get(30, TimeUnit.SECONDS);
-                return vertx;
             } catch (TimeoutException | InterruptedException | ExecutionException ie) {
                 throw new RuntimeException(ie);
             }

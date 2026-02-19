@@ -83,10 +83,7 @@ public class ServiceLoaderHelper {
             throw new IllegalArgumentException("Provider class name cannot be null or empty");
         }
 
-        final ServiceLoader.Provider<T> provider =
-                providers.stream().filter(p -> isEquals(name, p)).findFirst().orElse(null);
-
-        return provider;
+        return providers.stream().filter(p -> isEquals(name, p)).findFirst().orElse(null);
     }
 
     /**
