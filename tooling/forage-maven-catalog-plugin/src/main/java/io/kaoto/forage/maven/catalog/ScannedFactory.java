@@ -2,7 +2,6 @@ package io.kaoto.forage.maven.catalog;
 
 import io.kaoto.forage.catalog.model.ConditionalBeanGroup;
 import io.kaoto.forage.catalog.model.ForageFactory;
-import java.util.Arrays;
 import java.util.List;
 
 /**
