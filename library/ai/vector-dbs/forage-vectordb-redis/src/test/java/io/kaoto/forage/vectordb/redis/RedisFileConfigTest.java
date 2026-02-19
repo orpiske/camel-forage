@@ -99,7 +99,7 @@ public class RedisFileConfigTest {
         RedisProvider provider = new RedisProvider();
         org.assertj.core.api.Assertions.assertThat(provider).isNotNull();
 
-        assertThrows(Exception.class, () -> provider.create(), "Expected an exception on connecting to Redis");
+        assertThrows(Exception.class, provider::create, "Expected an exception on connecting to Redis");
         LOG.info("Successfully created Redis provider");
     }
 }

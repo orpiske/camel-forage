@@ -9,6 +9,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -256,7 +257,7 @@ public final class ConfigStore {
                         return null;
                     }
                 })
-                .filter(prefix -> prefix != null)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
     }
 

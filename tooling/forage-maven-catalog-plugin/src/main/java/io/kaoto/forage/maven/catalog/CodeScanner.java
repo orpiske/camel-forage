@@ -16,6 +16,7 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NormalAnnotationExpr;
 import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
+import com.github.javaparser.ast.nodeTypes.NodeWithName;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import io.kaoto.forage.catalog.model.ConditionalBeanGroup;
 import io.kaoto.forage.catalog.model.ConditionalBeanInfo;
@@ -792,7 +793,7 @@ public class CodeScanner {
             }
 
             // If not found in imports, it might be in the same package
-            Optional<String> packageName = cu.getPackageDeclaration().map(pd -> pd.getNameAsString());
+            Optional<String> packageName = cu.getPackageDeclaration().map(NodeWithName::getNameAsString);
             return packageName.map(s -> s + "." + simpleClassName).orElse(simpleClassName);
 
             // Last resort: return as-is (might be fully qualified already)
@@ -808,7 +809,7 @@ public class CodeScanner {
         // Check imports for this class
         return cu.getImports().stream()
                 .filter(importDecl -> !importDecl.isAsterisk())
-                .map(importDecl -> importDecl.getNameAsString())
+                .map(NodeWithName::getNameAsString)
                 .filter(importName -> importName.endsWith("." + simpleClassName))
                 .findFirst()
                 .orElse(null);
@@ -864,7 +865,7 @@ public class CodeScanner {
      * Gets the fully qualified class name from the compilation unit.
      */
     private String getFullyQualifiedClassName(ClassOrInterfaceDeclaration classDecl, CompilationUnit cu) {
-        Optional<String> packageName = cu.getPackageDeclaration().map(pd -> pd.getNameAsString());
+        Optional<String> packageName = cu.getPackageDeclaration().map(NodeWithName::getNameAsString);
         String className = classDecl.getNameAsString();
 
         return packageName.map(s -> s + "." + className).orElse(className);

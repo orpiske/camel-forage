@@ -92,7 +92,7 @@ public class ChromaFileConfigTest {
 
         assertThrows(
                 RuntimeException.class,
-                () -> provider.create(),
+                provider::create,
                 "Expected a runtime exception on connecting to chroma, caught it successfully");
 
         org.assertj.core.api.Assertions.assertThat(provider).isNotNull();

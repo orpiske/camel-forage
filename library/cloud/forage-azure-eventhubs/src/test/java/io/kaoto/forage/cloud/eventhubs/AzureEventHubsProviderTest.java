@@ -53,7 +53,7 @@ public class AzureEventHubsProviderTest {
         LOG.info("Testing provider with missing required configuration");
         AzureEventHubsProvider provider = new AzureEventHubsProvider();
 
-        assertThatThrownBy(() -> provider.create())
+        assertThatThrownBy(provider::create)
                 .isInstanceOf(MissingConfigException.class)
                 .hasMessageContaining("Fully qualified namespace is required");
 
@@ -67,7 +67,7 @@ public class AzureEventHubsProviderTest {
 
         AzureEventHubsProvider provider = new AzureEventHubsProvider();
 
-        assertThatThrownBy(() -> provider.create())
+        assertThatThrownBy(provider::create)
                 .isInstanceOf(MissingConfigException.class)
                 .hasMessageContaining("Event Hub name is required");
 

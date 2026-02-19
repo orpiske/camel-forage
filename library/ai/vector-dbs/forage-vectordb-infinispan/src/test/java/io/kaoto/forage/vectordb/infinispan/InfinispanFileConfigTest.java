@@ -111,7 +111,7 @@ public class InfinispanFileConfigTest {
         InfinispanProvider provider = new InfinispanProvider();
         org.assertj.core.api.Assertions.assertThat(provider).isNotNull();
 
-        assertThrows(Exception.class, () -> provider.create(), "Expected an exception on connecting to Infinispan");
+        assertThrows(Exception.class, provider::create, "Expected an exception on connecting to Infinispan");
         LOG.info("Successfully created Infinispan provider");
     }
 }

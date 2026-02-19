@@ -117,10 +117,7 @@ public class MilvusFileConfigTest {
         MilvusProvider provider = new MilvusProvider();
         org.assertj.core.api.Assertions.assertThat(provider).isNotNull();
 
-        assertThrows(
-                RuntimeException.class,
-                () -> provider.create(),
-                "Expected a runtime exception on connecting to Milvus");
+        assertThrows(RuntimeException.class, provider::create, "Expected a runtime exception on connecting to Milvus");
         LOG.info("Successfully created Milvus provider");
     }
 }

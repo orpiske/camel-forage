@@ -10,7 +10,7 @@ public abstract class ConfigEntries {
         return configModules.entrySet().stream()
                 .filter(e -> e.getKey().match(name))
                 .findFirst()
-                .map(c -> c.getKey());
+                .map(Map.Entry::getKey);
     }
 
     /**

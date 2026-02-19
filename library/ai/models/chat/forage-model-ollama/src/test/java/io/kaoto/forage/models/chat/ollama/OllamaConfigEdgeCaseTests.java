@@ -18,8 +18,8 @@ class OllamaConfigEdgeCaseTests {
         OllamaConfig config = new OllamaConfig();
 
         // Empty strings should result in null values after optional mapping
-        assertThatThrownBy(() -> config.temperature()).isInstanceOf(NumberFormatException.class);
-        assertThatThrownBy(() -> config.topK()).isInstanceOf(NumberFormatException.class);
+        assertThatThrownBy(config::temperature).isInstanceOf(NumberFormatException.class);
+        assertThatThrownBy(config::topK).isInstanceOf(NumberFormatException.class);
     }
 
     @Test

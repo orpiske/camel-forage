@@ -106,7 +106,7 @@ public class PineconeFileConfigTest {
         PineconeProvider provider = new PineconeProvider();
         org.assertj.core.api.Assertions.assertThat(provider).isNotNull();
 
-        assertThrows(Exception.class, () -> provider.create(), "Expected an exception on connecting to Pinecone");
+        assertThrows(Exception.class, provider::create, "Expected an exception on connecting to Pinecone");
 
         LOG.info("Successfully created Pinecone provider");
     }
