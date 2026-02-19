@@ -285,7 +285,7 @@ public class AgentBeanFactory implements BeanFactory {
             }
         }
 
-        LOG.warn("No model provider found for kind: {}", modelKind);
+        LOG.warn("No chat model provider found for kind: {}", modelKind);
         return null;
     }
 
@@ -305,7 +305,7 @@ public class AgentBeanFactory implements BeanFactory {
             }
         }
 
-        LOG.warn("No model provider found for kind: {}", modelKind);
+        LOG.warn("No embedding model provider found for kind: {}", modelKind);
         return null;
     }
 
@@ -323,7 +323,7 @@ public class AgentBeanFactory implements BeanFactory {
             return createEmbeddingStoreFromConfig(config, modelKind, modelProvider, agentName, model);
         }
 
-        LOG.warn("No model provider found for kind: {}", modelKind);
+        LOG.warn("No embedding store model provider found for kind: {}", modelKind);
         return null;
     }
 
@@ -346,7 +346,7 @@ public class AgentBeanFactory implements BeanFactory {
                     config, modelKind, retrievalAugmentorProvider, agentName, embeddingModel, embeddingStore);
         }
 
-        LOG.warn("No model provider found for kind: {}", modelKind);
+        LOG.warn("No retrieval augmentor provider found for kind: {}", modelKind);
         return null;
     }
 
