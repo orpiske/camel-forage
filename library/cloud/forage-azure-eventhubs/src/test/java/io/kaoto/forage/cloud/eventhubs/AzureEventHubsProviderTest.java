@@ -2,8 +2,8 @@ package io.kaoto.forage.cloud.eventhubs;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.azure.messaging.eventhubs.EventHubProducerAsyncClient;
 import io.kaoto.forage.core.util.config.MissingConfigException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -86,13 +86,10 @@ public class AzureEventHubsProviderTest {
 
         AzureEventHubsProvider provider = new AzureEventHubsProvider();
 
-        try {
-            EventHubProducerAsyncClient client = provider.create("test-prefix");
-        } catch (RuntimeException e) {
-            LOG.info(
-                    "Expected runtime exception when creating client without actual Azure connection: {}",
-                    e.getMessage());
-        }
+        assertThrows(
+                RuntimeException.class,
+                () -> provider.create("test-prefix"),
+                "Expected a runtime exception when creating client without actual Azure connection");
 
         LOG.info("Successfully validated prefixed configuration loading");
     }

@@ -1,9 +1,8 @@
 package io.kaoto.forage.vectordb.redis;
 
 import static org.assertj.core.api.Fail.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.store.embedding.EmbeddingStore;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -99,13 +98,8 @@ public class RedisFileConfigTest {
         LOG.info("Testing Redis provider instantiation");
         RedisProvider provider = new RedisProvider();
         org.assertj.core.api.Assertions.assertThat(provider).isNotNull();
-        try {
-            EmbeddingStore<TextSegment> redisfoo = provider.create();
-        } catch (redis.clients.jedis.exceptions.JedisConnectionException jce) {
-            LOG.info("Expected to catch RuntimeException creating Redis Embedding Store and did successfully...");
-        } catch (Exception e) {
-            fail("Caught exception trying to create Redis Embedding Store {}", e);
-        }
+
+        assertThrows(Exception.class, () -> provider.create(), "Expected an exception on connecting to Redis");
         LOG.info("Successfully created Redis provider");
     }
 }

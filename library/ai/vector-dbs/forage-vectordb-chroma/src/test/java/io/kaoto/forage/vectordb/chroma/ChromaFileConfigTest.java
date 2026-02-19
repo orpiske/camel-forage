@@ -1,9 +1,8 @@
 package io.kaoto.forage.vectordb.chroma;
 
 import static org.assertj.core.api.Fail.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.store.embedding.EmbeddingStore;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -90,13 +89,12 @@ public class ChromaFileConfigTest {
     public void shouldCreateChromaProviderInstance() {
         LOG.info("Testing Chroma provider instantiation");
         ChromaProvider provider = new ChromaProvider();
-        try {
-            EmbeddingStore<TextSegment> chroma = provider.create();
-        } catch (RuntimeException re) {
-            LOG.info("Expected a runtime exception on connecting to chroma, caught it successfully");
-        } catch (Exception e) {
-            fail("Could not instantiate a Chroma EmbeddingStore {}", e);
-        }
+
+        assertThrows(
+                RuntimeException.class,
+                () -> provider.create(),
+                "Expected a runtime exception on connecting to chroma, caught it successfully");
+
         org.assertj.core.api.Assertions.assertThat(provider).isNotNull();
 
         LOG.info("Successfully created Chroma provider");

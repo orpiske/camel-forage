@@ -1,9 +1,8 @@
 package io.kaoto.forage.vectordb.infinispan;
 
 import static org.assertj.core.api.Fail.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.store.embedding.EmbeddingStore;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -110,14 +109,9 @@ public class InfinispanFileConfigTest {
     public void shouldCreateInfinispanProviderInstance() {
         LOG.info("Testing Infinispan provider instantiation");
         InfinispanProvider provider = new InfinispanProvider();
-        try {
-            EmbeddingStore<TextSegment> inf = provider.create();
-        } catch (org.infinispan.client.hotrod.exceptions.TransportException te) {
-            LOG.info("Expected to catch TransportException, did successfully");
-        } catch (Exception e) {
-            fail("Caught exception trying to create Infinispan Embedding Store {}", e);
-        }
         org.assertj.core.api.Assertions.assertThat(provider).isNotNull();
+
+        assertThrows(Exception.class, () -> provider.create(), "Expected an exception on connecting to Infinispan");
         LOG.info("Successfully created Infinispan provider");
     }
 }

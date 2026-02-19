@@ -1,9 +1,8 @@
 package io.kaoto.forage.vectordb.pinecone;
 
 import static org.assertj.core.api.Fail.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.store.embedding.EmbeddingStore;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -107,13 +106,7 @@ public class PineconeFileConfigTest {
         PineconeProvider provider = new PineconeProvider();
         org.assertj.core.api.Assertions.assertThat(provider).isNotNull();
 
-        try {
-            EmbeddingStore<TextSegment> pinecone = provider.create();
-        } catch (io.pinecone.exceptions.PineconeAuthorizationException pae) {
-            LOG.info("Successfully caught PineconeAuthorizationException");
-        } catch (Exception e) {
-            fail("Failed to create Pinecone EmbeddingStore {}", e);
-        }
+        assertThrows(Exception.class, () -> provider.create(), "Expected an exception on connecting to Pinecone");
 
         LOG.info("Successfully created Pinecone provider");
     }
