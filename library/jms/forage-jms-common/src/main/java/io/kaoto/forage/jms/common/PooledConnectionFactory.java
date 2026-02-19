@@ -72,17 +72,7 @@ public abstract class PooledConnectionFactory implements ConnectionFactoryProvid
             }
 
             // Configure pooled connection factory for XA
-            JmsPoolConnectionFactory pooledConnectionFactory = new JmsPoolConnectionFactory();
-            pooledConnectionFactory.setConnectionFactory(xaConnectionFactory);
-            pooledConnectionFactory.setMaxConnections(config.maxConnections());
-            pooledConnectionFactory.setMaxSessionsPerConnection(config.maxSessionsPerConnection());
-            pooledConnectionFactory.setConnectionIdleTimeout((int) config.idleTimeoutMillis());
-            pooledConnectionFactory.setConnectionCheckInterval(config.expiryTimeoutMillis());
-            pooledConnectionFactory.setBlockIfSessionPoolIsFull(config.blockIfFull());
-
-            if (config.blockIfFull() && config.blockIfFullTimeoutMillis() > 0) {
-                pooledConnectionFactory.setBlockIfSessionPoolIsFullTimeout(config.blockIfFullTimeoutMillis());
-            }
+            final JmsPoolConnectionFactory pooledConnectionFactory = setupPooledConnectionFactory(xaConnectionFactory);
 
             LOG.info("Pooled XA ConnectionFactory initialized successfully for id: {}", id);
             return pooledConnectionFactory;
@@ -94,22 +84,28 @@ public abstract class PooledConnectionFactory implements ConnectionFactoryProvid
                 return underlyingConnectionFactory;
             }
 
-            // Configure pooled connection factory
-            JmsPoolConnectionFactory pooledConnectionFactory = new JmsPoolConnectionFactory();
-            pooledConnectionFactory.setConnectionFactory(underlyingConnectionFactory);
-            pooledConnectionFactory.setMaxConnections(config.maxConnections());
-            pooledConnectionFactory.setMaxSessionsPerConnection(config.maxSessionsPerConnection());
-            pooledConnectionFactory.setConnectionIdleTimeout((int) config.idleTimeoutMillis());
-            pooledConnectionFactory.setConnectionCheckInterval(config.expiryTimeoutMillis());
-            pooledConnectionFactory.setBlockIfSessionPoolIsFull(config.blockIfFull());
-
-            if (config.blockIfFull() && config.blockIfFullTimeoutMillis() > 0) {
-                pooledConnectionFactory.setBlockIfSessionPoolIsFullTimeout(config.blockIfFullTimeoutMillis());
-            }
+            final JmsPoolConnectionFactory pooledConnectionFactory =
+                    setupPooledConnectionFactory(underlyingConnectionFactory);
 
             LOG.info("Pooled ConnectionFactory initialized successfully for id: {}", id);
             return pooledConnectionFactory;
         }
+    }
+
+    private <T> JmsPoolConnectionFactory setupPooledConnectionFactory(T underlyingConnectionFactory) {
+        // Configure pooled connection factory
+        JmsPoolConnectionFactory pooledConnectionFactory = new JmsPoolConnectionFactory();
+        pooledConnectionFactory.setConnectionFactory(underlyingConnectionFactory);
+        pooledConnectionFactory.setMaxConnections(config.maxConnections());
+        pooledConnectionFactory.setMaxSessionsPerConnection(config.maxSessionsPerConnection());
+        pooledConnectionFactory.setConnectionIdleTimeout((int) config.idleTimeoutMillis());
+        pooledConnectionFactory.setConnectionCheckInterval(config.expiryTimeoutMillis());
+        pooledConnectionFactory.setBlockIfSessionPoolIsFull(config.blockIfFull());
+
+        if (config.blockIfFull() && config.blockIfFullTimeoutMillis() > 0) {
+            pooledConnectionFactory.setBlockIfSessionPoolIsFullTimeout(config.blockIfFullTimeoutMillis());
+        }
+        return pooledConnectionFactory;
     }
 
     protected ConnectionFactoryConfig getConfig() {
