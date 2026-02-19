@@ -3,7 +3,6 @@ package io.kaoto.forage.models.chat.ollama;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.kaoto.forage.core.util.config.ConfigStore;
-import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,7 +29,7 @@ class OllamaNamedConfigurationTest {
 
     @Test
     @DisplayName("Should handle unnamed configurations only")
-    void handledUnnamedOnly() throws IOException {
+    void handledUnnamedOnly() {
         OllamaConfig config = new OllamaConfig();
 
         assertThat(config.baseUrl()).isEqualTo("http://config-file-server:11434");
@@ -45,7 +44,7 @@ class OllamaNamedConfigurationTest {
 
     @Test
     @DisplayName("Should handle named configurations only")
-    void handledNamedOnly() throws IOException {
+    void handledNamedOnly() {
         OllamaConfig config = new OllamaConfig("instance1");
 
         assertThat(config.baseUrl()).isEqualTo("http://instance1-server:11434");

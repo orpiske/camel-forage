@@ -45,8 +45,9 @@ public class ForageJdbcProcessor {
     @BuildStep
     @Record(value = ExecutionTime.STATIC_INIT)
     void registerAggregation(
-            CamelContextBuildItem context, ForageJdbcRecorder recorder, BuildProducer<CamelRuntimeBeanBuildItem> beans)
-            throws Exception {
+            CamelContextBuildItem context,
+            ForageJdbcRecorder recorder,
+            BuildProducer<CamelRuntimeBeanBuildItem> beans) {
         ConfigStore.getInstance().setClassLoader(Thread.currentThread().getContextClassLoader());
         DataSourceFactoryConfig config = new DataSourceFactoryConfig();
         Set<String> prefixes =

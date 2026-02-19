@@ -71,10 +71,9 @@ public class TestDataSourceCommand extends CamelCommand {
      * Executes the datasource connection test.
      *
      * @return 0 if successful, 1 if failed
-     * @throws Exception if command execution fails
      */
     @Override
-    public Integer doCall() throws Exception {
+    public Integer doCall() {
         try {
             if (directory == null) {
                 directory = new File(System.getProperty("user.dir"));
@@ -186,9 +185,8 @@ public class TestDataSourceCommand extends CamelCommand {
      * @param dbKind the database type
      * @param classLoader the classloader containing the provider
      * @return configured DataSource instance
-     * @throws Exception if datasource creation fails
      */
-    private DataSourceProvider createDataSourceProvider(String dbKind, ClassLoader classLoader) throws Exception {
+    private DataSourceProvider createDataSourceProvider(String dbKind, ClassLoader classLoader) {
         Set<Class<? extends DataSourceProvider>> providers = findImplementations(classLoader);
 
         return providers.stream()

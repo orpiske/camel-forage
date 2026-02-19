@@ -3,7 +3,6 @@ package io.kaoto.forage.models.chat.ollama;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.kaoto.forage.core.util.config.ConfigStore;
-import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +28,7 @@ class OllamaConfigurationSourcesTest {
 
     @Test
     @DisplayName("Should load from configuration file only")
-    void shouldLoadFromConfigurationFileOnly() throws IOException {
+    void shouldLoadFromConfigurationFileOnly() {
         OllamaConfig config = new OllamaConfig();
 
         assertThat(config.baseUrl()).isEqualTo("http://config-file-server:11434");

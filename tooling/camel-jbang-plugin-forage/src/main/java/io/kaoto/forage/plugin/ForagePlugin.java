@@ -59,7 +59,7 @@ public class ForagePlugin implements Plugin {
             }
 
             @Override
-            public void addSourceFiles(Path buildDir, String packageName, Printer printer) throws Exception {}
+            public void addSourceFiles(Path buildDir, String packageName, Printer printer) {}
         });
     }
 }

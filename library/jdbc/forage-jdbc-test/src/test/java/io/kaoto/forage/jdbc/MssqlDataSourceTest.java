@@ -55,7 +55,7 @@ public class MssqlDataSourceTest extends DataSourceTest {
     }
 
     @Test
-    public void testDefaultTransactedDataSource() throws Exception {
+    public void testDefaultTransactedDataSource() {
         // XA Transactions do not work with mssql docker image
     }
 }

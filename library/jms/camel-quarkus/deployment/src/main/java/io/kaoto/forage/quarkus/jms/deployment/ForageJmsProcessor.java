@@ -42,8 +42,7 @@ public class ForageJmsProcessor {
 
     @BuildStep
     @Record(value = ExecutionTime.STATIC_INIT)
-    void registerIbmMqConnectionFactory(ForageJmsRecorder recorder, BuildProducer<CamelRuntimeBeanBuildItem> beans)
-            throws Exception {
+    void registerIbmMqConnectionFactory(ForageJmsRecorder recorder, BuildProducer<CamelRuntimeBeanBuildItem> beans) {
 
         ConnectionFactoryConfig config = new ConnectionFactoryConfig();
         Set<String> named = ConfigStore.getInstance().readPrefixes(config, ConfigHelper.getNamedPropertyRegexp("jms"));

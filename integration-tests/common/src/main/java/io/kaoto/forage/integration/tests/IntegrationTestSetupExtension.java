@@ -61,7 +61,7 @@ public class IntegrationTestSetupExtension implements BeforeEachCallback, AfterA
         }
     }
 
-    private void runBeforeAll(ExtensionContext context, CamelActionBuilder camel) throws Exception {
+    private void runBeforeAll(ExtensionContext context, CamelActionBuilder camel) {
 
         if (context.getRequiredTestInstance() instanceof ForageIntegrationTest forageTest) {
 
@@ -80,7 +80,7 @@ public class IntegrationTestSetupExtension implements BeforeEachCallback, AfterA
     }
 
     @Override
-    public void afterAll(ExtensionContext context) throws Exception {
+    public void afterAll(ExtensionContext context) {
         previousTestContext = null;
         LOG.info("Running 'afterAll' setup for class: %s"
                 .formatted(context.getRequiredTestClass().getName()));
@@ -94,7 +94,7 @@ public class IntegrationTestSetupExtension implements BeforeEachCallback, AfterA
         closeables.clear();
     }
 
-    private void internalBeforeAll(ExtensionContext context, CamelActionBuilder camel) throws Exception {
+    private void internalBeforeAll(ExtensionContext context, CamelActionBuilder camel) {
         String projectVersion = ExportHelper.getProjectVersion();
         // ensure, that forage plugin is installed
         CitrusExtensionHelper.getTestRunner(context)

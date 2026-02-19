@@ -3,7 +3,6 @@ package io.kaoto.forage.vectordb.inmemory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.kaoto.forage.core.util.config.ConfigStore;
-import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +28,7 @@ class InMemoryStoreSourcesTest {
 
     @Test
     @DisplayName("Should load from configuration file only")
-    void shouldLoadFromConfigurationFileOnly() throws IOException {
+    void shouldLoadFromConfigurationFileOnly() {
         InMemoryStoreConfig config = new InMemoryStoreConfig();
 
         assertThat(config.fileSource()).isEqualTo("file.txt");
