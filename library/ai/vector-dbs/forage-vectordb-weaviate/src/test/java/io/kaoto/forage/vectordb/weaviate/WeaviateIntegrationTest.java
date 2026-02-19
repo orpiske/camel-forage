@@ -40,7 +40,8 @@ public class WeaviateIntegrationTest {
             httpUrl = new URL("http://" + weaviateContainer.getHttpHostAddress());
             grpcUrl = new URL("http://" + weaviateContainer.getGrpcHostAddress());
         } catch (java.net.MalformedURLException mue) {
-            mue.printStackTrace();
+            LOG.error("Failed to set up Weaviate configuration", mue);
+            fail(mue.getMessage());
         }
 
         Integer httpPort = httpUrl.getPort();
