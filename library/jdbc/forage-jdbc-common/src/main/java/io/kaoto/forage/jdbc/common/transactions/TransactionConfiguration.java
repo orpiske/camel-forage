@@ -64,14 +64,6 @@ public class TransactionConfiguration {
         }
 
         // TODO Handle jdbc case, a datasource has to be created for this use case
-        //        if ("jdbc".equals(config.transactionObjectStoreType())) {
-        //            osBean.setObjectStoreType(JDBCStore.class.getName());
-        //            osBean.setJdbcDataSource(objectStorageDataSource);
-        //
-        //            osBean.setCreateTable(config.transactionObjectStoreCreateTable());
-        //            osBean.setDropTable(config.transactionObjectStoreDropTable());
-        //            osBean.setTablePrefix(config.transactionObjectStoreTablePrefix());
-        //        }
         log.debug("Object store configured successfully");
     }
 

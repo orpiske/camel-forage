@@ -305,15 +305,6 @@ public final class AgentConfigEntries extends ConfigEntries {
             "string",
             false,
             ConfigTag.COMMON);
-    //    public static final ConfigModule EMBEDDING_MODEL_CUSTOM_HEADERS = ConfigModule.of(
-    //            AgentConfig.class,
-    //            "forage.agent.embedding.model.custom.headers",
-    //            "todo",
-    //            "Custom Headers",
-    //            null,
-    //            "map",
-    //            false,
-    //            ConfigTag.COMMON);
     public static final ConfigModule EMBEDDING_MODEL_TIMEOUT = ConfigModule.of(
             AgentConfig.class,
             "forage.agent.embedding.model.timeout",
