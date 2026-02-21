@@ -29,7 +29,7 @@ env:
 
 jobs:
   build:
-    if: github.repository == 'megacamelus/camel-forage'
+    if: github.repository == 'KaotoIO/forage'
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
     strategy:
@@ -53,6 +53,7 @@ jobs:
         run: mvn -B '-Dsurefire.rerunFailingTestsCount=2' '-Dci.env.name=github.com' package --file pom.xml
 
   build-with-integration-tests:
+    if: github.repository == 'KaotoIO/forage'
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.experimental }}
     strategy:
