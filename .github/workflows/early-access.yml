@@ -10,6 +10,7 @@ on:
 jobs:
   publish-snapshot:
     name: Publish Snapshot
+    if: github.repository == 'KaotoIO/forage'
     runs-on: ubuntu-latest
 
     steps:
