@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.util.Properties;
 import org.apache.camel.dsl.jbang.core.commands.CamelJBangMain;
 import org.apache.camel.dsl.jbang.core.common.StringPrinter;
+import io.kaoto.forage.core.common.VersionHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -42,11 +43,16 @@ class ConfigWriteCommandDeleteTest {
                 forage.myPG.jdbc.url=jdbc:postgresql://localhost:5432/
                 forage.myPG.jdbc.username=test
                 forage.myPG.jdbc.password=test
-                camel.jbang.dependencies=io.kaoto.forage:forage-jdbc-postgresql:1.0-SNAPSHOT
-                camel.jbang.dependencies.main=io.kaoto.forage:forage-jdbc:1.0-SNAPSHOT
-                camel.jbang.dependencies.spring-boot=io.kaoto.forage:forage-jdbc-starter:1.0-SNAPSHOT
-                camel.jbang.dependencies.quarkus=io.kaoto.forage:forage-quarkus-jdbc-deployment:1.0-SNAPSHOT
-                """;
+                camel.jbang.dependencies=io.kaoto.forage:forage-jdbc-postgresql:%s
+                camel.jbang.dependencies.main=io.kaoto.forage:forage-jdbc:%s
+                camel.jbang.dependencies.spring-boot=io.kaoto.forage:forage-jdbc-starter:%s
+                camel.jbang.dependencies.quarkus=io.kaoto.forage:forage-quarkus-jdbc-deployment:%s
+                """
+                        .formatted(
+                                VersionHelper.VERSION,
+                                VersionHelper.VERSION,
+                                VersionHelper.VERSION,
+                                VersionHelper.VERSION);
         Files.writeString(propsFile.toPath(), existingContent);
 
         // Execute delete command
@@ -102,11 +108,17 @@ class ConfigWriteCommandDeleteTest {
                 forage.myMariaDB.jdbc.password=mariapass
 
                 # Dependencies for both
-                camel.jbang.dependencies=io.kaoto.forage:forage-jdbc-postgresql:1.0-SNAPSHOT,io.kaoto.forage:forage-jdbc-mariadb:1.0-SNAPSHOT
-                camel.jbang.dependencies.main=io.kaoto.forage:forage-jdbc:1.0-SNAPSHOT
-                camel.jbang.dependencies.spring-boot=io.kaoto.forage:forage-jdbc-starter:1.0-SNAPSHOT
-                camel.jbang.dependencies.quarkus=io.kaoto.forage:forage-quarkus-jdbc-deployment:1.0-SNAPSHOT
-                """;
+                camel.jbang.dependencies=io.kaoto.forage:forage-jdbc-postgresql:%s,io.kaoto.forage:forage-jdbc-mariadb:%s
+                camel.jbang.dependencies.main=io.kaoto.forage:forage-jdbc:%s
+                camel.jbang.dependencies.spring-boot=io.kaoto.forage:forage-jdbc-starter:%s
+                camel.jbang.dependencies.quarkus=io.kaoto.forage:forage-quarkus-jdbc-deployment:%s
+                """
+                        .formatted(
+                                VersionHelper.VERSION,
+                                VersionHelper.VERSION,
+                                VersionHelper.VERSION,
+                                VersionHelper.VERSION,
+                                VersionHelper.VERSION);
         Files.writeString(propsFile.toPath(), existingContent);
 
         // Execute delete command for PostgreSQL only
@@ -144,15 +156,15 @@ class ConfigWriteCommandDeleteTest {
 
         // Factory dependencies should be preserved (MariaDB still uses jdbc factory)
         assertThat(props.getProperty("camel.jbang.dependencies.main"))
-                .contains("io.kaoto.forage:forage-jdbc:1.0-SNAPSHOT");
+                .contains("io.kaoto.forage:forage-jdbc:%s".formatted(VersionHelper.VERSION));
         assertThat(props.getProperty("camel.jbang.dependencies.spring-boot"))
-                .contains("io.kaoto.forage:forage-jdbc-starter:1.0-SNAPSHOT");
+                .contains("io.kaoto.forage:forage-jdbc-starter:%s".formatted(VersionHelper.VERSION));
         assertThat(props.getProperty("camel.jbang.dependencies.quarkus"))
-                .contains("io.kaoto.forage:forage-quarkus-jdbc-deployment:1.0-SNAPSHOT");
+                .contains("io.kaoto.forage:forage-quarkus-jdbc-deployment:%s".formatted(VersionHelper.VERSION));
 
         // MariaDB bean dependency should be preserved
         assertThat(props.getProperty("camel.jbang.dependencies"))
-                .contains("io.kaoto.forage:forage-jdbc-mariadb:1.0-SNAPSHOT");
+                .contains("io.kaoto.forage:forage-jdbc-mariadb:%s".formatted(VersionHelper.VERSION));
     }
 
     @Test
@@ -167,11 +179,16 @@ class ConfigWriteCommandDeleteTest {
                 forage.myOllama.ollama.log.requests=true
 
                 # Agent factory dependencies
-                camel.jbang.dependencies=io.kaoto.forage:forage-model-ollama:1.0-SNAPSHOT
-                camel.jbang.dependencies.main=io.kaoto.forage:forage-agent:1.0-SNAPSHOT
-                camel.jbang.dependencies.spring-boot=io.kaoto.forage:forage-agent-starter:1.0-SNAPSHOT
-                camel.jbang.dependencies.quarkus=io.kaoto.forage:forage-quarkus-agent-deployment:1.0-SNAPSHOT
-                """;
+                camel.jbang.dependencies=io.kaoto.forage:forage-model-ollama:%s
+                camel.jbang.dependencies.main=io.kaoto.forage:forage-agent:%s
+                camel.jbang.dependencies.spring-boot=io.kaoto.forage:forage-agent-starter:%s
+                camel.jbang.dependencies.quarkus=io.kaoto.forage:forage-quarkus-agent-deployment:%s
+                """
+                        .formatted(
+                                VersionHelper.VERSION,
+                                VersionHelper.VERSION,
+                                VersionHelper.VERSION,
+                                VersionHelper.VERSION);
         Files.writeString(propsFile.toPath(), existingContent);
 
         // Execute delete command
@@ -234,11 +251,20 @@ class ConfigWriteCommandDeleteTest {
                 forage.myArtemis.jms.password=admin
 
                 # Dependencies
-                camel.jbang.dependencies=io.kaoto.forage:forage-jdbc-postgresql:1.0-SNAPSHOT,io.kaoto.forage:forage-jms-artemis:1.0-SNAPSHOT
-                camel.jbang.dependencies.main=io.kaoto.forage:forage-jdbc:1.0-SNAPSHOT,io.kaoto.forage:forage-jms:1.0-SNAPSHOT
-                camel.jbang.dependencies.spring-boot=io.kaoto.forage:forage-jdbc-starter:1.0-SNAPSHOT,io.kaoto.forage:forage-jms-starter:1.0-SNAPSHOT
-                camel.jbang.dependencies.quarkus=io.kaoto.forage:forage-quarkus-jdbc-deployment:1.0-SNAPSHOT,io.kaoto.forage:forage-quarkus-jms-deployment:1.0-SNAPSHOT
-                """;
+                camel.jbang.dependencies=io.kaoto.forage:forage-jdbc-postgresql:%s,io.kaoto.forage:forage-jms-artemis:%s
+                camel.jbang.dependencies.main=io.kaoto.forage:forage-jdbc:%s,io.kaoto.forage:forage-jms:%s
+                camel.jbang.dependencies.spring-boot=io.kaoto.forage:forage-jdbc-starter:%s,io.kaoto.forage:forage-jms-starter:%s
+                camel.jbang.dependencies.quarkus=io.kaoto.forage:forage-quarkus-jdbc-deployment:%s,io.kaoto.forage:forage-quarkus-jms-deployment:%s
+                """
+                        .formatted(
+                                VersionHelper.VERSION,
+                                VersionHelper.VERSION,
+                                VersionHelper.VERSION,
+                                VersionHelper.VERSION,
+                                VersionHelper.VERSION,
+                                VersionHelper.VERSION,
+                                VersionHelper.VERSION,
+                                VersionHelper.VERSION);
         Files.writeString(propsFile.toPath(), existingContent);
 
         // Execute delete command for PostgreSQL
@@ -293,9 +319,10 @@ class ConfigWriteCommandDeleteTest {
                 forage.myPG.jdbc.password=test
 
                 # Dependencies including custom ones
-                camel.jbang.dependencies=com.example:custom-lib:1.0,io.kaoto.forage:forage-jdbc-postgresql:1.0-SNAPSHOT,com.another:lib:2.0
-                camel.jbang.dependencies.main=com.example:custom-main:1.0,io.kaoto.forage:forage-jdbc:1.0-SNAPSHOT
-                """;
+                camel.jbang.dependencies=com.example:custom-lib:1.0,io.kaoto.forage:forage-jdbc-postgresql:%s,com.another:lib:2.0
+                camel.jbang.dependencies.main=com.example:custom-main:1.0,io.kaoto.forage:forage-jdbc:%s
+                """
+                        .formatted(VersionHelper.VERSION, VersionHelper.VERSION);
         Files.writeString(propsFile.toPath(), existingContent);
 
         // Execute delete command

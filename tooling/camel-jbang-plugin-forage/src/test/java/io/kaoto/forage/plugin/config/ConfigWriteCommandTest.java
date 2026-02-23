@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.util.Properties;
 import org.apache.camel.dsl.jbang.core.commands.CamelJBangMain;
 import org.apache.camel.dsl.jbang.core.common.StringPrinter;
+import io.kaoto.forage.core.common.VersionHelper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -377,11 +378,16 @@ class ConfigWriteCommandTest {
                 forage.myPG.jdbc.password=test
 
                 # Existing dependencies
-                camel.jbang.dependencies=io.kaoto.forage:forage-jdbc-postgresql:1.0-SNAPSHOT
-                camel.jbang.dependencies.main=io.kaoto.forage:forage-jdbc:1.0-SNAPSHOT
-                camel.jbang.dependencies.spring-boot=io.kaoto.forage:forage-jdbc-starter:1.0-SNAPSHOT
-                camel.jbang.dependencies.quarkus=io.kaoto.forage:forage-quarkus-jdbc-deployment:1.0-SNAPSHOT
-                """;
+                camel.jbang.dependencies=io.kaoto.forage:forage-jdbc-postgresql:%s
+                camel.jbang.dependencies.main=io.kaoto.forage:forage-jdbc:%s
+                camel.jbang.dependencies.spring-boot=io.kaoto.forage:forage-jdbc-starter:%s
+                camel.jbang.dependencies.quarkus=io.kaoto.forage:forage-quarkus-jdbc-deployment:%s
+                """
+                        .formatted(
+                                VersionHelper.VERSION,
+                                VersionHelper.VERSION,
+                                VersionHelper.VERSION,
+                                VersionHelper.VERSION);
         Files.writeString(propsFile.toPath(), existingContent);
 
         // Step 1: Add Google Gemini agent configuration
@@ -421,12 +427,13 @@ class ConfigWriteCommandTest {
 
         // Verify base dependencies contain PostgreSQL and Google Gemini
         String baseDepsAfterGemini = propsAfterGemini.getProperty("camel.jbang.dependencies");
-        assertThat(baseDepsAfterGemini).contains("io.kaoto.forage:forage-jdbc-postgresql:1.0-SNAPSHOT");
+        assertThat(baseDepsAfterGemini)
+                .contains("io.kaoto.forage:forage-jdbc-postgresql:%s".formatted(VersionHelper.VERSION));
         assertThat(baseDepsAfterGemini).contains("io.kaoto.forage:forage-model-google-gemini:");
 
         // Verify main dependencies still contain JDBC
         String mainDepsAfterGemini = propsAfterGemini.getProperty("camel.jbang.dependencies.main");
-        assertThat(mainDepsAfterGemini).contains("io.kaoto.forage:forage-jdbc:1.0-SNAPSHOT");
+        assertThat(mainDepsAfterGemini).contains("io.kaoto.forage:forage-jdbc:%s".formatted(VersionHelper.VERSION));
 
         // Step 2: Add JMS Artemis configuration using ConfigWriteCommand
         printer = new StringPrinter(); // Reset printer for second command
@@ -473,23 +480,26 @@ class ConfigWriteCommandTest {
 
         // Verify base dependencies contain PostgreSQL, Google Gemini, and Artemis
         String finalBaseDeps = finalProps.getProperty("camel.jbang.dependencies");
-        assertThat(finalBaseDeps).contains("io.kaoto.forage:forage-jdbc-postgresql:1.0-SNAPSHOT");
+        assertThat(finalBaseDeps)
+                .contains("io.kaoto.forage:forage-jdbc-postgresql:%s".formatted(VersionHelper.VERSION));
         assertThat(finalBaseDeps).contains("io.kaoto.forage:forage-model-google-gemini:");
         assertThat(finalBaseDeps).contains("io.kaoto.forage:forage-jms-artemis:");
 
         // Verify main dependencies contain both JDBC and JMS
         String finalMainDeps = finalProps.getProperty("camel.jbang.dependencies.main");
-        assertThat(finalMainDeps).contains("io.kaoto.forage:forage-jdbc:1.0-SNAPSHOT");
+        assertThat(finalMainDeps).contains("io.kaoto.forage:forage-jdbc:%s".formatted(VersionHelper.VERSION));
         assertThat(finalMainDeps).contains("io.kaoto.forage:forage-jms:");
 
         // Verify spring-boot dependencies contain both JDBC and JMS starters
         String finalSpringBootDeps = finalProps.getProperty("camel.jbang.dependencies.spring-boot");
-        assertThat(finalSpringBootDeps).contains("io.kaoto.forage:forage-jdbc-starter:1.0-SNAPSHOT");
+        assertThat(finalSpringBootDeps)
+                .contains("io.kaoto.forage:forage-jdbc-starter:%s".formatted(VersionHelper.VERSION));
         assertThat(finalSpringBootDeps).contains("io.kaoto.forage:forage-jms-starter:");
 
         // Verify quarkus dependencies contain both JDBC and JMS
         String finalQuarkusDeps = finalProps.getProperty("camel.jbang.dependencies.quarkus");
-        assertThat(finalQuarkusDeps).contains("io.kaoto.forage:forage-quarkus-jdbc-deployment:1.0-SNAPSHOT");
+        assertThat(finalQuarkusDeps)
+                .contains("io.kaoto.forage:forage-quarkus-jdbc-deployment:%s".formatted(VersionHelper.VERSION));
         assertThat(finalQuarkusDeps).contains("io.kaoto.forage:forage-quarkus-jms-deployment:");
     }
 

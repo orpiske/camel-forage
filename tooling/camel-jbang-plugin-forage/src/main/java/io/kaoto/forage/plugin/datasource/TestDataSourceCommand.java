@@ -22,6 +22,7 @@ import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
+import io.kaoto.forage.core.common.VersionHelper;
 import io.kaoto.forage.core.jdbc.DataSourceProvider;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigStore;
@@ -273,7 +274,7 @@ public class TestDataSourceCommand extends CamelCommand {
         }
 
         // Ultimate fallback
-        return "1.0-SNAPSHOT";
+        return VersionHelper.VERSION;
     }
 
     /**
