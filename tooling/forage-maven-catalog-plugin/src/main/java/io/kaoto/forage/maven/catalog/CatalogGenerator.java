@@ -13,11 +13,13 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import io.kaoto.forage.catalog.model.ConfigEntry;
+import io.kaoto.forage.catalog.model.ConfigurationModule;
 import io.kaoto.forage.catalog.model.FactoryVariant;
 import io.kaoto.forage.catalog.model.FactoryVariants;
 import io.kaoto.forage.catalog.model.FeatureBeans;
 import io.kaoto.forage.catalog.model.ForageBean;
 import io.kaoto.forage.catalog.model.ForageCatalog;
+import io.kaoto.forage.catalog.model.ForageConfigurationCatalog;
 import io.kaoto.forage.catalog.model.ForageFactory;
 import io.kaoto.forage.core.annotations.FactoryType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -81,6 +83,9 @@ public class CatalogGenerator {
                 generatedFiles.add(generateYamlCatalog(catalog, outputDirectory));
             }
         }
+
+        // Generate the configuration catalog with ALL configs across all modules
+        generatedFiles.addAll(generateConfigurationCatalog(components, outputDirectory));
 
         return new CatalogResult(factories.size(), generatedFiles);
     }
@@ -423,6 +428,84 @@ public class CatalogGenerator {
         }
 
         return result;
+    }
+
+    /**
+     * Generates a configuration catalog containing ALL configuration entries across all modules,
+     * regardless of whether they are associated with a factory.
+     */
+    List<File> generateConfigurationCatalog(List<ForageComponent> components, File outputDirectory) throws IOException {
+        ConfigMappings configMappings = collectConfigMappings(components);
+
+        List<ConfigurationModule> modules = new ArrayList<>();
+
+        for (ForageComponent component : components) {
+            if (component.getConfigurationProperties() == null
+                    || component.getConfigurationProperties().isEmpty()) {
+                continue;
+            }
+
+            ConfigurationModule module = new ConfigurationModule();
+            module.setArtifactId(component.getArtifactId());
+            module.setGroupId(component.getGroupId());
+            module.setPropertiesFile(resolvePropertiesFileForComponent(component, configMappings.classToConfigName));
+            module.setConfigEntries(new ArrayList<>(component.getConfigurationProperties()));
+            modules.add(module);
+        }
+
+        log.info("Generated configuration catalog with " + modules.size() + " modules");
+
+        ForageConfigurationCatalog configCatalog = new ForageConfigurationCatalog();
+        configCatalog.setVersion("1.0");
+        configCatalog.setGeneratedBy("forage-maven-catalog-plugin");
+        configCatalog.setTimestamp(System.currentTimeMillis());
+        configCatalog.setModules(modules);
+
+        List<File> generatedFiles = new ArrayList<>();
+
+        switch (format.toLowerCase()) {
+            case "json" -> generatedFiles.add(generateJsonConfigurationCatalog(configCatalog, outputDirectory));
+            case "yaml" -> generatedFiles.add(generateYamlConfigurationCatalog(configCatalog, outputDirectory));
+            default -> {
+                generatedFiles.add(generateJsonConfigurationCatalog(configCatalog, outputDirectory));
+                generatedFiles.add(generateYamlConfigurationCatalog(configCatalog, outputDirectory));
+            }
+        }
+
+        return generatedFiles;
+    }
+
+    /**
+     * Resolves the properties file name for a component by looking at its config classes.
+     */
+    private String resolvePropertiesFileForComponent(ForageComponent component, Map<String, String> classToConfigName) {
+        if (component.getConfigClasses() == null || component.getConfigClasses().isEmpty()) {
+            return null;
+        }
+
+        // Use the first config class that resolves to a properties file
+        for (Map.Entry<String, String> entry : component.getConfigClasses().entrySet()) {
+            String configName = entry.getValue();
+            if (configName != null && !configName.isEmpty()) {
+                return configName + ".properties";
+            }
+        }
+
+        return null;
+    }
+
+    private File generateJsonConfigurationCatalog(ForageConfigurationCatalog catalog, File outputDirectory)
+            throws IOException {
+        File outputFile = new File(outputDirectory, "forage-configuration-catalog.json");
+        objectMapper.writeValue(outputFile, catalog);
+        return outputFile;
+    }
+
+    private File generateYamlConfigurationCatalog(ForageConfigurationCatalog catalog, File outputDirectory)
+            throws IOException {
+        File outputFile = new File(outputDirectory, "forage-configuration-catalog.yaml");
+        yamlObjectMapper.writeValue(outputFile, catalog);
+        return outputFile;
     }
 
     private List<ForageComponent> discoverComponents(MavenProject project) {
