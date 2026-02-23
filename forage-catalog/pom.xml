@@ -328,15 +328,30 @@
                         <goals>
                             <goal>generate</goal>
                         </goals>
+                        <configuration>
+                            <classNames>
+                                <className>io.kaoto.forage.catalog.model.ForageCatalog</className>
+                            </classNames>
+                            <schemaFileName>forage-catalog.schema.json</schemaFileName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-configuration-schema</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <classNames>
+                                <className>io.kaoto.forage.catalog.model.ForageConfigurationCatalog</className>
+                            </classNames>
+                            <schemaFileName>forage-configuration-catalog.schema.json</schemaFileName>
+                        </configuration>
                     </execution>
                 </executions>
                 <configuration>
-                    <classNames>
-                        <className>io.kaoto.forage.catalog.model.ForageCatalog</className>
-                    </classNames>
                     <classpath>WITH_COMPILE_DEPENDENCIES</classpath>
                     <schemaFilePath>${project.build.directory}/generated-catalog</schemaFilePath>
-                    <schemaFileName>forage-catalog.schema.json</schemaFileName>
                     <schemaVersion>DRAFT_2020_12</schemaVersion>
                     <options>
                         <preset>PLAIN_JSON</preset>
@@ -402,6 +417,11 @@
                                     <file>${project.build.directory}/generated-catalog/forage-catalog.json</file>
                                     <type>json</type>
                                     <classifier>catalog</classifier>
+                                </artifact>
+                                <artifact>
+                                    <file>${project.build.directory}/generated-catalog/forage-configuration-catalog.json</file>
+                                    <type>json</type>
+                                    <classifier>configuration-catalog</classifier>
                                 </artifact>
                             </artifacts>
                         </configuration>
