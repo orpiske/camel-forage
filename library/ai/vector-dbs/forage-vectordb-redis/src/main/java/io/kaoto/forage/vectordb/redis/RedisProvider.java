@@ -11,6 +11,9 @@ import dev.langchain4j.community.store.embedding.redis.MetricType;
 import dev.langchain4j.community.store.embedding.redis.RedisEmbeddingStore;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
+import redis.clients.jedis.DefaultJedisClientConfig;
+import redis.clients.jedis.HostAndPort;
+import redis.clients.jedis.UnifiedJedis;
 
 /**
  * Provider for creating Redis embedding stores with configurable parameters.
@@ -86,26 +89,16 @@ public class RedisProvider implements EmbeddingStoreProvider {
                 distanceMetric);
 
         RedisEmbeddingStore.Builder builder = RedisEmbeddingStore.builder()
-                .host(host)
-                .port(port)
                 .dimension(dimension)
                 .prefix(prefix)
                 .indexName(indexName);
-
-        // Set optional authentication parameters if configured
-        if (user != null) {
-            builder.user(user);
-        }
-
-        if (password != null) {
-            builder.password(password);
-        }
+        builder.unifiedJedis(createUnifiedJedis(user, password, host, port));
 
         // Set optional metadata fields if configured
         if (metadataFields != null && !metadataFields.trim().isEmpty()) {
             String[] fields = metadataFields.split(",");
             Collection<String> fieldNames = new ArrayList<>(Arrays.asList(fields));
-            builder.metadataFieldsName(fieldNames);
+            builder.metadataKeys(fieldNames);
         }
 
         // Set distance metric
@@ -120,5 +113,22 @@ public class RedisProvider implements EmbeddingStoreProvider {
                 };
 
         return builder.build();
+    }
+
+    private static UnifiedJedis createUnifiedJedis(String user, String password, String host, int port) {
+        final UnifiedJedis unifiedJedis;
+        final DefaultJedisClientConfig.Builder jedisClientConfigBuilder = DefaultJedisClientConfig.builder();
+
+        // Set optional authentication parameters if configured
+        if (user != null) {
+            jedisClientConfigBuilder.user(user);
+        }
+
+        if (password != null) {
+            jedisClientConfigBuilder.password(password);
+        }
+
+        unifiedJedis = new UnifiedJedis(new HostAndPort(host, port), jedisClientConfigBuilder.build());
+        return unifiedJedis;
     }
 }
