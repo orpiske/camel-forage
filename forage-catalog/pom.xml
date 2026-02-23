@@ -119,6 +119,18 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- Guardrail Modules -->
+        <dependency>
+            <groupId>io.kaoto.forage</groupId>
+            <artifactId>forage-guardrails-input</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.kaoto.forage</groupId>
+            <artifactId>forage-guardrails-output</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- AI Model Modules -->
         <dependency>
             <groupId>io.kaoto.forage</groupId>
@@ -183,6 +195,27 @@
         <dependency>
             <groupId>io.kaoto.forage</groupId>
             <artifactId>forage-model-watsonx-ai</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Embedding Model Modules -->
+        <dependency>
+            <groupId>io.kaoto.forage</groupId>
+            <artifactId>forage-model-embeddings-ollama</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- RAG Modules -->
+        <dependency>
+            <groupId>io.kaoto.forage</groupId>
+            <artifactId>forage-default-retrieval-augmentor</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- In-Memory Vector Store -->
+        <dependency>
+            <groupId>io.kaoto.forage</groupId>
+            <artifactId>forage-in-memory-store</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -291,6 +324,37 @@
                     <artifactId>camel-quarkus-core-deployment</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!-- Cloud Modules -->
+        <dependency>
+            <groupId>io.kaoto.forage</groupId>
+            <artifactId>forage-azure-eventhubs</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Vert.x Modules -->
+        <dependency>
+            <groupId>io.kaoto.forage</groupId>
+            <artifactId>forage-vertx</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Route Policy Modules -->
+        <dependency>
+            <groupId>io.kaoto.forage</groupId>
+            <artifactId>forage-policy-factory</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.kaoto.forage</groupId>
+            <artifactId>forage-policy-flip</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.kaoto.forage</groupId>
+            <artifactId>forage-policy-schedule</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
