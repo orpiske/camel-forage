@@ -3,10 +3,13 @@ package io.kaoto.forage.plugin.config;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import io.kaoto.forage.catalog.model.ConditionalBeanGroup;
 import io.kaoto.forage.catalog.model.ConfigEntry;
 import io.kaoto.forage.catalog.model.FactoryVariant;
@@ -39,8 +42,8 @@ public final class ForageCatalog {
     private final Map<String, List<ConditionalBeanGroup>> conditionalBeansByFactory;
     // Maps factory type key to its variants (base, springboot, quarkus)
     private final Map<String, FactoryVariants> factoryVariantsByKey;
-    // Maps bean name to its GAV coordinate
-    private final Map<String, String> beanNameToGav;
+    // Maps bean name to its GAV coordinates (multiple beans can share a name across features)
+    private final Map<String, Set<String>> beanNameToGav;
 
     private ForageCatalog(io.kaoto.forage.catalog.model.ForageCatalog catalog) {
         this.catalog = catalog;
@@ -140,10 +143,12 @@ public final class ForageCatalog {
                                     beanNameToFactoryKey.put(beanName.toLowerCase(), factoryTypeKey);
                                     beanNameToFeature.put(beanName.toLowerCase(), featureName);
 
-                                    // Store bean GAV
+                                    // Store bean GAV (multiple beans may share a name across features)
                                     String beanGav = bean.getGav();
                                     if (beanGav != null && !beanGav.isEmpty()) {
-                                        beanNameToGav.put(beanName.toLowerCase(), beanGav);
+                                        beanNameToGav
+                                                .computeIfAbsent(beanName.toLowerCase(), k -> new HashSet<>())
+                                                .add(beanGav);
                                     }
 
                                     // Extract property prefix from bean's configEntries
@@ -437,16 +442,18 @@ public final class ForageCatalog {
     }
 
     /**
-     * Gets the GAV coordinate for a bean by its name.
+     * Gets all GAV coordinates for a bean by its name.
+     * Multiple beans can share a name across different features (e.g., "ollama" exists
+     * as both a Chat Model and an Embeddings Model).
      *
      * @param beanName the bean name (e.g., "postgresql", "artemis", "ollama")
-     * @return Optional containing the GAV if found
+     * @return a collection of matching GAVs, or an empty collection if none found
      */
-    public Optional<String> getBeanGav(String beanName) {
+    public Collection<String> getBeanGavs(String beanName) {
         if (beanName == null) {
-            return Optional.empty();
+            return Collections.emptySet();
         }
-        return Optional.ofNullable(beanNameToGav.get(beanName.toLowerCase()));
+        return beanNameToGav.getOrDefault(beanName.toLowerCase(), Collections.emptySet());
     }
 
     /**

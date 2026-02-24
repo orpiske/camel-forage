@@ -394,7 +394,7 @@ public class ConfigWriteCommand extends CamelCommand {
 
             // Add bean GAV if kind is specified
             if (kind != null && !kind.isEmpty()) {
-                catalog.getBeanGav(kind).ifPresent(baseDeps::add);
+                baseDeps.addAll(catalog.getBeanGavs(kind));
             }
 
             // Add factory variant GAVs
@@ -871,7 +871,7 @@ public class ConfigWriteCommand extends CamelCommand {
         for (String deletedType : deletedTypes) {
             if (!remainingTypes.contains(deletedType)) {
                 // This type is no longer configured, remove its dependency
-                catalog.getBeanGav(deletedType).ifPresent(gavsToRemove::add);
+                gavsToRemove.addAll(catalog.getBeanGavs(deletedType));
             }
         }
 
