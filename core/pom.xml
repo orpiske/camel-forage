@@ -14,6 +14,7 @@
 
     <modules>
         <module>forage-catalog-model</module>
+        <module>forage-catalog-reader</module>
         <module>forage-core-common</module>
         <module>forage-core-ai</module>
         <module>forage-core-guardrails</module>

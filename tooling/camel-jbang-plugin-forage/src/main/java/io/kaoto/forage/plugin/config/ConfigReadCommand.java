@@ -20,6 +20,7 @@ import org.apache.camel.dsl.jbang.core.commands.CamelCommand;
 import org.apache.camel.dsl.jbang.core.commands.CamelJBangMain;
 import io.kaoto.forage.catalog.model.ConditionalBeanGroup;
 import io.kaoto.forage.catalog.model.ConditionalBeanInfo;
+import io.kaoto.forage.catalog.reader.ForageCatalogReader;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import picocli.CommandLine;
@@ -58,7 +59,7 @@ public class ConfigReadCommand extends CamelCommand {
             defaultValue = "application")
     private String strategy;
 
-    private ForageCatalog catalog;
+    private ForageCatalogReader catalog;
 
     public ConfigReadCommand(CamelJBangMain main) {
         super(main);
@@ -77,7 +78,7 @@ public class ConfigReadCommand extends CamelCommand {
     @Override
     public Integer doCall() throws Exception {
         try {
-            catalog = ForageCatalog.getInstance();
+            catalog = ForageCatalogReader.getInstance();
 
             if (directory == null) {
                 directory = new File(System.getProperty("user.dir"));
@@ -150,7 +151,7 @@ public class ConfigReadCommand extends CamelCommand {
             targetFileNames.add("application.properties");
         } else {
             // Get properties file names from the catalog
-            for (ForageCatalog.FactoryMetadata metadata : catalog.getAllFactories()) {
+            for (ForageCatalogReader.FactoryMetadata metadata : catalog.getAllFactories()) {
                 String propsFile = metadata.propertiesFileName();
                 if (propsFile != null && !propsFile.isEmpty()) {
                     targetFileNames.add(propsFile);
@@ -286,7 +287,7 @@ public class ConfigReadCommand extends CamelCommand {
         String beanKind = determineBeanKind(instance);
 
         // Get factory metadata
-        Optional<ForageCatalog.FactoryMetadata> metadataOpt = catalog.getFactoryMetadata(instance.factoryType);
+        Optional<ForageCatalogReader.FactoryMetadata> metadataOpt = catalog.getFactoryMetadata(instance.factoryType);
 
         // Determine the Java type
         String javaType = metadataOpt.isPresent() ? getFactoryJavaType(metadataOpt.get(), instance) : "Unknown";
@@ -318,7 +319,7 @@ public class ConfigReadCommand extends CamelCommand {
         }
 
         // Use default bean name derived from the catalog's factoryType
-        Optional<ForageCatalog.FactoryMetadata> metadataOpt = catalog.getFactoryMetadata(instance.factoryType);
+        Optional<ForageCatalogReader.FactoryMetadata> metadataOpt = catalog.getFactoryMetadata(instance.factoryType);
         if (metadataOpt.isPresent()) {
             return deriveDefaultBeanName(metadataOpt.get());
         }
@@ -334,7 +335,7 @@ public class ConfigReadCommand extends CamelCommand {
      *       "jakarta.jms.ConnectionFactory" -> "connectionFactory"
      *       "org.apache.camel.component.langchain4j.agent.api.Agent" -> "agent"
      */
-    private String deriveDefaultBeanName(ForageCatalog.FactoryMetadata metadata) {
+    private String deriveDefaultBeanName(ForageCatalogReader.FactoryMetadata metadata) {
         String factoryType = metadata.factoryType();
         if (factoryType == null || factoryType.isEmpty()) {
             return metadata.factoryTypeKey();
@@ -368,7 +369,7 @@ public class ConfigReadCommand extends CamelCommand {
         return null;
     }
 
-    private String getFactoryJavaType(ForageCatalog.FactoryMetadata metadata, InstanceProperties instance) {
+    private String getFactoryJavaType(ForageCatalogReader.FactoryMetadata metadata, InstanceProperties instance) {
         // For beans with a specific bean type, look up the feature to determine the Java type
         if (instance.beanType != null) {
             Optional<String> featureOpt = catalog.getBeanFeature(instance.beanType);

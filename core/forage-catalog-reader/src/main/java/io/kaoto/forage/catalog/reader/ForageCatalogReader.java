@@ -1,4 +1,4 @@
-package io.kaoto.forage.plugin.config;
+package io.kaoto.forage.catalog.reader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +16,7 @@ import io.kaoto.forage.catalog.model.FactoryVariant;
 import io.kaoto.forage.catalog.model.FactoryVariants;
 import io.kaoto.forage.catalog.model.FeatureBeans;
 import io.kaoto.forage.catalog.model.ForageBean;
+import io.kaoto.forage.catalog.model.ForageCatalog;
 import io.kaoto.forage.catalog.model.ForageFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -24,13 +25,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * The catalog contains metadata about factory configurations including the prefix property
  * that identifies instance names.
  */
-public final class ForageCatalog {
+public final class ForageCatalogReader {
 
     private static final String CATALOG_RESOURCE = "catalog/forage-catalog.json";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    private static volatile ForageCatalog instance;
-    private final io.kaoto.forage.catalog.model.ForageCatalog catalog;
+    private static volatile ForageCatalogReader instance;
+    private final ForageCatalog catalog;
     private final Map<String, FactoryMetadata> factoryMetadataByKey;
     // Maps bean names (e.g., "ollama", "openai", "postgresql") to their parent factory type key
     private final Map<String, String> beanNameToFactoryKey;
@@ -45,7 +46,7 @@ public final class ForageCatalog {
     // Maps bean name to its GAV coordinates (multiple beans can share a name across features)
     private final Map<String, Set<String>> beanNameToGav;
 
-    private ForageCatalog(io.kaoto.forage.catalog.model.ForageCatalog catalog) {
+    private ForageCatalogReader(ForageCatalog catalog) {
         this.catalog = catalog;
         this.factoryMetadataByKey = new HashMap<>();
         this.beanNameToFactoryKey = new HashMap<>();
@@ -57,9 +58,9 @@ public final class ForageCatalog {
         parseCatalog();
     }
 
-    public static ForageCatalog getInstance() {
+    public static ForageCatalogReader getInstance() {
         if (instance == null) {
-            synchronized (ForageCatalog.class) {
+            synchronized (ForageCatalogReader.class) {
                 if (instance == null) {
                     instance = loadCatalog();
                 }
@@ -68,14 +69,25 @@ public final class ForageCatalog {
         return instance;
     }
 
-    private static ForageCatalog loadCatalog() {
-        try (InputStream is = ForageCatalog.class.getClassLoader().getResourceAsStream(CATALOG_RESOURCE)) {
+    /**
+     * Creates a ForageCatalogReader from the given input stream.
+     * This is useful for testing or for loading catalogs from non-classpath sources.
+     *
+     * @param inputStream the input stream containing the catalog JSON
+     * @return a new ForageCatalogReader instance
+     * @throws IOException if the catalog cannot be read
+     */
+    public static ForageCatalogReader fromInputStream(InputStream inputStream) throws IOException {
+        ForageCatalog catalogModel = OBJECT_MAPPER.readValue(inputStream, ForageCatalog.class);
+        return new ForageCatalogReader(catalogModel);
+    }
+
+    private static ForageCatalogReader loadCatalog() {
+        try (InputStream is = ForageCatalogReader.class.getClassLoader().getResourceAsStream(CATALOG_RESOURCE)) {
             if (is == null) {
                 throw new IllegalStateException("Forage catalog not found: " + CATALOG_RESOURCE);
             }
-            io.kaoto.forage.catalog.model.ForageCatalog catalogModel =
-                    OBJECT_MAPPER.readValue(is, io.kaoto.forage.catalog.model.ForageCatalog.class);
-            return new ForageCatalog(catalogModel);
+            return fromInputStream(is);
         } catch (IOException e) {
             throw new IllegalStateException("Failed to load Forage catalog", e);
         }
