@@ -24,6 +24,8 @@ class ForageCatalogReaderTest {
                   "name": "JDBC DataSource Factory",
                   "factoryType": "javax.sql.DataSource",
                   "description": "Creates JDBC DataSource beans",
+                  "components": ["camel-sql"],
+                  "autowired": true,
                   "propertiesFile": "forage-jdbc.properties",
                   "variants": {
                     "base": { "className": "io.kaoto.forage.jdbc.JdbcFactory", "gav": "io.kaoto.forage:forage-jdbc:1.0" },
@@ -87,6 +89,9 @@ class ForageCatalogReaderTest {
         assertThat(metadata.get().propertiesFileName()).isEqualTo("forage-jdbc.properties");
         assertThat(metadata.get().prefixPropertyName()).isEqualTo("forage.jdbc.name");
         assertThat(metadata.get().factoryTypeKey()).isEqualTo("jdbc");
+        assertThat(metadata.get().description()).isEqualTo("Creates JDBC DataSource beans");
+        assertThat(metadata.get().components()).containsExactly("camel-sql");
+        assertThat(metadata.get().autowired()).isTrue();
     }
 
     @Test

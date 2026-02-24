@@ -132,8 +132,20 @@ public final class ForageCatalogReader {
 
             if (factoryTypeKey != null) {
 
+                String description = factory.getDescription();
+                List<String> components = factory.getComponents();
+                boolean autowired = factory.isAutowired();
+
                 FactoryMetadata metadata = new FactoryMetadata(
-                        factoryName, factoryType, propertiesFile, prefixPropertyName, factoryTypeKey, configEntries);
+                        factoryName,
+                        factoryType,
+                        description,
+                        components,
+                        autowired,
+                        propertiesFile,
+                        prefixPropertyName,
+                        factoryTypeKey,
+                        configEntries);
                 factoryMetadataByKey.put(factoryTypeKey, metadata);
 
                 // Store factory variants
@@ -474,6 +486,9 @@ public final class ForageCatalogReader {
     public record FactoryMetadata(
             String factoryName,
             String factoryType,
+            String description,
+            List<String> components,
+            boolean autowired,
             String propertiesFileName,
             String prefixPropertyName,
             String factoryTypeKey,
