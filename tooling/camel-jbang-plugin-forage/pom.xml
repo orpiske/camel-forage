@@ -27,6 +27,12 @@
 
         <dependency>
             <groupId>io.kaoto.forage</groupId>
+            <artifactId>forage-catalog-reader</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.kaoto.forage</groupId>
             <artifactId>forage-jdbc-common</artifactId>
             <version>${project.version}</version>
         </dependency>

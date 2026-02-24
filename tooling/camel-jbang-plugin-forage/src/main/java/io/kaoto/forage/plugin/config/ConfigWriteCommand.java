@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.apache.camel.dsl.jbang.core.commands.CamelCommand;
 import org.apache.camel.dsl.jbang.core.commands.CamelJBangMain;
+import io.kaoto.forage.catalog.reader.ForageCatalogReader;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,7 +59,7 @@ public class ConfigWriteCommand extends CamelCommand {
             defaultValue = "application")
     private String strategy;
 
-    private ForageCatalog catalog;
+    private ForageCatalogReader catalog;
 
     public ConfigWriteCommand(CamelJBangMain main) {
         super(main);
@@ -67,7 +68,7 @@ public class ConfigWriteCommand extends CamelCommand {
     @Override
     public Integer doCall() throws Exception {
         try {
-            catalog = ForageCatalog.getInstance();
+            catalog = ForageCatalogReader.getInstance();
 
             if (directory == null) {
                 directory = new File(System.getProperty("user.dir"));
@@ -263,9 +264,9 @@ public class ConfigWriteCommand extends CamelCommand {
             String factoryTypeKey = factoryTypeOpt.get();
 
             // Check if this key is the prefix/name property for this factory
-            Optional<ForageCatalog.FactoryMetadata> metadataOpt = catalog.getFactoryMetadata(factoryTypeKey);
+            Optional<ForageCatalogReader.FactoryMetadata> metadataOpt = catalog.getFactoryMetadata(factoryTypeKey);
             if (metadataOpt.isPresent()) {
-                ForageCatalog.FactoryMetadata metadata = metadataOpt.get();
+                ForageCatalogReader.FactoryMetadata metadata = metadataOpt.get();
                 Optional<String> shortPrefixKeyOpt = metadata.getShortPrefixPropertyKey();
                 if (shortPrefixKeyOpt.isPresent() && normalizedKey.equals(shortPrefixKeyOpt.get())) {
                     // This is the bean name property - only store non-empty values
@@ -328,9 +329,9 @@ public class ConfigWriteCommand extends CamelCommand {
             String kindForFactory = factoryKinds.getOrDefault(factoryTypeKey, globalKind);
 
             // Skip the factory-specific name property itself - it's used for prefixing, not stored directly
-            Optional<ForageCatalog.FactoryMetadata> metadataOpt = catalog.getFactoryMetadata(factoryTypeKey);
+            Optional<ForageCatalogReader.FactoryMetadata> metadataOpt = catalog.getFactoryMetadata(factoryTypeKey);
             if (metadataOpt.isPresent()) {
-                ForageCatalog.FactoryMetadata metadata = metadataOpt.get();
+                ForageCatalogReader.FactoryMetadata metadata = metadataOpt.get();
                 Optional<String> shortPrefixKeyOpt = metadata.getShortPrefixPropertyKey();
                 if (shortPrefixKeyOpt.isPresent() && normalizedKey.equals(shortPrefixKeyOpt.get())) {
                     // Skip the name property, but ensure we have an entry for this factory
@@ -528,7 +529,7 @@ public class ConfigWriteCommand extends CamelCommand {
 
     private String getFactoryDisplayName(String factoryTypeKey) {
         return catalog.getFactoryMetadata(factoryTypeKey)
-                .map(ForageCatalog.FactoryMetadata::factoryName)
+                .map(ForageCatalogReader.FactoryMetadata::factoryName)
                 .orElse(factoryTypeKey + " factory");
     }
 
@@ -676,7 +677,7 @@ public class ConfigWriteCommand extends CamelCommand {
                 propertiesFilesToScan.add(appProps);
             }
         } else {
-            for (ForageCatalog.FactoryMetadata metadata : catalog.getAllFactories()) {
+            for (ForageCatalogReader.FactoryMetadata metadata : catalog.getAllFactories()) {
                 String propertiesFileName = getPropertiesFileName(metadata.factoryTypeKey());
                 if (propertiesFileName != null) {
                     File propertiesFile = new File(directory, propertiesFileName);
