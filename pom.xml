@@ -36,6 +36,7 @@
         <maven-plugin-central-publishing.version>0.10.0</maven-plugin-central-publishing.version>
         <maven-plugin-gpg.version>3.2.8</maven-plugin-gpg.version>
 
+        <maven-plugin-source.version>3.4.0</maven-plugin-source.version>
         <maven-plugin-annotations.version>3.15.1</maven-plugin-annotations.version>
         <maven-plugin-api.version>3.9.11</maven-plugin-api.version>
         <maven-plugin-plugin.version>3.15.2</maven-plugin-plugin.version>
@@ -281,6 +282,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
+                        <version>${maven-plugin-source.version}</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
