@@ -58,7 +58,7 @@ jobs:
           echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
           ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
           
-          mvn -DskipTests -Darguments="-DskipTests" -Pdist -B --file pom.xml -Dtag=v${{ github.event.inputs.currentDevelopmentVersion }} -DreleaseVersion=${{ github.event.inputs.currentDevelopmentVersion }} -DdevelopmentVersion=${{ github.event.inputs.nextDevelopmentVersion }}-SNAPSHOT release:prepare release:perform
+          mvn -DskipTests -Darguments="-DskipTests" -Pdist -B --no-transfer-progress --file pom.xml -Dtag=v${{ github.event.inputs.currentDevelopmentVersion }} -DreleaseVersion=${{ github.event.inputs.currentDevelopmentVersion }} -DdevelopmentVersion=${{ github.event.inputs.nextDevelopmentVersion }}-SNAPSHOT release:prepare release:perform
 
       # Create a release
 

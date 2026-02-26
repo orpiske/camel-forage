@@ -50,7 +50,7 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - name: Build with Maven
-        run: mvn -B '-Dsurefire.rerunFailingTestsCount=2' '-Dci.env.name=github.com' package --file pom.xml
+        run: mvn -B --no-transfer-progress '-Dsurefire.rerunFailingTestsCount=2' '-Dci.env.name=github.com' package --file pom.xml
 
   build-with-integration-tests:
     if: github.repository == 'KaotoIO/forage'
@@ -71,4 +71,4 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - name: Build with Maven and run integration tests
-        run: mvn -B '-Dsurefire.rerunFailingTestsCount=2' '-Dci.env.name=github.com' install failsafe:integration-test failsafe:verify --file pom.xml
+        run: mvn -B --no-transfer-progress '-Dsurefire.rerunFailingTestsCount=2' '-Dci.env.name=github.com' install failsafe:integration-test failsafe:verify --file pom.xml
