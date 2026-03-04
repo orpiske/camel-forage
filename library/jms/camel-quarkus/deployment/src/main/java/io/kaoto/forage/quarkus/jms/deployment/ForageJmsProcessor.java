@@ -15,6 +15,7 @@ import io.kaoto.forage.core.annotations.ForageFactory;
 import io.kaoto.forage.core.util.config.ConfigHelper;
 import io.kaoto.forage.core.util.config.ConfigStore;
 import io.kaoto.forage.jms.common.ConnectionFactoryConfig;
+import io.kaoto.forage.jms.common.JmsModuleDescriptor;
 import io.kaoto.forage.quarkus.jms.ForageJmsRecorder;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
@@ -35,6 +36,7 @@ public class ForageJmsProcessor {
 
     private static final Logger LOG = Logger.getLogger(ForageJmsProcessor.class);
     private static final String FEATURE = "forage-jms";
+    private static final JmsModuleDescriptor DESCRIPTOR = new JmsModuleDescriptor();
 
     @BuildStep
     FeatureBuildItem feature() {
@@ -45,12 +47,13 @@ public class ForageJmsProcessor {
     @Record(value = ExecutionTime.STATIC_INIT)
     void registerIbmMqConnectionFactory(ForageJmsRecorder recorder, BuildProducer<CamelRuntimeBeanBuildItem> beans) {
 
-        ConnectionFactoryConfig config = new ConnectionFactoryConfig();
-        Set<String> named = ConfigStore.getInstance().readPrefixes(config, ConfigHelper.getNamedPropertyRegexp("jms"));
+        ConnectionFactoryConfig defaultConfig = DESCRIPTOR.createConfig(null);
+        Set<String> named = ConfigStore.getInstance()
+                .readPrefixes(defaultConfig, ConfigHelper.getNamedPropertyRegexp(DESCRIPTOR.modulePrefix()));
 
         Map<String, ConnectionFactoryConfig> configs = named.isEmpty()
-                ? Collections.singletonMap((String) null, config)
-                : named.stream().collect(Collectors.toMap(n -> n, ConnectionFactoryConfig::new));
+                ? Collections.singletonMap((String) null, defaultConfig)
+                : named.stream().collect(Collectors.toMap(n -> n, DESCRIPTOR::createConfig));
 
         for (Map.Entry<String, ConnectionFactoryConfig> entry : configs.entrySet()) {
             if ("ibmmq".equals(entry.getValue().jmsKind())) {

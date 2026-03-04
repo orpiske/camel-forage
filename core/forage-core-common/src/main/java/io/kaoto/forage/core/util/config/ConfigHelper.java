@@ -68,6 +68,11 @@ public final class ConfigHelper {
     private static Properties springBootConfig = null;
     private static Properties camelConfig = null;
 
+    /**
+     * @deprecated Runtime detection is now handled by the {@link ConfigResolver} chain.
+     *     Use {@link ConfigStore#registerResolver(ConfigResolver)} to plug in runtime-specific resolvers.
+     */
+    @Deprecated(since = "1.1", forRemoval = true)
     public static RuntimeType getRuntime() {
         if (runtime == null) {
             if (isRuntimeSpringBoot()) {
@@ -126,6 +131,10 @@ public final class ConfigHelper {
         }
     }
 
+    /**
+     * @deprecated Use {@link ConfigStore#registerResolver(ConfigResolver)} with a Spring-specific resolver instead.
+     */
+    @Deprecated(since = "1.1", forRemoval = true)
     public static boolean isRuntimeSpringBoot() {
         boolean classExists = classExists("org.springframework.boot.SpringBootVersion");
         if (classExists) {
@@ -153,6 +162,10 @@ public final class ConfigHelper {
         return false;
     }
 
+    /**
+     * @deprecated Use {@link ConfigStore#registerResolver(ConfigResolver)} with a Quarkus-specific resolver instead.
+     */
+    @Deprecated(since = "1.1", forRemoval = true)
     public static boolean isRuntimeQuarkus() {
         boolean classExists = classExists("io.quarkus.runtime.Application");
 
@@ -178,7 +191,10 @@ public final class ConfigHelper {
     /**
      * Returns the application.properties as a Properties object for the current runtime,
      * or null if unavailable (e.g., Quarkus uses SmallRyeConfig instead).
+     *
+     * @deprecated Runtime-specific property loading is now handled by the {@link ConfigResolver} chain.
      */
+    @Deprecated(since = "1.1", forRemoval = true)
     public static Properties getApplicationProperties() {
         return switch (getRuntime()) {
             case springBoot -> getSpringBootConfig();

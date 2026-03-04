@@ -7,7 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -66,12 +69,16 @@ public final class ConfigStore {
 
     private static ConfigStore INSTANCE;
     private final Properties properties = new Properties();
+    private final List<ConfigResolver> resolvers = new ArrayList<>();
     private ClassLoader classLoader;
 
     /**
      * Private constructor to enforce singleton pattern.
+     * Registers the {@link DefaultConfigResolver} as the baseline resolver.
      */
-    private ConfigStore() {}
+    private ConfigStore() {
+        resolvers.add(new DefaultConfigResolver());
+    }
 
     /**
      * Returns the singleton instance of the ConfigStore.
@@ -88,6 +95,28 @@ public final class ConfigStore {
 
         INSTANCE = new ConfigStore();
         return INSTANCE;
+    }
+
+    /**
+     * Registers a custom {@link ConfigResolver} into the resolver chain.
+     *
+     * <p>Resolvers are consulted in priority order (highest first) when resolving configuration values.
+     * The {@link DefaultConfigResolver} is always present at priority 0.
+     *
+     * @param resolver the resolver to register
+     */
+    public void registerResolver(ConfigResolver resolver) {
+        resolvers.add(resolver);
+        resolvers.sort(Comparator.comparingInt(ConfigResolver::priority).reversed());
+    }
+
+    /**
+     * Returns an unmodifiable view of the registered resolvers.
+     *
+     * @return the list of resolvers ordered by priority (highest first)
+     */
+    public List<ConfigResolver> getResolvers() {
+        return Collections.unmodifiableList(resolvers);
     }
 
     /**
@@ -167,7 +196,14 @@ public final class ConfigStore {
             }
         }
 
-        return readPrefixes(merged, regexp);
+        Set<String> prefixes = readPrefixes(merged, regexp);
+
+        // Consult registered resolvers for additional prefix discovery
+        for (ConfigResolver resolver : resolvers) {
+            prefixes.addAll(resolver.discoverPrefixes(regexp));
+        }
+
+        return prefixes;
     }
 
     /**
@@ -270,35 +306,22 @@ public final class ConfigStore {
     }
 
     /**
-     * Reads a configuration value from the sources defined in the ConfigEntry.
+     * Reads a configuration value by consulting the resolver chain in priority order.
      *
-     * <p>This method implements the configuration source precedence by checking:
-     * <ol>
-     *   <li>Environment variables (via {@link System#getenv(String)})</li>
-     *   <li>System properties (via {@link System#getProperty(String)})</li>
-     * </ol>
-     *
-     * <p>The first non-null value found is returned. If no value is found from any source,
-     * an empty Optional is returned.
+     * <p>Each registered {@link ConfigResolver} is tried in order of descending priority.
+     * The first resolver that returns a non-empty value wins.
      *
      * @return an Optional containing the configuration value, or empty if not found
      */
     private Optional<String> tryRead(ConfigModule module) {
-        final String environmentValue = System.getenv(module.envName());
-        if (environmentValue != null) {
-            return Optional.of(environmentValue);
+        String propertyName = module.propertyName();
+        for (ConfigResolver resolver : resolvers) {
+            Optional<String> value = resolver.resolve(propertyName);
+            if (value.isPresent()) {
+                return value;
+            }
         }
-
-        final String propertyValue = System.getProperty(module.propertyName());
-        if (propertyValue != null) {
-            return Optional.of(propertyValue);
-        }
-
-        return switch (ConfigHelper.getRuntime()) {
-            case springBoot -> ConfigHelper.getSpringBootProperty(module.propertyName());
-            case quarkus -> ConfigHelper.getQuarkusProperty(module.propertyName());
-            case main -> ConfigHelper.getCamelMainProperty(module.propertyName());
-        };
+        return Optional.empty();
     }
 
     /**

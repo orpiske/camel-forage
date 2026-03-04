@@ -17,6 +17,8 @@ import io.kaoto.forage.core.util.config.ConfigStore;
 
 /**
  * Condition that matches when a specific ConfigModule property matches the expected criteria.
+ *
+ * @deprecated Use standard {@code @ConditionalOnProperty} instead. See {@link ConditionalOnForageProperty}.
  * This condition leverages the existing ConfigModule and ConfigStore infrastructure to provide
  * type-safe property access without reflection.
  *
@@ -33,6 +35,7 @@ import io.kaoto.forage.core.util.config.ConfigStore;
  * @see ConfigModule
  * @see ConfigStore
  */
+@Deprecated(since = "1.1", forRemoval = true)
 public class ForagePropertyCondition extends SpringBootCondition {
 
     private static final Logger log = LoggerFactory.getLogger(ForagePropertyCondition.class);

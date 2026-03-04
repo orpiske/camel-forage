@@ -13,6 +13,10 @@ import io.kaoto.forage.core.util.config.Config;
  * matches the expected value. Conditionally enables Spring components based on
  * Forage configuration properties in any configuration (default or prefixed).
  *
+ * @deprecated Use standard {@code @ConditionalOnProperty} instead. The
+ *     {@link ForageEnvironmentPostProcessor} now bridges Forage properties into
+ *     Spring's Environment, making this custom annotation unnecessary.
+ *
  * <p>Example usage:
  * <pre class="code">
  * // Check if transaction is enabled in DataSourceFactoryConfig
@@ -34,6 +38,7 @@ import io.kaoto.forage.core.util.config.Config;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Conditional(ForagePropertyCondition.class)
+@Deprecated(since = "1.1", forRemoval = true)
 public @interface ConditionalOnForageProperty {
 
     /**

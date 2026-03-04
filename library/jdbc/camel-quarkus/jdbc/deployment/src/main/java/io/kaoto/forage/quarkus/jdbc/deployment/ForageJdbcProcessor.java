@@ -1,6 +1,7 @@
 package io.kaoto.forage.quarkus.jdbc.deployment;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -15,6 +16,7 @@ import io.kaoto.forage.core.annotations.ForageFactory;
 import io.kaoto.forage.core.util.config.ConfigHelper;
 import io.kaoto.forage.core.util.config.ConfigStore;
 import io.kaoto.forage.jdbc.common.DataSourceFactoryConfig;
+import io.kaoto.forage.jdbc.common.JdbcModuleDescriptor;
 import io.kaoto.forage.quarkus.jdbc.ForageJdbcRecorder;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
@@ -37,75 +39,88 @@ public class ForageJdbcProcessor {
 
     private static final Logger LOG = Logger.getLogger(ForageJdbcProcessor.class);
     private static final String FEATURE = "forage-jdbc";
+    private static final JdbcModuleDescriptor DESCRIPTOR = new JdbcModuleDescriptor();
 
     @BuildStep
     FeatureBuildItem feature() {
         return new FeatureBuildItem(FEATURE);
     }
 
+    /**
+     * Discovers Forage JDBC prefixes using the {@link JdbcModuleDescriptor} and produces
+     * {@link ForageDataSourceBuildItem}s for consumption by subsequent build steps.
+     */
     @BuildStep
-    @Record(value = ExecutionTime.STATIC_INIT)
-    void registerAggregation(
-            CamelContextBuildItem context,
-            ForageJdbcRecorder recorder,
-            BuildProducer<CamelRuntimeBeanBuildItem> beans) {
-        ConfigStore.getInstance().setClassLoader(Thread.currentThread().getContextClassLoader());
-        DataSourceFactoryConfig config = new DataSourceFactoryConfig();
-        Set<String> prefixes =
-                ConfigStore.getInstance().readPrefixes(config, ConfigHelper.getNamedPropertyRegexp("jdbc"));
+    void discoverDataSources(BuildProducer<ForageDataSourceBuildItem> dataSources) {
+        DataSourceFactoryConfig defaultConfig = DESCRIPTOR.createConfig(null);
+        Set<String> prefixes = ConfigStore.getInstance()
+                .readPrefixes(defaultConfig, ConfigHelper.getNamedPropertyRegexp(DESCRIPTOR.modulePrefix()));
 
         Map<String, DataSourceFactoryConfig> configs = prefixes.isEmpty()
-                ? Collections.singletonMap("dataSource", new DataSourceFactoryConfig())
-                : prefixes.stream().collect(Collectors.toMap(n -> n, DataSourceFactoryConfig::new));
+                ? Collections.singletonMap(DESCRIPTOR.defaultBeanName(), DESCRIPTOR.createConfig(null))
+                : prefixes.stream().collect(Collectors.toMap(n -> n, DESCRIPTOR::createConfig));
 
         for (Map.Entry<String, DataSourceFactoryConfig> entry : configs.entrySet()) {
-            if (StringUtils.isNotBlank(entry.getValue().aggregationRepositoryName())) {
-                // create aggregation repository
-                RuntimeValue<JdbcAggregationRepository> aggRepo = recorder.createAggregationRepository(
-                        entry.getKey(), context.getCamelContext(), entry.getValue());
+            dataSources.produce(new ForageDataSourceBuildItem(entry.getKey(), entry.getValue()));
+        }
+    }
+
+    /**
+     * Registers aggregation and idempotent repository beans using discovered
+     * {@link ForageDataSourceBuildItem}s instead of reading ConfigStore directly.
+     */
+    @BuildStep
+    @Record(value = ExecutionTime.STATIC_INIT)
+    void registerRepositories(
+            CamelContextBuildItem context,
+            ForageJdbcRecorder recorder,
+            List<ForageDataSourceBuildItem> dataSources,
+            BuildProducer<CamelRuntimeBeanBuildItem> beans) {
+
+        for (ForageDataSourceBuildItem ds : dataSources) {
+            String name = ds.getName();
+            DataSourceFactoryConfig dsConfig = ds.getConfig();
+
+            if (StringUtils.isNotBlank(dsConfig.aggregationRepositoryName())) {
+                RuntimeValue<JdbcAggregationRepository> aggRepo =
+                        recorder.createAggregationRepository(name, context.getCamelContext(), dsConfig);
                 if (aggRepo != null) {
                     beans.produce(new CamelRuntimeBeanBuildItem(
-                            entry.getValue().aggregationRepositoryName(),
-                            JdbcAggregationRepository.class.getName(),
-                            aggRepo));
+                            dsConfig.aggregationRepositoryName(), JdbcAggregationRepository.class.getName(), aggRepo));
                 }
             } else {
-                // if aggregation name is blank,but there is another aggregation property, show warning
                 logMissingMandatoryProperty(
                         "aggregation",
-                        entry,
+                        dsConfig,
                         "Aggregation name has to be provided in order to create aggregation repositories (`%s` is already provided)");
             }
 
-            if (entry.getValue().enableIdempotentRepository()) {
-                if (StringUtils.isNotBlank(entry.getValue().idempotentRepositoryTableName())) {
-                    // create idempotent repository
-                    RuntimeValue<JdbcMessageIdRepository> idRepo = recorder.createIdempotentRepository(
-                            entry.getKey(), context.getCamelContext(), entry.getValue());
+            if (dsConfig.enableIdempotentRepository()) {
+                if (StringUtils.isNotBlank(dsConfig.idempotentRepositoryTableName())) {
+                    RuntimeValue<JdbcMessageIdRepository> idRepo =
+                            recorder.createIdempotentRepository(name, context.getCamelContext(), dsConfig);
                     if (idRepo != null) {
                         beans.produce(new CamelRuntimeBeanBuildItem(
-                                entry.getValue().idempotentRepositoryTableName(),
+                                dsConfig.idempotentRepositoryTableName(),
                                 JdbcMessageIdRepository.class.getName(),
                                 idRepo));
                     }
                 } else {
-                    // if idempotent table name is blank,but there is another idempotent property, show warning
                     logMissingMandatoryProperty(
                             "idempotent",
-                            entry,
+                            dsConfig,
                             "Idempotent repository table name has to be provided in order to create idempotent repository (`%s` is already provided)");
                 }
             }
         }
     }
 
-    private static void logMissingMandatoryProperty(
-            String aggregation, Map.Entry<String, DataSourceFactoryConfig> entry, String warnMsg) {
+    private static void logMissingMandatoryProperty(String keyword, DataSourceFactoryConfig config, String warnMsg) {
         ConfigHelper.getGetterMethods(DataSourceFactoryConfig.class).stream()
-                .filter(m -> m.getName().toLowerCase().contains(aggregation))
+                .filter(m -> m.getName().toLowerCase().contains(keyword))
                 .forEach(m -> {
                     try {
-                        Object value = m.invoke(entry.getValue());
+                        Object value = m.invoke(config);
                         if (value != null && StringUtils.isNotBlank(value.toString())) {
                             LOG.warn(warnMsg.formatted(m.getName()));
                         }

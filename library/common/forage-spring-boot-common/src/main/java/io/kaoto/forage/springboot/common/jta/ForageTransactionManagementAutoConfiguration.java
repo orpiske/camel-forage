@@ -17,7 +17,7 @@ import com.arjuna.ats.internal.jta.transaction.arjunacore.UserTransactionImple;
  * <p>Subclasses should:
  * <ul>
  * <li>Be annotated with {@code @Configuration}</li>
- * <li>Use {@code @ConditionalOnForageProperty} to enable based on module-specific configuration</li>
+ * <li>Use {@code @ConditionalOnProperty} to enable based on module-specific configuration</li>
  * <li>Be annotated with {@code @EnableTransactionManagement}</li>
  * <li>Override {@code init()} method with {@code @PostConstruct} for module-specific initialization logging</li>
  * </ul>
