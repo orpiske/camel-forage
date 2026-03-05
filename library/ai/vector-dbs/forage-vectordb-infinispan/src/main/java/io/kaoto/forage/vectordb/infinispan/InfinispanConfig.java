@@ -1,9 +1,6 @@
 package io.kaoto.forage.vectordb.infinispan;
 
-import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 import io.kaoto.forage.core.util.config.MissingConfigException;
 
 import static io.kaoto.forage.vectordb.infinispan.InfinispanConfigEntries.CACHE_CONFIG;
@@ -93,15 +90,15 @@ import static io.kaoto.forage.vectordb.infinispan.InfinispanConfigEntries.USERNA
  * </ul>
  *
  * <p>This class automatically registers itself and its configuration parameters with the
- * {@link ConfigStore} during construction, making the configuration values available
+ * {@link io.kaoto.forage.core.util.config.ConfigStore} during construction, making the configuration values available
  * to other components in the framework.
  *
- * @see Config
- * @see ConfigStore
- * @see ConfigModule
+ * @see AbstractConfig
+ * @see io.kaoto.forage.core.util.config.ConfigStore
+ * @see io.kaoto.forage.core.util.config.ConfigModule
  * @since 1.0
  */
-public class InfinispanConfig implements Config {
+public class InfinispanConfig extends AbstractConfig {
     private static final int DEFAULT_DISTANCE = 3;
     private static final String DEFAULT_SIMILARITY = "COSINE";
     private static final String DEFAULT_PACKAGE_NAME = "io.kaoto.forage.vectordb.infinispan.schema";
@@ -112,8 +109,6 @@ public class InfinispanConfig implements Config {
     private static final boolean DEFAULT_CREATE_CACHE = true;
     private static final String DEFAULT_HOST = "localhost";
     private static final int DEFAULT_PORT = 11222;
-
-    private final String prefix;
 
     /**
      * Constructs a new InfinispanConfig and registers configuration parameters with the ConfigStore.
@@ -135,16 +130,7 @@ public class InfinispanConfig implements Config {
     }
 
     public InfinispanConfig(String prefix) {
-        this.prefix = prefix;
-
-        // First register new configuration modules. This happens only if a prefix is provided
-        InfinispanConfigEntries.register(prefix);
-
-        // Then, loads the configurations from the properties file associated with this Config module
-        ConfigStore.getInstance().load(InfinispanConfig.class, this, this::register);
-
-        // Lastly, load the overrides defined in system properties and environment variables
-        InfinispanConfigEntries.loadOverrides(prefix);
+        super(prefix, InfinispanConfigEntries.class);
     }
 
     @Override
@@ -170,9 +156,7 @@ public class InfinispanConfig implements Config {
      * @throws MissingConfigException if no cache name is configured
      */
     public String cacheName() {
-        return ConfigStore.getInstance()
-                .get(CACHE_NAME.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing Infinispan cache name"));
+        return getRequired(CACHE_NAME, "Missing Infinispan cache name");
     }
 
     /**
@@ -193,8 +177,7 @@ public class InfinispanConfig implements Config {
      * @throws MissingConfigException if no dimension is configured
      */
     public Integer dimension() {
-        return ConfigStore.getInstance()
-                .get(DIMENSION.asNamed(prefix))
+        return get(DIMENSION)
                 .map(Integer::parseInt)
                 .orElseThrow(() -> new MissingConfigException("Missing Infinispan dimension"));
     }
@@ -213,10 +196,7 @@ public class InfinispanConfig implements Config {
      * @return the distance metric
      */
     public Integer distance() {
-        return ConfigStore.getInstance()
-                .get(DISTANCE.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(DEFAULT_DISTANCE);
+        return get(DISTANCE).map(Integer::parseInt).orElse(DEFAULT_DISTANCE);
     }
 
     /**
@@ -233,7 +213,7 @@ public class InfinispanConfig implements Config {
      * @return the similarity algorithm
      */
     public String similarity() {
-        return ConfigStore.getInstance().get(SIMILARITY.asNamed(prefix)).orElse(DEFAULT_SIMILARITY);
+        return get(SIMILARITY).orElse(DEFAULT_SIMILARITY);
     }
 
     /**
@@ -250,7 +230,7 @@ public class InfinispanConfig implements Config {
      * @return the cache configuration, or null if not configured
      */
     public String cacheConfig() {
-        return ConfigStore.getInstance().get(CACHE_CONFIG.asNamed(prefix)).orElse(null);
+        return get(CACHE_CONFIG).orElse(null);
     }
 
     /**
@@ -267,7 +247,7 @@ public class InfinispanConfig implements Config {
      * @return the package name for generated classes
      */
     public String packageName() {
-        return ConfigStore.getInstance().get(PACKAGE_NAME.asNamed(prefix)).orElse(DEFAULT_PACKAGE_NAME);
+        return get(PACKAGE_NAME).orElse(DEFAULT_PACKAGE_NAME);
     }
 
     /**
@@ -284,7 +264,7 @@ public class InfinispanConfig implements Config {
      * @return the schema file name
      */
     public String fileName() {
-        return ConfigStore.getInstance().get(FILE_NAME.asNamed(prefix)).orElse(DEFAULT_FILE_NAME);
+        return get(FILE_NAME).orElse(DEFAULT_FILE_NAME);
     }
 
     /**
@@ -301,9 +281,7 @@ public class InfinispanConfig implements Config {
      * @return the LangChain item class name
      */
     public String langchainItemName() {
-        return ConfigStore.getInstance()
-                .get(LANGCHAIN_ITEM_NAME.asNamed(prefix))
-                .orElse(DEFAULT_LANGCHAIN_ITEM_NAME);
+        return get(LANGCHAIN_ITEM_NAME).orElse(DEFAULT_LANGCHAIN_ITEM_NAME);
     }
 
     /**
@@ -320,7 +298,7 @@ public class InfinispanConfig implements Config {
      * @return the metadata item class name
      */
     public String metadataItemName() {
-        return ConfigStore.getInstance().get(METADATA_ITEM_NAME.asNamed(prefix)).orElse(DEFAULT_METADATA_ITEM_NAME);
+        return get(METADATA_ITEM_NAME).orElse(DEFAULT_METADATA_ITEM_NAME);
     }
 
     /**
@@ -337,10 +315,7 @@ public class InfinispanConfig implements Config {
      * @return true if schema should be registered automatically
      */
     public Boolean registerSchema() {
-        return ConfigStore.getInstance()
-                .get(REGISTER_SCHEMA.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(DEFAULT_REGISTER_SCHEMA);
+        return get(REGISTER_SCHEMA).map(Boolean::parseBoolean).orElse(DEFAULT_REGISTER_SCHEMA);
     }
 
     /**
@@ -357,10 +332,7 @@ public class InfinispanConfig implements Config {
      * @return true if cache should be created if it doesn't exist
      */
     public Boolean createCache() {
-        return ConfigStore.getInstance()
-                .get(CREATE_CACHE.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(DEFAULT_CREATE_CACHE);
+        return get(CREATE_CACHE).map(Boolean::parseBoolean).orElse(DEFAULT_CREATE_CACHE);
     }
 
     /**
@@ -377,7 +349,7 @@ public class InfinispanConfig implements Config {
      * @return the Infinispan server host address
      */
     public String host() {
-        return ConfigStore.getInstance().get(HOST.asNamed(prefix)).orElse(DEFAULT_HOST);
+        return get(HOST).orElse(DEFAULT_HOST);
     }
 
     /**
@@ -394,10 +366,7 @@ public class InfinispanConfig implements Config {
      * @return the Infinispan server port number
      */
     public Integer port() {
-        return ConfigStore.getInstance()
-                .get(PORT.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(DEFAULT_PORT);
+        return get(PORT).map(Integer::parseInt).orElse(DEFAULT_PORT);
     }
 
     /**
@@ -414,7 +383,7 @@ public class InfinispanConfig implements Config {
      * @return the username for authentication, or null if not configured
      */
     public String username() {
-        return ConfigStore.getInstance().get(USERNAME.asNamed(prefix)).orElse(null);
+        return get(USERNAME).orElse(null);
     }
 
     /**
@@ -431,13 +400,6 @@ public class InfinispanConfig implements Config {
      * @return the password for authentication, or null if not configured
      */
     public String password() {
-        return ConfigStore.getInstance().get(PASSWORD.asNamed(prefix)).orElse(null);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = InfinispanConfigEntries.find(prefix, name);
-
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        return get(PASSWORD).orElse(null);
     }
 }

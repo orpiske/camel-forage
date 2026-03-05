@@ -1,11 +1,6 @@
 package io.kaoto.forage.vectordb.pinecone;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import io.kaoto.forage.core.util.config.ConfigEntries;
-import io.kaoto.forage.core.util.config.ConfigEntry;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigTag;
 
@@ -110,52 +105,19 @@ public final class PineconeConfigEntries extends ConfigEntries {
             false,
             ConfigTag.ADVANCED);
 
-    private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
-
     static {
-        init();
-    }
-
-    static void init() {
-        CONFIG_MODULES.put(API_KEY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(INDEX, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(NAME_SPACE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(METADATA_TEXT_KEY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(CREATE_INDEX, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(ENVIRONMENT, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(PROJECT_ID, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(DIMENSION, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(CLOUD, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(REGION, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(DELETION_PROTECTION, ConfigEntry.fromModule());
-    }
-
-    public static Map<ConfigModule, ConfigEntry> entries() {
-        return Collections.unmodifiableMap(CONFIG_MODULES);
-    }
-
-    public static Optional<ConfigModule> find(String prefix, String name) {
-        return find(CONFIG_MODULES, prefix, name);
-    }
-
-    /**
-     * Registers new known configuration if a prefix is provided (otherwise is ignored)
-     * @param prefix the prefix to register
-     */
-    public static void register(String prefix) {
-        if (prefix != null) {
-            for (Map.Entry<ConfigModule, ConfigEntry> entry : entries().entrySet()) {
-                ConfigModule configModule = entry.getKey().asNamed(prefix);
-                CONFIG_MODULES.put(configModule, ConfigEntry.fromModule());
-            }
-        }
-    }
-
-    /**
-     * Load override configurations (which are defined via environment variables and/or system properties)
-     * @param prefix and optional prefix to use
-     */
-    public static void loadOverrides(String prefix) {
-        load(CONFIG_MODULES, prefix);
+        initModules(
+                PineconeConfigEntries.class,
+                API_KEY,
+                INDEX,
+                NAME_SPACE,
+                METADATA_TEXT_KEY,
+                CREATE_INDEX,
+                ENVIRONMENT,
+                PROJECT_ID,
+                DIMENSION,
+                CLOUD,
+                REGION,
+                DELETION_PROTECTION);
     }
 }

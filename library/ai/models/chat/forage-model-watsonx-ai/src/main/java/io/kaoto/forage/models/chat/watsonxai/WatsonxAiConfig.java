@@ -1,11 +1,8 @@
 package io.kaoto.forage.models.chat.watsonxai;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.core.util.config.MissingConfigException;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 
 import static io.kaoto.forage.models.chat.watsonxai.WatsonxAiConfigEntries.API_KEY;
 import static io.kaoto.forage.models.chat.watsonxai.WatsonxAiConfigEntries.LOG_REQUESTS_AND_RESPONSES;
@@ -78,14 +75,12 @@ import static io.kaoto.forage.models.chat.watsonxai.WatsonxAiConfigEntries.URL;
  * Never commit API keys to version control. Use environment variables or secure configuration
  * management systems for production deployments.
  *
- * @see Config
- * @see ConfigStore
- * @see ConfigModule
+ * @see AbstractConfig
+ * @see io.kaoto.forage.core.util.config.ConfigStore
+ * @see io.kaoto.forage.core.util.config.ConfigModule
  * @since 1.0
  */
-public class WatsonxAiConfig implements Config {
-
-    private final String prefix;
+public class WatsonxAiConfig extends AbstractConfig {
 
     /**
      * Constructs a new WatsonxAiConfig and registers configuration parameters with the ConfigStore.
@@ -95,23 +90,7 @@ public class WatsonxAiConfig implements Config {
     }
 
     public WatsonxAiConfig(String prefix) {
-        this.prefix = prefix;
-
-        // First register new configuration modules. This happens only if a prefix is provided
-        WatsonxAiConfigEntries.register(prefix);
-
-        // Then, loads the configurations from the properties file associated with this Config module
-        ConfigStore.getInstance().load(WatsonxAiConfig.class, this, this::register);
-
-        // Lastly, load the overrides defined in system properties and environment variables
-        WatsonxAiConfigEntries.loadOverrides(prefix);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = WatsonxAiConfigEntries.find(prefix, name);
-
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        super(prefix, WatsonxAiConfigEntries.class);
     }
 
     /**
@@ -138,12 +117,10 @@ public class WatsonxAiConfig implements Config {
      * </ol>
      *
      * @return the IBM Cloud API key
-     * @throws MissingConfigException if no API key is configured
+     * @throws io.kaoto.forage.core.util.config.MissingConfigException if no API key is configured
      */
     public String apiKey() {
-        return ConfigStore.getInstance()
-                .get(API_KEY.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing Watsonx.ai API key"));
+        return getRequired(API_KEY, "Missing Watsonx.ai API key");
     }
 
     /**
@@ -167,12 +144,10 @@ public class WatsonxAiConfig implements Config {
      * </ol>
      *
      * @return the Watsonx.ai service URL
-     * @throws MissingConfigException if no URL is configured
+     * @throws io.kaoto.forage.core.util.config.MissingConfigException if no URL is configured
      */
     public String url() {
-        return ConfigStore.getInstance()
-                .get(URL.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing Watsonx.ai URL"));
+        return getRequired(URL, "Missing Watsonx.ai URL");
     }
 
     /**
@@ -189,12 +164,10 @@ public class WatsonxAiConfig implements Config {
      * </ol>
      *
      * @return the Watsonx.ai project ID
-     * @throws MissingConfigException if no project ID is configured
+     * @throws io.kaoto.forage.core.util.config.MissingConfigException if no project ID is configured
      */
     public String projectId() {
-        return ConfigStore.getInstance()
-                .get(PROJECT_ID.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing Watsonx.ai project ID"));
+        return getRequired(PROJECT_ID, "Missing Watsonx.ai project ID");
     }
 
     /**
@@ -214,7 +187,7 @@ public class WatsonxAiConfig implements Config {
      * @return the model name, defaults to "llama-3-405b-instruct" if not configured
      */
     public String modelName() {
-        return ConfigStore.getInstance().get(MODEL_NAME.asNamed(prefix)).orElse(MODEL_NAME.defaultValue());
+        return get(MODEL_NAME).orElse(MODEL_NAME.defaultValue());
     }
 
     /**
@@ -228,10 +201,7 @@ public class WatsonxAiConfig implements Config {
      * @return the temperature value, or null if not configured
      */
     public Double temperature() {
-        return ConfigStore.getInstance()
-                .get(TEMPERATURE.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(TEMPERATURE).map(Double::parseDouble).orElse(null);
     }
 
     /**
@@ -242,10 +212,7 @@ public class WatsonxAiConfig implements Config {
      * @return the maximum new tokens limit, or null if not configured
      */
     public Integer maxNewTokens() {
-        return ConfigStore.getInstance()
-                .get(MAX_NEW_TOKENS.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(MAX_NEW_TOKENS).map(Integer::parseInt).orElse(null);
     }
 
     /**
@@ -258,10 +225,7 @@ public class WatsonxAiConfig implements Config {
      * @return the top-p value, or null if not configured
      */
     public Double topP() {
-        return ConfigStore.getInstance()
-                .get(TOP_P.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(TOP_P).map(Double::parseDouble).orElse(null);
     }
 
     /**
@@ -272,10 +236,7 @@ public class WatsonxAiConfig implements Config {
      * @return the top-k value, or null if not configured
      */
     public Integer topK() {
-        return ConfigStore.getInstance()
-                .get(TOP_K.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(TOP_K).map(Integer::parseInt).orElse(null);
     }
 
     /**
@@ -284,10 +245,7 @@ public class WatsonxAiConfig implements Config {
      * @return the random seed value, or null if not configured
      */
     public Integer randomSeed() {
-        return ConfigStore.getInstance()
-                .get(RANDOM_SEED.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(RANDOM_SEED).map(Integer::parseInt).orElse(null);
     }
 
     /**
@@ -298,10 +256,7 @@ public class WatsonxAiConfig implements Config {
      * @return the repetition penalty value, or null if not configured
      */
     public Double repetitionPenalty() {
-        return ConfigStore.getInstance()
-                .get(REPETITION_PENALTY.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(REPETITION_PENALTY).map(Double::parseDouble).orElse(null);
     }
 
     /**
@@ -310,10 +265,7 @@ public class WatsonxAiConfig implements Config {
      * @return the minimum new tokens, or null if not configured
      */
     public Integer minNewTokens() {
-        return ConfigStore.getInstance()
-                .get(MIN_NEW_TOKENS.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(MIN_NEW_TOKENS).map(Integer::parseInt).orElse(null);
     }
 
     /**
@@ -324,9 +276,11 @@ public class WatsonxAiConfig implements Config {
      * @return the stop sequences as a list, or null if not configured
      */
     public List<String> stopSequences() {
-        return ConfigStore.getInstance()
-                .get(STOP_SEQUENCES.asNamed(prefix))
-                .map(sequences -> List.of(sequences.split(",")))
+        return get(STOP_SEQUENCES)
+                .map(sequences -> Arrays.stream(sequences.split(","))
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .toList())
                 .orElse(null);
     }
 
@@ -336,10 +290,7 @@ public class WatsonxAiConfig implements Config {
      * @return the timeout in seconds, or null if not configured
      */
     public Integer timeoutSeconds() {
-        return ConfigStore.getInstance()
-                .get(TIMEOUT.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(TIMEOUT).map(Integer::parseInt).orElse(null);
     }
 
     /**
@@ -348,10 +299,7 @@ public class WatsonxAiConfig implements Config {
      * @return the maximum retry attempts, or null if not configured
      */
     public Integer maxRetries() {
-        return ConfigStore.getInstance()
-                .get(MAX_RETRIES.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(MAX_RETRIES).map(Integer::parseInt).orElse(null);
     }
 
     /**
@@ -360,9 +308,6 @@ public class WatsonxAiConfig implements Config {
      * @return true if request and response logging is enabled, false if disabled, or null if not configured
      */
     public Boolean logRequestsAndResponses() {
-        return ConfigStore.getInstance()
-                .get(LOG_REQUESTS_AND_RESPONSES.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(null);
+        return get(LOG_REQUESTS_AND_RESPONSES).map(Boolean::parseBoolean).orElse(null);
     }
 }

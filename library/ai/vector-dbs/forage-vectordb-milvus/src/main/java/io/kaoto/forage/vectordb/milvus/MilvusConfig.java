@@ -1,9 +1,6 @@
 package io.kaoto.forage.vectordb.milvus;
 
-import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 import io.kaoto.forage.core.util.config.MissingConfigException;
 import io.milvus.common.clientenum.ConsistencyLevelEnum;
 import io.milvus.param.IndexType;
@@ -75,25 +72,14 @@ import static io.kaoto.forage.vectordb.milvus.MilvusConfigEntries.VECTOR_FIELD_N
  *
  * @since 1.0
  */
-public class MilvusConfig implements Config {
-
-    private final String prefix;
+public class MilvusConfig extends AbstractConfig {
 
     public MilvusConfig() {
         this(null);
     }
 
     public MilvusConfig(String prefix) {
-        this.prefix = prefix;
-
-        // First register new configuration modules. This happens only if a prefix is provided
-        MilvusConfigEntries.register(prefix);
-
-        // Then, loads the configurations from the properties file associated with this Config module
-        ConfigStore.getInstance().load(MilvusConfig.class, this, this::register);
-
-        // Lastly, load the overrides defined in system properties and environment variables
-        MilvusConfigEntries.loadOverrides(prefix);
+        super(prefix, MilvusConfigEntries.class);
 
         // Validate connection configuration
         validateConnectionConfig();
@@ -105,30 +91,25 @@ public class MilvusConfig implements Config {
     }
 
     public String host() {
-        return ConfigStore.getInstance().get(HOST.asNamed(prefix)).orElse(null);
+        return get(HOST).orElse(null);
     }
 
     public Integer port() {
-        return ConfigStore.getInstance()
-                .get(PORT.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(PORT).map(Integer::parseInt).orElse(null);
     }
 
     public String collectionName() {
-        return ConfigStore.getInstance().get(COLLECTION_NAME.asNamed(prefix)).orElse("default");
+        return get(COLLECTION_NAME).orElse("default");
     }
 
     public Integer dimension() {
-        return ConfigStore.getInstance()
-                .get(DIMENSION.asNamed(prefix))
+        return get(DIMENSION)
                 .map(Integer::parseInt)
                 .orElseThrow(() -> new MissingConfigException("Missing Milvus dimension"));
     }
 
     public IndexType indexType() {
-        String indexType =
-                ConfigStore.getInstance().get(INDEX_TYPE.asNamed(prefix)).orElse(null);
+        String indexType = get(INDEX_TYPE).orElse(null);
 
         if (indexType != null) {
             return IndexType.valueOf(indexType);
@@ -138,8 +119,7 @@ public class MilvusConfig implements Config {
     }
 
     public MetricType metricType() {
-        String metricType =
-                ConfigStore.getInstance().get(METRIC_TYPE.asNamed(prefix)).orElse(null);
+        String metricType = get(METRIC_TYPE).orElse(null);
         if (metricType != null) {
             return MetricType.valueOf(metricType);
         } else {
@@ -148,24 +128,23 @@ public class MilvusConfig implements Config {
     }
 
     public String uri() {
-        return ConfigStore.getInstance().get(URI.asNamed(prefix)).orElse(null);
+        return get(URI).orElse(null);
     }
 
     public String token() {
-        return ConfigStore.getInstance().get(TOKEN.asNamed(prefix)).orElse(null);
+        return get(TOKEN).orElse(null);
     }
 
     public String username() {
-        return ConfigStore.getInstance().get(USERNAME.asNamed(prefix)).orElse("");
+        return get(USERNAME).orElse("");
     }
 
     public String password() {
-        return ConfigStore.getInstance().get(PASSWORD.asNamed(prefix)).orElse("");
+        return get(PASSWORD).orElse("");
     }
 
     public ConsistencyLevelEnum consistencyLevel() {
-        String consistencyLevel =
-                ConfigStore.getInstance().get(CONSISTENCY_LEVEL.asNamed(prefix)).orElse(null);
+        String consistencyLevel = get(CONSISTENCY_LEVEL).orElse(null);
 
         if (consistencyLevel != null) {
             return ConsistencyLevelEnum.valueOf(consistencyLevel);
@@ -175,48 +154,31 @@ public class MilvusConfig implements Config {
     }
 
     public Boolean retrieveEmbeddingsOnSearch() {
-        return ConfigStore.getInstance()
-                .get(RETRIEVE_EMBEDDINGS_ON_SEARCH.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(false);
+        return get(RETRIEVE_EMBEDDINGS_ON_SEARCH).map(Boolean::parseBoolean).orElse(false);
     }
 
     public String databaseName() {
-        return ConfigStore.getInstance()
-                .get(DATABASE_NAME.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing Milvus database name"));
+        return getRequired(DATABASE_NAME, "Missing Milvus database name");
     }
 
     public String idFieldName() {
-        return ConfigStore.getInstance().get(ID_FIELD_NAME.asNamed(prefix)).orElse("id");
+        return get(ID_FIELD_NAME).orElse("id");
     }
 
     public String textFieldName() {
-        return ConfigStore.getInstance().get(TEXT_FIELD_NAME.asNamed(prefix)).orElse("text");
+        return get(TEXT_FIELD_NAME).orElse("text");
     }
 
     public String metadataFieldName() {
-        return ConfigStore.getInstance()
-                .get(METADATA_FIELD_NAME.asNamed(prefix))
-                .orElse("metadata");
+        return get(METADATA_FIELD_NAME).orElse("metadata");
     }
 
     public String vectorFieldName() {
-        return ConfigStore.getInstance().get(VECTOR_FIELD_NAME.asNamed(prefix)).orElse("vector");
+        return get(VECTOR_FIELD_NAME).orElse("vector");
     }
 
     public Boolean autoFlushOnInsert() {
-        return ConfigStore.getInstance()
-                .get(AUTO_FLUSH_ON_INSERT.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(false);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = MilvusConfigEntries.find(prefix, name);
-
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        return get(AUTO_FLUSH_ON_INSERT).map(Boolean::parseBoolean).orElse(false);
     }
 
     /*

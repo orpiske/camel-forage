@@ -53,7 +53,7 @@ mvn install -DskipTests
 forage/
 ├── core/                           # Core interfaces and utilities
 │   ├── forage-core-ai/            # AI interfaces (ModelProvider, ChatMemoryFactory)
-│   ├── forage-core-common/        # Config system (ConfigStore, ConfigModule, ConfigEntry)
+│   ├── forage-core-common/        # Config system (ConfigStore, ConfigModule, ConfigEntry, ConfigEntries, AbstractConfig)
 │   ├── forage-core-vectordb/      # EmbeddingStoreProvider interface
 │   ├── forage-core-jdbc/          # DataSourceProvider interface
 │   ├── forage-core-jms/           # JMS interfaces
@@ -116,46 +116,46 @@ public class MyFactory implements AgentFactory { ... }
 
 Each module requires two configuration classes:
 
-**ConfigEntries class** - Defines configuration modules:
+**ConfigEntries class** - Defines configuration modules using the central registry in the `ConfigEntries` base class. Subclasses contain only field declarations and a `static { initModules(...) }` block — no methods:
 ```java
 public final class ExampleConfigEntries extends ConfigEntries {
     public static final ConfigModule API_KEY = ConfigModule.of(ExampleConfig.class, "forage.example.api.key");
-    private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
+    public static final ConfigModule MODEL_NAME = ConfigModule.of(ExampleConfig.class, "forage.example.model.name",
+            "Model name", "Model Name", "default-model", "string", true, ConfigTag.COMMON);
 
-    static { init(); }
-    static void init() { CONFIG_MODULES.put(API_KEY, ConfigEntry.fromModule()); }
-
-    public static Map<ConfigModule, ConfigEntry> entries() { return Collections.unmodifiableMap(CONFIG_MODULES); }
-    public static Optional<ConfigModule> find(String prefix, String name) { return find(CONFIG_MODULES, prefix, name); }
-    public static void register(String prefix) { /* register prefixed configs */ }
-    public static void loadOverrides(String prefix) { load(CONFIG_MODULES, prefix); }
+    static {
+        initModules(ExampleConfigEntries.class, API_KEY, MODEL_NAME);
+    }
 }
 ```
 
-**Config class** - Implements Config interface:
+Callers use `ConfigEntries` base class methods directly: `ConfigEntries.entriesOf(ExampleConfigEntries.class)`, `ConfigEntries.registerPrefix(ExampleConfigEntries.class, prefix)`, `ConfigEntries.find(ConfigEntries.getModules(ExampleConfigEntries.class), prefix, name)`, `ConfigEntries.loadOverridesFor(ExampleConfigEntries.class, prefix)`.
+
+**Config class** - Extends `AbstractConfig`, which handles constructor boilerplate (prefix registration, properties loading, overrides) and provides `get(ConfigModule)` / `getRequired(ConfigModule, String)` helpers:
 ```java
-public class ExampleConfig implements Config {
-    private final String prefix;
+public class ExampleConfig extends AbstractConfig {
 
     public ExampleConfig() { this(null); }
     public ExampleConfig(String prefix) {
-        this.prefix = prefix;
-        ExampleConfigEntries.register(prefix);  // 1. Register prefixed modules
-        ConfigStore.getInstance().load(ExampleConfig.class, this, this::register);  // 2. Load from properties
-        ExampleConfigEntries.loadOverrides(prefix);  // 3. Load env/system overrides
+        super(prefix, ExampleConfigEntries.class);
     }
 
     @Override public String name() { return "forage-module-example"; }
-    @Override public void register(String name, String value) {
-        ExampleConfigEntries.find(prefix, name).ifPresent(m -> ConfigStore.getInstance().set(m, value));
-    }
 
     public String apiKey() {
-        return ConfigStore.getInstance().get(ExampleConfigEntries.API_KEY.asNamed(prefix))
-            .orElseThrow(() -> new MissingConfigException("Missing API key"));
+        return getRequired(API_KEY, "Missing API key");
+    }
+    public String modelName() {
+        return get(MODEL_NAME).orElse(MODEL_NAME.defaultValue());
     }
 }
 ```
+
+**Key base class infrastructure:**
+- `ConfigEntries.initModules(Class, ConfigModule...)` — registers modules in a central registry (replaces per-class `CONFIG_MODULES` map and `init()` method)
+- `ConfigEntries.entriesOf/getModules/registerPrefix/loadOverridesFor/find` — public base class helpers called directly by callers (no subclass delegation)
+- `AbstractConfig` — handles the 3-step constructor pattern (register prefix → load properties → load overrides), provides `get()`, `getRequired()`, and auto-implements `register(String, String)`
+- `AbstractConfig.ensureInitialized()` — forces ConfigEntries subclass static initialization when only a `Class` literal is passed
 
 **Configuration precedence** (highest to lowest):
 1. Environment variables (`FORAGE_EXAMPLE_API_KEY`)
@@ -189,13 +189,27 @@ public class MyTest implements ForageIntegrationTest {
 }
 ```
 
+## Adding New Modules
+
+See **[docs/adding-modules.md](docs/adding-modules.md)** for the complete guide on adding new Forage modules with support for plain Camel, Spring Boot, and Quarkus runtimes. The guide covers:
+- Configuration two-class pattern (`ConfigEntries` + `AbstractConfig`)
+- Provider implementation with `@ForageBean`
+- `ForageModuleDescriptor` for runtime adapters
+- Spring Boot auto-configuration and bean registration
+- Quarkus `ConfigSourceFactory` and deployment processors
+- Integration testing with Citrus
+
 ## Development Guidelines
 
 - Code formatting is applied automatically during compile phase via Spotless
 - All provider classes must have `@ForageBean` annotation
 - All factory classes must have `@ForageFactory` annotation
-- Use `MissingConfigException` for required missing configuration
+- Config classes must extend `AbstractConfig` (not implement `Config` directly)
+- ConfigEntries classes must use `initModules()` in their static block — no delegator methods (callers use `ConfigEntries` base class methods directly)
+- Use `getRequired(MODULE, "error message")` for required config, `get(MODULE)` for optional config
+- Use `MissingConfigException` for required missing configuration (or `getRequired()` which wraps it)
 - Properties files named `<module-name>.properties` in resources
+- **Special cases:** `FlipRoutePolicyConfig/ConfigEntries` and `ScheduleRoutePolicyConfig/ConfigEntries` use a dynamic ConfigModule pattern and do NOT extend `AbstractConfig` / use `initModules()`
 
 ## Active Technologies
 - Java 17+ + Apache Camel 4.16+, camel-api (RoutePolicyFactory, RoutePolicy) (001-route-policies)

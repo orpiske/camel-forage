@@ -1,11 +1,6 @@
 package io.kaoto.forage.models.chat.bedrock;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import io.kaoto.forage.core.util.config.ConfigEntries;
-import io.kaoto.forage.core.util.config.ConfigEntry;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigTag;
 
@@ -74,48 +69,15 @@ public final class BedrockConfigEntries extends ConfigEntries {
             true,
             ConfigTag.ADVANCED);
 
-    private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
-
     static {
-        init();
-    }
-
-    static void init() {
-        CONFIG_MODULES.put(REGION, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MODEL_ID, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(ACCESS_KEY_ID, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(SECRET_ACCESS_KEY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TEMPERATURE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MAX_TOKENS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TOP_P, ConfigEntry.fromModule());
-    }
-
-    public static Map<ConfigModule, ConfigEntry> entries() {
-        return Collections.unmodifiableMap(CONFIG_MODULES);
-    }
-
-    public static Optional<ConfigModule> find(String prefix, String name) {
-        return find(CONFIG_MODULES, prefix, name);
-    }
-
-    /**
-     * Registers new known configuration if a prefix is provided (otherwise is ignored)
-     * @param prefix the prefix to register
-     */
-    public static void register(String prefix) {
-        if (prefix != null) {
-            for (Map.Entry<ConfigModule, ConfigEntry> entry : entries().entrySet()) {
-                ConfigModule configModule = entry.getKey().asNamed(prefix);
-                CONFIG_MODULES.put(configModule, ConfigEntry.fromModule());
-            }
-        }
-    }
-
-    /**
-     * Load override configurations (which are defined via environment variables and/or system properties)
-     * @param prefix an optional prefix to use
-     */
-    public static void loadOverrides(String prefix) {
-        load(CONFIG_MODULES, prefix);
+        initModules(
+                BedrockConfigEntries.class,
+                REGION,
+                MODEL_ID,
+                ACCESS_KEY_ID,
+                SECRET_ACCESS_KEY,
+                TEMPERATURE,
+                MAX_TOKENS,
+                TOP_P);
     }
 }

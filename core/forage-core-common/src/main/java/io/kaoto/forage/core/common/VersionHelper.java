@@ -31,7 +31,9 @@ public final class VersionHelper {
      */
     private static String initVersion() {
         try (InputStream stream = VersionHelper.class.getResourceAsStream("/forage-version.txt")) {
-            assert stream != null;
+            if (stream == null) {
+                throw new IllegalStateException("Resource /forage-version.txt not found on classpath");
+            }
             byte[] bytes = stream.readAllBytes();
             return new String(bytes, StandardCharsets.UTF_8);
         } catch (IOException e) {

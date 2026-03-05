@@ -1,10 +1,7 @@
 package io.kaoto.forage.vectordb.pinecone;
 
-import java.util.Optional;
 import org.openapitools.db_control.client.model.DeletionProtection;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 import io.kaoto.forage.core.util.config.MissingConfigException;
 
 import static io.kaoto.forage.vectordb.pinecone.PineconeConfigEntries.API_KEY;
@@ -16,25 +13,14 @@ import static io.kaoto.forage.vectordb.pinecone.PineconeConfigEntries.METADATA_T
 import static io.kaoto.forage.vectordb.pinecone.PineconeConfigEntries.NAME_SPACE;
 import static io.kaoto.forage.vectordb.pinecone.PineconeConfigEntries.REGION;
 
-public class PineconeConfig implements Config {
-
-    private final String prefix;
+public class PineconeConfig extends AbstractConfig {
 
     public PineconeConfig() {
         this(null);
     }
 
     public PineconeConfig(String prefix) {
-        this.prefix = prefix;
-
-        // First register new configuration modules. This happens only if a prefix is provided
-        PineconeConfigEntries.register(prefix);
-
-        // Then, loads the configurations from the properties file associated with this Config module
-        ConfigStore.getInstance().load(PineconeConfig.class, this, this::register);
-
-        // Lastly, load the overrides defined in system properties and environment variables
-        PineconeConfigEntries.loadOverrides(prefix);
+        super(prefix, PineconeConfigEntries.class);
     }
 
     @Override
@@ -43,55 +29,36 @@ public class PineconeConfig implements Config {
     }
 
     public String apiKey() {
-        return ConfigStore.getInstance()
-                .get(API_KEY.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing Pinecone API key"));
+        return getRequired(API_KEY, "Missing Pinecone API key");
     }
 
     public String index() {
-        return ConfigStore.getInstance()
-                .get(INDEX.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing Pinecone index"));
+        return getRequired(INDEX, "Missing Pinecone index");
     }
 
     public String nameSpace() {
-        return ConfigStore.getInstance().get(NAME_SPACE.asNamed(prefix)).orElse("default");
+        return get(NAME_SPACE).orElse("default");
     }
 
     public String metadataTextKey() {
-        return ConfigStore.getInstance().get(METADATA_TEXT_KEY.asNamed(prefix)).orElse("text_segment");
+        return get(METADATA_TEXT_KEY).orElse("text_segment");
     }
 
     public Integer dimension() {
-        return ConfigStore.getInstance()
-                .get(DIMENSION.asNamed(prefix))
+        return get(DIMENSION)
                 .map(Integer::parseInt)
                 .orElseThrow(() -> new MissingConfigException("Missing Pinecone dimension"));
     }
 
     public String cloud() {
-        return ConfigStore.getInstance()
-                .get(CLOUD.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing Pinecone cloud"));
+        return getRequired(CLOUD, "Missing Pinecone cloud");
     }
 
     public String region() {
-        return ConfigStore.getInstance()
-                .get(REGION.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing Pinecone region"));
+        return getRequired(REGION, "Missing Pinecone region");
     }
 
     public DeletionProtection deletionProtection() {
-        return ConfigStore.getInstance()
-                .get(DELETION_PROTECTION.asNamed(prefix))
-                .map(DeletionProtection::valueOf)
-                .orElse(DeletionProtection.ENABLED);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = PineconeConfigEntries.find(prefix, name);
-
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        return get(DELETION_PROTECTION).map(DeletionProtection::valueOf).orElse(DeletionProtection.ENABLED);
     }
 }

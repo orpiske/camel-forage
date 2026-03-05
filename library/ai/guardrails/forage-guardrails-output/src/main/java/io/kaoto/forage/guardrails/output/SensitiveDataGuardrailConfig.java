@@ -2,15 +2,12 @@ package io.kaoto.forage.guardrails.output;
 
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.Optional;
 import java.util.Set;
 import org.apache.camel.component.langchain4j.agent.api.guardrails.SensitiveDataOutputGuardrail.Action;
 import org.apache.camel.component.langchain4j.agent.api.guardrails.SensitiveDataOutputGuardrail.SensitiveDataType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 
 import static io.kaoto.forage.guardrails.output.SensitiveDataGuardrailConfigEntries.ACTION;
 import static io.kaoto.forage.guardrails.output.SensitiveDataGuardrailConfigEntries.DETECT_TYPES;
@@ -19,28 +16,16 @@ import static io.kaoto.forage.guardrails.output.SensitiveDataGuardrailConfigEntr
 /**
  * Configuration class for sensitive data output guardrail.
  */
-public class SensitiveDataGuardrailConfig implements Config {
+public class SensitiveDataGuardrailConfig extends AbstractConfig {
 
     private static final Logger LOG = LoggerFactory.getLogger(SensitiveDataGuardrailConfig.class);
-
-    private final String prefix;
 
     public SensitiveDataGuardrailConfig() {
         this(null);
     }
 
     public SensitiveDataGuardrailConfig(String prefix) {
-        this.prefix = prefix;
-
-        SensitiveDataGuardrailConfigEntries.register(prefix);
-        ConfigStore.getInstance().load(SensitiveDataGuardrailConfig.class, this, this::register);
-        SensitiveDataGuardrailConfigEntries.loadOverrides(prefix);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = SensitiveDataGuardrailConfigEntries.find(prefix, name);
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        super(prefix, SensitiveDataGuardrailConfigEntries.class);
     }
 
     @Override
@@ -49,8 +34,7 @@ public class SensitiveDataGuardrailConfig implements Config {
     }
 
     public Set<SensitiveDataType> detectTypes() {
-        String typesStr = ConfigStore.getInstance()
-                .get(DETECT_TYPES.asNamed(prefix))
+        String typesStr = get(DETECT_TYPES)
                 .orElse("API_KEY,AWS_KEY,SECRET,PRIVATE_KEY,CREDIT_CARD,SSN,JWT,CONNECTION_STRING,GITHUB_TOKEN");
 
         Set<SensitiveDataType> types = EnumSet.noneOf(SensitiveDataType.class);
@@ -69,7 +53,7 @@ public class SensitiveDataGuardrailConfig implements Config {
     }
 
     public Action action() {
-        String actionStr = ConfigStore.getInstance().get(ACTION.asNamed(prefix)).orElse("BLOCK");
+        String actionStr = get(ACTION).orElse("BLOCK");
 
         try {
             return Action.valueOf(actionStr.toUpperCase());
@@ -79,6 +63,6 @@ public class SensitiveDataGuardrailConfig implements Config {
     }
 
     public String redactionText() {
-        return ConfigStore.getInstance().get(REDACTION_TEXT.asNamed(prefix)).orElse("[REDACTED]");
+        return get(REDACTION_TEXT).orElse("[REDACTED]");
     }
 }

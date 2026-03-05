@@ -1,11 +1,6 @@
 package io.kaoto.forage.vectordb.milvus;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import io.kaoto.forage.core.util.config.ConfigEntries;
-import io.kaoto.forage.core.util.config.ConfigEntry;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigTag;
 
@@ -173,59 +168,26 @@ public final class MilvusConfigEntries extends ConfigEntries {
             false,
             ConfigTag.ADVANCED);
 
-    private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
-
     static {
-        init();
-    }
-
-    static void init() {
-        CONFIG_MODULES.put(HOST, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(PORT, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(COLLECTION_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(DIMENSION, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(INDEX_TYPE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(METRIC_TYPE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(URI, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TOKEN, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(USERNAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(PASSWORD, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(CONSISTENCY_LEVEL, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(RETRIEVE_EMBEDDINGS_ON_SEARCH, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(AUTO_FLUSH_ON_INSERT, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(DATABASE_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(ID_FIELD_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TEXT_FIELD_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(METADATA_FIELD_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(VECTOR_FIELD_NAME, ConfigEntry.fromModule());
-    }
-
-    public static Map<ConfigModule, ConfigEntry> entries() {
-        return Collections.unmodifiableMap(CONFIG_MODULES);
-    }
-
-    public static Optional<ConfigModule> find(String prefix, String name) {
-        return find(CONFIG_MODULES, prefix, name);
-    }
-
-    /**
-     * Registers new known configuration if a prefix is provided (otherwise is ignored)
-     * @param prefix the prefix to register
-     */
-    public static void register(String prefix) {
-        if (prefix != null) {
-            for (Map.Entry<ConfigModule, ConfigEntry> entry : entries().entrySet()) {
-                ConfigModule configModule = entry.getKey().asNamed(prefix);
-                CONFIG_MODULES.put(configModule, ConfigEntry.fromModule());
-            }
-        }
-    }
-
-    /**
-     * Load override configurations (which are defined via environment variables and/or system properties)
-     * @param prefix and optional prefix to use
-     */
-    public static void loadOverrides(String prefix) {
-        load(CONFIG_MODULES, prefix);
+        initModules(
+                MilvusConfigEntries.class,
+                HOST,
+                PORT,
+                COLLECTION_NAME,
+                DIMENSION,
+                INDEX_TYPE,
+                METRIC_TYPE,
+                URI,
+                TOKEN,
+                USERNAME,
+                PASSWORD,
+                CONSISTENCY_LEVEL,
+                RETRIEVE_EMBEDDINGS_ON_SEARCH,
+                AUTO_FLUSH_ON_INSERT,
+                DATABASE_NAME,
+                ID_FIELD_NAME,
+                TEXT_FIELD_NAME,
+                METADATA_FIELD_NAME,
+                VECTOR_FIELD_NAME);
     }
 }

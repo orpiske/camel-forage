@@ -48,7 +48,7 @@ class ForageJdbcBeanRegistrar implements ImportBeanDefinitionRegistrar, org.spri
 
         LOG.info("Discovered Forage JDBC configuration prefixes: {}", prefixes);
         boolean isFirst = true;
-        for (String name : prefixes) {
+        for (String name : prefixes.stream().sorted().toList()) {
             if (!registry.containsBeanDefinition(name)) {
                 registerBean(registry, descriptor, name);
                 if (isFirst) {

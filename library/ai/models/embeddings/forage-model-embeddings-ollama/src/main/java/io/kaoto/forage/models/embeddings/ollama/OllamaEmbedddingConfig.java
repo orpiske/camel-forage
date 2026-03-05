@@ -1,10 +1,7 @@
 package io.kaoto.forage.models.embeddings.ollama;
 
 import java.time.Duration;
-import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 
 import static io.kaoto.forage.models.embeddings.ollama.OllamaEmbeddingConfigEntries.BASE_URL;
 import static io.kaoto.forage.models.embeddings.ollama.OllamaEmbeddingConfigEntries.LOG_REQUESTS;
@@ -37,9 +34,7 @@ import static io.kaoto.forage.models.embeddings.ollama.OllamaEmbeddingConfigEntr
  * @see ConfigModule
  * @since 1.0
  */
-public class OllamaEmbedddingConfig implements Config {
-
-    private final String prefix;
+public class OllamaEmbedddingConfig extends AbstractConfig {
 
     /**
      * Creates an Ollama Embedding model instance.
@@ -60,9 +55,6 @@ public class OllamaEmbedddingConfig implements Config {
      *   <li><strong>OLLAMA_LOG_RESPONSES</strong> - Enable response logging, true/false (no default)</li>
      * </ul>
      *
-     * @see Config
-     * @see ConfigStore
-     * @see ConfigModule
      * @since 1.0
      */
     public OllamaEmbedddingConfig() {
@@ -70,23 +62,7 @@ public class OllamaEmbedddingConfig implements Config {
     }
 
     public OllamaEmbedddingConfig(String prefix) {
-        this.prefix = prefix;
-
-        // First register new configuration modules. This happens only if a prefix is provided
-        OllamaEmbeddingConfigEntries.register(prefix);
-
-        // Then, loads the configurations from the properties file associated with this Config module
-        ConfigStore.getInstance().load(OllamaEmbedddingConfig.class, this, this::register);
-
-        // Lastly, load the overrides defined in system properties and environment variables
-        OllamaEmbeddingConfigEntries.loadOverrides(prefix);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = OllamaEmbeddingConfigEntries.find(prefix, name);
-
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        super(prefix, OllamaEmbeddingConfigEntries.class);
     }
 
     /**
@@ -122,7 +98,7 @@ public class OllamaEmbedddingConfig implements Config {
      * @return the Ollama server base URL, never null
      */
     public String baseUrl() {
-        return ConfigStore.getInstance().get(BASE_URL.asNamed(prefix)).orElse(BASE_URL.defaultValue());
+        return get(BASE_URL).orElse(BASE_URL.defaultValue());
     }
 
     /**
@@ -144,7 +120,7 @@ public class OllamaEmbedddingConfig implements Config {
      * @return the Ollama model name, never null
      */
     public String modelName() {
-        return ConfigStore.getInstance().get(MODEL_NAME.asNamed(prefix)).orElse("llama3");
+        return get(MODEL_NAME).orElse("llama3");
     }
 
     /**
@@ -153,10 +129,7 @@ public class OllamaEmbedddingConfig implements Config {
      * <p>Used for the HttpClientBuilder that will be used to create the HttpClient that will be used to communicate with Ollama.</p>
      */
     public Integer maxRetries() {
-        return ConfigStore.getInstance()
-                .get(MAX_RETRIES.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(MAX_RETRIES).map(Integer::parseInt).orElse(null);
     }
 
     /**
@@ -167,10 +140,7 @@ public class OllamaEmbedddingConfig implements Config {
      *  NOTE: timeout(Duration) overrides timeouts set on the HttpClientBuilder.
      */
     public Duration timeout() {
-        return ConfigStore.getInstance()
-                .get(TIMEOUT.asNamed(prefix))
-                .map(Duration::parse)
-                .orElse(null);
+        return get(TIMEOUT).map(Duration::parse).orElse(null);
     }
 
     /**
@@ -183,10 +153,7 @@ public class OllamaEmbedddingConfig implements Config {
      * @return true if request logging is enabled, false if disabled, null if not configured
      */
     public Boolean logRequests() {
-        return ConfigStore.getInstance()
-                .get(LOG_REQUESTS.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(null);
+        return get(LOG_REQUESTS).map(Boolean::parseBoolean).orElse(null);
     }
 
     /**
@@ -199,9 +166,6 @@ public class OllamaEmbedddingConfig implements Config {
      * @return true if response logging is enabled, false if disabled, null if not configured
      */
     public Boolean logResponses() {
-        return ConfigStore.getInstance()
-                .get(LOG_RESPONSES.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(null);
+        return get(LOG_RESPONSES).map(Boolean::parseBoolean).orElse(null);
     }
 }

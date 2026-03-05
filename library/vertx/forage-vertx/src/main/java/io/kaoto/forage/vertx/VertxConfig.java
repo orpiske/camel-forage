@@ -1,10 +1,7 @@
 package io.kaoto.forage.vertx;
 
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 import io.vertx.core.VertxOptions;
 
 import static io.kaoto.forage.vertx.VertxConfigEntries.BLOCKED_THREAD_CHECK_INTERVAL;
@@ -104,17 +101,13 @@ import static io.kaoto.forage.vertx.VertxConfigEntries.WORKER_POOL_SIZE;
  * </ul>
  *
  * <p>This class automatically registers itself and its configuration parameters with the
- * {@link ConfigStore} during construction, making the configuration values available
+ * {@link io.kaoto.forage.core.util.config.ConfigStore} during construction, making the configuration values available
  * to other components in the framework.
  *
- * @see Config
- * @see ConfigStore
- * @see ConfigModule
+ * @see AbstractConfig
  * @since 1.0
  */
-public class VertxConfig implements Config {
-
-    private final String prefix;
+public class VertxConfig extends AbstractConfig {
 
     /**
      * Constructs a new VertxConfig and registers configuration parameters with the ConfigStore.
@@ -135,23 +128,7 @@ public class VertxConfig implements Config {
     }
 
     public VertxConfig(String prefix) {
-        this.prefix = prefix;
-
-        // First register new configuration modules. This happens only if a prefix is provided
-        VertxConfigEntries.register(prefix);
-
-        // Then, loads the configurations from the properties file associated with this Config module
-        ConfigStore.getInstance().load(VertxConfig.class, this, this::register);
-
-        // Lastly, load the overrides defined in system properties and environment variables
-        VertxConfigEntries.loadOverrides(prefix);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = VertxConfigEntries.find(prefix, name);
-
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        super(prefix, VertxConfigEntries.class);
     }
 
     /**
@@ -188,10 +165,7 @@ public class VertxConfig implements Config {
      * @return the worker pool size, or null if not configured
      */
     public Integer workerPoolSize() {
-        return ConfigStore.getInstance()
-                .get(WORKER_POOL_SIZE.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(VertxOptions.DEFAULT_WORKER_POOL_SIZE);
+        return get(WORKER_POOL_SIZE).map(Integer::parseInt).orElse(VertxOptions.DEFAULT_WORKER_POOL_SIZE);
     }
 
     /**
@@ -211,10 +185,7 @@ public class VertxConfig implements Config {
      * @return the event loop pool size, or null if not configured
      */
     public Integer eventLoopPoolSize() {
-        return ConfigStore.getInstance()
-                .get(EVENT_LOOP_POOL_SIZE.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(VertxOptions.DEFAULT_EVENT_LOOP_POOL_SIZE);
+        return get(EVENT_LOOP_POOL_SIZE).map(Integer::parseInt).orElse(VertxOptions.DEFAULT_EVENT_LOOP_POOL_SIZE);
     }
 
     /**
@@ -235,111 +206,82 @@ public class VertxConfig implements Config {
      * @return true if clustered mode is enabled, false otherwise
      */
     public Boolean clustered() {
-        return ConfigStore.getInstance()
-                .get(CLUSTERED.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(false);
+        return get(CLUSTERED).map(Boolean::parseBoolean).orElse(false);
     }
 
     public Integer internalBlockingPoolSize() {
-        return ConfigStore.getInstance()
-                .get(INTERNAL_BLOCKING_POOL_SIZE.asNamed(prefix))
+        return get(INTERNAL_BLOCKING_POOL_SIZE)
                 .map(Integer::parseInt)
                 .orElse(VertxOptions.DEFAULT_INTERNAL_BLOCKING_POOL_SIZE);
     }
 
     public Long blockedThreadCheckInterval() {
-        return ConfigStore.getInstance()
-                .get(BLOCKED_THREAD_CHECK_INTERVAL.asNamed(prefix))
+        return get(BLOCKED_THREAD_CHECK_INTERVAL)
                 .map(Long::parseLong)
                 .orElse(VertxOptions.DEFAULT_BLOCKED_THREAD_CHECK_INTERVAL);
     }
 
     public Long maxEventLoopExecuteTime() {
-        return ConfigStore.getInstance()
-                .get(MAX_EVENT_LOOP_EXECUTE_TIME.asNamed(prefix))
+        return get(MAX_EVENT_LOOP_EXECUTE_TIME)
                 .map(Long::parseLong)
-                .orElse(VertxOptions.DEFAULT_MAX_WORKER_EXECUTE_TIME);
+                .orElse(VertxOptions.DEFAULT_MAX_EVENT_LOOP_EXECUTE_TIME);
     }
 
     public Long maxWorkerExecuteTime() {
-        return ConfigStore.getInstance()
-                .get(MAX_WORKER_EXECUTE_TIME.asNamed(prefix))
-                .map(Long::parseLong)
-                .orElse(VertxOptions.DEFAULT_MAX_WORKER_EXECUTE_TIME);
+        return get(MAX_WORKER_EXECUTE_TIME).map(Long::parseLong).orElse(VertxOptions.DEFAULT_MAX_WORKER_EXECUTE_TIME);
     }
 
     public Boolean haEnabled() {
-        return ConfigStore.getInstance()
-                .get(HA_ENABLED.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(VertxOptions.DEFAULT_HA_ENABLED);
+        return get(HA_ENABLED).map(Boolean::parseBoolean).orElse(VertxOptions.DEFAULT_HA_ENABLED);
     }
 
     public Integer quorumSize() {
-        return ConfigStore.getInstance()
-                .get(QUORUM_SIZE.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(VertxOptions.DEFAULT_QUORUM_SIZE);
+        return get(QUORUM_SIZE).map(Integer::parseInt).orElse(VertxOptions.DEFAULT_QUORUM_SIZE);
     }
 
     public String haGroup() {
-        return ConfigStore.getInstance().get(HA_GROUP.asNamed(prefix)).orElse(VertxOptions.DEFAULT_HA_GROUP);
+        return get(HA_GROUP).orElse(VertxOptions.DEFAULT_HA_GROUP);
     }
 
     public Long warningExceptionTime() {
-        return ConfigStore.getInstance()
-                .get(WARNING_EXCEPTION_TIME.asNamed(prefix))
-                .map(Long::parseLong)
-                .orElse(TimeUnit.SECONDS.toNanos(5));
+        return get(WARNING_EXCEPTION_TIME).map(Long::parseLong).orElse(TimeUnit.SECONDS.toNanos(5));
     }
 
     public TimeUnit warningExceptionTimeUnit() {
-        return ConfigStore.getInstance()
-                .get(WARNING_EXCEPTION_TIME_UNIT.asNamed(prefix))
+        return get(WARNING_EXCEPTION_TIME_UNIT)
                 .map(TimeUnit::valueOf)
                 .orElse(VertxOptions.DEFAULT_WARNING_EXCEPTION_TIME_UNIT);
     }
 
     public Boolean preferNativeTransport() {
-        return ConfigStore.getInstance()
-                .get(PREFER_NATIVE_TRANSPORT.asNamed(prefix))
+        return get(PREFER_NATIVE_TRANSPORT)
                 .map(Boolean::parseBoolean)
                 .orElse(VertxOptions.DEFAULT_PREFER_NATIVE_TRANSPORT);
     }
 
     public TimeUnit maxEventLoopExecuteTimeUnit() {
-        return ConfigStore.getInstance()
-                .get(MAX_EVENT_LOOP_EXECUTE_TIME_UNIT.asNamed(prefix))
+        return get(MAX_EVENT_LOOP_EXECUTE_TIME_UNIT)
                 .map(TimeUnit::valueOf)
                 .orElse(VertxOptions.DEFAULT_MAX_EVENT_LOOP_EXECUTE_TIME_UNIT);
     }
 
     public TimeUnit maxWorkerExecuteTimeUnit() {
-        return ConfigStore.getInstance()
-                .get(MAX_WORKER_EXECUTE_TIME_UNIT.asNamed(prefix))
+        return get(MAX_WORKER_EXECUTE_TIME_UNIT)
                 .map(TimeUnit::valueOf)
                 .orElse(VertxOptions.DEFAULT_MAX_WORKER_EXECUTE_TIME_UNIT);
     }
 
     public TimeUnit blockedThreadCheckIntervalUnit() {
-        return ConfigStore.getInstance()
-                .get(BLOCKED_THREAD_CHECK_INTERVAL_UNIT.asNamed(prefix))
+        return get(BLOCKED_THREAD_CHECK_INTERVAL_UNIT)
                 .map(TimeUnit::valueOf)
                 .orElse(VertxOptions.DEFAULT_BLOCKED_THREAD_CHECK_INTERVAL_UNIT);
     }
 
     public Boolean disableTccl() {
-        return ConfigStore.getInstance()
-                .get(DISABLE_TCCL.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(VertxOptions.DEFAULT_DISABLE_TCCL);
+        return get(DISABLE_TCCL).map(Boolean::parseBoolean).orElse(VertxOptions.DEFAULT_DISABLE_TCCL);
     }
 
     public Boolean useDaemonThread() {
-        return ConfigStore.getInstance()
-                .get(USE_DAEMON_THREAD.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(VertxOptions.DEFAULT_USE_DAEMON_THREAD);
+        return get(USE_DAEMON_THREAD).map(Boolean::parseBoolean).orElse(VertxOptions.DEFAULT_USE_DAEMON_THREAD);
     }
 }

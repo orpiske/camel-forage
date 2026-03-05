@@ -2,14 +2,11 @@ package io.kaoto.forage.guardrails.input;
 
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.Optional;
 import java.util.Set;
 import org.apache.camel.component.langchain4j.agent.api.guardrails.PiiDetectorGuardrail.PiiType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 
 import static io.kaoto.forage.guardrails.input.PiiDetectorGuardrailConfigEntries.BLOCK_ON_DETECTION;
 import static io.kaoto.forage.guardrails.input.PiiDetectorGuardrailConfigEntries.DETECT_TYPES;
@@ -17,28 +14,16 @@ import static io.kaoto.forage.guardrails.input.PiiDetectorGuardrailConfigEntries
 /**
  * Configuration class for PII detector guardrail.
  */
-public class PiiDetectorGuardrailConfig implements Config {
+public class PiiDetectorGuardrailConfig extends AbstractConfig {
 
     private static final Logger LOG = LoggerFactory.getLogger(PiiDetectorGuardrailConfig.class);
-
-    private final String prefix;
 
     public PiiDetectorGuardrailConfig() {
         this(null);
     }
 
     public PiiDetectorGuardrailConfig(String prefix) {
-        this.prefix = prefix;
-
-        PiiDetectorGuardrailConfigEntries.register(prefix);
-        ConfigStore.getInstance().load(PiiDetectorGuardrailConfig.class, this, this::register);
-        PiiDetectorGuardrailConfigEntries.loadOverrides(prefix);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = PiiDetectorGuardrailConfigEntries.find(prefix, name);
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        super(prefix, PiiDetectorGuardrailConfigEntries.class);
     }
 
     @Override
@@ -47,9 +32,7 @@ public class PiiDetectorGuardrailConfig implements Config {
     }
 
     public Set<PiiType> detectTypes() {
-        String typesStr = ConfigStore.getInstance()
-                .get(DETECT_TYPES.asNamed(prefix))
-                .orElse("EMAIL,PHONE,SSN,CREDIT_CARD,IP_ADDRESS");
+        String typesStr = get(DETECT_TYPES).orElse("EMAIL,PHONE,SSN,CREDIT_CARD,IP_ADDRESS");
 
         Set<PiiType> types = EnumSet.noneOf(PiiType.class);
         Arrays.stream(typesStr.split(","))
@@ -67,9 +50,6 @@ public class PiiDetectorGuardrailConfig implements Config {
     }
 
     public boolean blockOnDetection() {
-        return ConfigStore.getInstance()
-                .get(BLOCK_ON_DETECTION.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(true);
+        return get(BLOCK_ON_DETECTION).map(Boolean::parseBoolean).orElse(true);
     }
 }

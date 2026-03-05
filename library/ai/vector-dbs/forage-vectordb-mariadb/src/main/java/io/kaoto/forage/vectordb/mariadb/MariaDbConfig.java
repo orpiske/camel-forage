@@ -1,10 +1,6 @@
 package io.kaoto.forage.vectordb.mariadb;
 
-import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.core.util.config.MissingConfigException;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 import dev.langchain4j.store.embedding.mariadb.MariaDBDistanceType;
 
 import static io.kaoto.forage.vectordb.mariadb.MariaDbConfigEntries.CONTENT_FIELD_NAME;
@@ -40,11 +36,9 @@ import static io.kaoto.forage.vectordb.mariadb.MariaDbConfigEntries.USER;
  * @see MariaDbConfigEntries
  * @see MariaDbProvider
  */
-public class MariaDbConfig implements Config {
+public class MariaDbConfig extends AbstractConfig {
 
     private static final int DEFAULT_DIMENSION = 384;
-
-    private final String prefix;
 
     /**
      * Creates a new MariaDB configuration using default (non-prefixed) properties.
@@ -66,16 +60,7 @@ public class MariaDbConfig implements Config {
      * @param prefix optional prefix for scoped configuration properties
      */
     public MariaDbConfig(String prefix) {
-        this.prefix = prefix;
-
-        // First register new configuration modules. This happens only if a prefix is provided
-        MariaDbConfigEntries.register(prefix);
-
-        // Then, loads the configurations from the properties file associated with this Config module
-        ConfigStore.getInstance().load(MariaDbConfig.class, this, this::register);
-
-        // Lastly, load the overrides defined in system properties and environment variables
-        MariaDbConfigEntries.loadOverrides(prefix);
+        super(prefix, MariaDbConfigEntries.class);
     }
 
     @Override
@@ -87,24 +72,20 @@ public class MariaDbConfig implements Config {
      * Gets the MariaDB JDBC URL for database connection.
      *
      * @return the JDBC URL (e.g., "jdbc:mariadb://localhost:3306/vectordb")
-     * @throws MissingConfigException if URL is not configured
+     * @throws io.kaoto.forage.core.util.config.MissingConfigException if URL is not configured
      */
     public String url() {
-        return ConfigStore.getInstance()
-                .get(URL.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing MariaDB JDBC URL"));
+        return getRequired(URL, "Missing MariaDB JDBC URL");
     }
 
     /**
      * Gets the database username for authentication.
      *
      * @return the database username
-     * @throws MissingConfigException if username is not configured
+     * @throws io.kaoto.forage.core.util.config.MissingConfigException if username is not configured
      */
     public String user() {
-        return ConfigStore.getInstance()
-                .get(USER.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing MariaDB user"));
+        return getRequired(USER, "Missing MariaDB user");
     }
 
     /**
@@ -113,7 +94,7 @@ public class MariaDbConfig implements Config {
      * @return the database password, or null if not configured
      */
     public String password() {
-        return ConfigStore.getInstance().get(PASSWORD.asNamed(prefix)).orElse(null);
+        return get(PASSWORD).orElse(null);
     }
 
     /**
@@ -122,7 +103,7 @@ public class MariaDbConfig implements Config {
      * @return the table name (default: "embeddings")
      */
     public String table() {
-        return ConfigStore.getInstance().get(TABLE.asNamed(prefix)).orElse("embeddings");
+        return get(TABLE).orElse("embeddings");
     }
 
     /**
@@ -132,8 +113,7 @@ public class MariaDbConfig implements Config {
      * @throws IllegalArgumentException if an invalid distance type is configured
      */
     public MariaDBDistanceType distanceType() {
-        return ConfigStore.getInstance()
-                .get(DISTANCE_TYPE.asNamed(prefix))
+        return get(DISTANCE_TYPE)
                 .map(value -> MariaDBDistanceType.valueOf(value.toUpperCase()))
                 .orElse(MariaDBDistanceType.COSINE);
     }
@@ -144,7 +124,7 @@ public class MariaDbConfig implements Config {
      * @return the ID field name (default: "id")
      */
     public String idFieldName() {
-        return ConfigStore.getInstance().get(ID_FIELD_NAME.asNamed(prefix)).orElse("id");
+        return get(ID_FIELD_NAME).orElse("id");
     }
 
     /**
@@ -153,9 +133,7 @@ public class MariaDbConfig implements Config {
      * @return the embedding field name (default: "embedding")
      */
     public String embeddingFieldName() {
-        return ConfigStore.getInstance()
-                .get(EMBEDDING_FIELD_NAME.asNamed(prefix))
-                .orElse("embedding");
+        return get(EMBEDDING_FIELD_NAME).orElse("embedding");
     }
 
     /**
@@ -164,7 +142,7 @@ public class MariaDbConfig implements Config {
      * @return the content field name (default: "content")
      */
     public String contentFieldName() {
-        return ConfigStore.getInstance().get(CONTENT_FIELD_NAME.asNamed(prefix)).orElse("content");
+        return get(CONTENT_FIELD_NAME).orElse("content");
     }
 
     /**
@@ -173,10 +151,7 @@ public class MariaDbConfig implements Config {
      * @return true to create table automatically (default: true)
      */
     public Boolean createTable() {
-        return ConfigStore.getInstance()
-                .get(CREATE_TABLE.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(true);
+        return get(CREATE_TABLE).map(Boolean::parseBoolean).orElse(true);
     }
 
     /**
@@ -185,10 +160,7 @@ public class MariaDbConfig implements Config {
      * @return true to drop table first (default: false)
      */
     public Boolean dropTableFirst() {
-        return ConfigStore.getInstance()
-                .get(DROP_TABLE_FIRST.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(false);
+        return get(DROP_TABLE_FIRST).map(Boolean::parseBoolean).orElse(false);
     }
 
     /**
@@ -197,16 +169,6 @@ public class MariaDbConfig implements Config {
      * @return the configured vector dimension, or the default of 384
      */
     public Integer dimension() {
-        return ConfigStore.getInstance()
-                .get(DIMENSION.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(DEFAULT_DIMENSION);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = MariaDbConfigEntries.find(prefix, name);
-
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        return get(DIMENSION).map(Integer::parseInt).orElse(DEFAULT_DIMENSION);
     }
 }

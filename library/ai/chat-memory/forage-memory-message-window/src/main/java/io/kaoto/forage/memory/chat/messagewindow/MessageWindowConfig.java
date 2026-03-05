@@ -1,31 +1,21 @@
 package io.kaoto.forage.memory.chat.messagewindow;
 
-import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 
-public class MessageWindowConfig implements Config {
+public class MessageWindowConfig extends AbstractConfig {
 
     private static final int DEFAULT_MAX_MESSAGES = 10;
-
-    private final String prefix;
 
     public MessageWindowConfig() {
         this(null);
     }
 
     public MessageWindowConfig(String prefix) {
-        this.prefix = prefix;
-
-        MessageWindowConfigEntries.register(prefix);
-        ConfigStore.getInstance().load(MessageWindowConfig.class, this, this::register);
-        MessageWindowConfigEntries.loadOverrides(prefix);
+        super(prefix, MessageWindowConfigEntries.class);
     }
 
     public int maxMessages() {
-        return ConfigStore.getInstance()
-                .get(MessageWindowConfigEntries.MAX_MESSAGES.asNamed(prefix))
+        return get(MessageWindowConfigEntries.MAX_MESSAGES)
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -39,11 +29,5 @@ public class MessageWindowConfig implements Config {
     @Override
     public String name() {
         return "forage-memory-message-window";
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = MessageWindowConfigEntries.find(prefix, name);
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
     }
 }

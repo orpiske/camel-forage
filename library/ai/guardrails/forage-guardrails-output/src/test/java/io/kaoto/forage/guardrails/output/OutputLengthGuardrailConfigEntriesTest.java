@@ -2,6 +2,7 @@ package io.kaoto.forage.guardrails.output;
 
 import java.util.Map;
 import java.util.Optional;
+import io.kaoto.forage.core.util.config.ConfigEntries;
 import io.kaoto.forage.core.util.config.ConfigEntry;
 import io.kaoto.forage.core.util.config.ConfigModule;
 
@@ -51,7 +52,7 @@ class OutputLengthGuardrailConfigEntriesTest {
         @Test
         @DisplayName("Should return immutable map from entries()")
         void shouldReturnImmutableMapFromEntries() {
-            Map<ConfigModule, ConfigEntry> entries = OutputLengthGuardrailConfigEntries.entries();
+            Map<ConfigModule, ConfigEntry> entries = ConfigEntries.entriesOf(OutputLengthGuardrailConfigEntries.class);
 
             assertThat(entries).isNotNull();
             assertThat(entries).isNotEmpty();
@@ -62,7 +63,7 @@ class OutputLengthGuardrailConfigEntriesTest {
         @Test
         @DisplayName("Should contain all ConfigModules in entries map")
         void shouldContainAllConfigModulesInEntriesMap() {
-            Map<ConfigModule, ConfigEntry> entries = OutputLengthGuardrailConfigEntries.entries();
+            Map<ConfigModule, ConfigEntry> entries = ConfigEntries.entriesOf(OutputLengthGuardrailConfigEntries.class);
 
             assertThat(entries).containsKey(OutputLengthGuardrailConfigEntries.MAX_CHARS);
             assertThat(entries).containsKey(OutputLengthGuardrailConfigEntries.MIN_CHARS);
@@ -77,8 +78,10 @@ class OutputLengthGuardrailConfigEntriesTest {
         @Test
         @DisplayName("Should find ConfigModule without prefix")
         void shouldFindConfigModuleWithoutPrefix() {
-            Optional<ConfigModule> found =
-                    OutputLengthGuardrailConfigEntries.find(null, "forage.guardrail.output.length.max.chars");
+            Optional<ConfigModule> found = ConfigEntries.find(
+                    ConfigEntries.getModules(OutputLengthGuardrailConfigEntries.class),
+                    null,
+                    "forage.guardrail.output.length.max.chars");
 
             assertThat(found).isPresent();
             assertThat(found.get()).isEqualTo(OutputLengthGuardrailConfigEntries.MAX_CHARS);
@@ -87,7 +90,8 @@ class OutputLengthGuardrailConfigEntriesTest {
         @Test
         @DisplayName("Should return Optional.empty for unknown configuration name")
         void shouldReturnEmptyForUnknownConfigurationName() {
-            assertThat(OutputLengthGuardrailConfigEntries.find(null, "unknown.config"))
+            assertThat(ConfigEntries.find(
+                            ConfigEntries.getModules(OutputLengthGuardrailConfigEntries.class), null, "unknown.config"))
                     .isEmpty();
         }
     }
@@ -99,7 +103,7 @@ class OutputLengthGuardrailConfigEntriesTest {
         @Test
         @DisplayName("Should register configurations without prefix")
         void shouldRegisterConfigurationsWithoutPrefix() {
-            OutputLengthGuardrailConfigEntries.register(null);
+            ConfigEntries.registerPrefix(OutputLengthGuardrailConfigEntries.class, null);
 
             OutputLengthGuardrailConfig config = new OutputLengthGuardrailConfig();
             assertThat(config).isNotNull();
@@ -110,7 +114,7 @@ class OutputLengthGuardrailConfigEntriesTest {
         void shouldRegisterConfigurationsWithPrefix() {
             String prefix = "testoutputlength";
 
-            OutputLengthGuardrailConfigEntries.register(prefix);
+            ConfigEntries.registerPrefix(OutputLengthGuardrailConfigEntries.class, prefix);
 
             System.setProperty("forage." + prefix + ".guardrail.output.length.max.chars", "25000");
 

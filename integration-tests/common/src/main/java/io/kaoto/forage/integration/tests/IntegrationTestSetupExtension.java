@@ -1,6 +1,7 @@
 package io.kaoto.forage.integration.tests;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 import org.citrusframework.TestActionBuilder;
 import org.citrusframework.camel.actions.CamelActionBuilder;
 import org.citrusframework.context.TestContext;
@@ -49,7 +50,7 @@ public class IntegrationTestSetupExtension implements BeforeEachCallback, AfterA
                     (CamelActionBuilder) TestActionBuilder.lookup("camel").get();
             runBeforeAll = true;
             internalBeforeAll(context, camel);
-            runBeforeAll(context, camel);
+            runBeforeAll(context);
         }
         // save test context variables
         TestContext testContext = CitrusExtensionHelper.getTestContext(context);
@@ -60,7 +61,7 @@ public class IntegrationTestSetupExtension implements BeforeEachCallback, AfterA
         }
     }
 
-    private void runBeforeAll(ExtensionContext context, CamelActionBuilder camel) {
+    private void runBeforeAll(ExtensionContext context) {
 
         if (context.getRequiredTestInstance() instanceof ForageIntegrationTest forageTest) {
 
@@ -74,9 +75,49 @@ public class IntegrationTestSetupExtension implements BeforeEachCallback, AfterA
                 LOG.warn(
                         "'runBeforeAll' method did not return name of the integration. Any required cleanup has to be registered manually.");
             } else {
-                closeables.add(() -> runner.then(camel.jbang().stop().integration(integrationName)));
+                // Citrus TestContext is scoped per test method: the runner and context captured
+                // here belong to the first test method's lifecycle and are invalidated once that
+                // test completes. Because afterAll() executes after all test methods have
+                // finished, running Citrus actions (e.g. camel.jbang().stop()) through the
+                // captured runner would operate on a stale context. This may be improved in a
+                // future Citrus version by providing a class-level TestContext. Until then, we
+                // capture the OS process ID and destroy the process directly in afterAll().
+                TestContext testContext = CitrusExtensionHelper.getTestContext(context);
+                Object pidValue = testContext.getVariables().get(integrationName + ":pid");
+                if (pidValue != null) {
+                    long pid = Long.parseLong(pidValue.toString());
+                    closeables.add(() -> destroyProcess(integrationName, pid));
+                }
             }
         }
+    }
+
+    private void destroyProcess(String integrationName, long pid) {
+        ProcessHandle.of(pid)
+                .ifPresentOrElse(
+                        handle -> {
+                            LOG.info("Stopping Camel integration '{}' (pid: {})", integrationName, pid);
+                            // Destroy the entire process tree. Camel JBang may spawn child processes
+                            // (e.g. mvn quarkus:run → java) that hold resources such as network ports.
+                            // Killing only the top-level process can leave children running.
+                            handle.descendants().forEach(descendant -> {
+                                LOG.info("Stopping descendant process (pid: {})", descendant.pid());
+                                descendant.destroy();
+                            });
+                            handle.destroy();
+                            try {
+                                handle.onExit().get(10, TimeUnit.SECONDS);
+                                LOG.info("Camel integration '{}' (pid: {}) stopped", integrationName, pid);
+                            } catch (Exception e) {
+                                LOG.warn(
+                                        "Camel integration '{}' (pid: {}) did not stop gracefully, forcing kill",
+                                        integrationName,
+                                        pid);
+                                handle.descendants().forEach(ProcessHandle::destroyForcibly);
+                                handle.destroyForcibly();
+                            }
+                        },
+                        () -> LOG.info("Camel integration '{}' (pid: {}) already stopped", integrationName, pid));
     }
 
     @Override

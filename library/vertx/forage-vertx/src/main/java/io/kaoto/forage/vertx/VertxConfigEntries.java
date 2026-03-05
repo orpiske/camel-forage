@@ -1,11 +1,6 @@
 package io.kaoto.forage.vertx;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import io.kaoto.forage.core.util.config.ConfigEntries;
-import io.kaoto.forage.core.util.config.ConfigEntry;
 import io.kaoto.forage.core.util.config.ConfigModule;
 
 public final class VertxConfigEntries extends ConfigEntries {
@@ -41,59 +36,26 @@ public final class VertxConfigEntries extends ConfigEntries {
             ConfigModule.of(VertxConfig.class, "forage.vertx.use.daemon.thread");
     public static final ConfigModule CLUSTERED = ConfigModule.of(VertxConfig.class, "forage.vertx.clustered");
 
-    private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
-
     static {
-        init();
-    }
-
-    static void init() {
-        CONFIG_MODULES.put(WORKER_POOL_SIZE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(EVENT_LOOP_POOL_SIZE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(INTERNAL_BLOCKING_POOL_SIZE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(BLOCKED_THREAD_CHECK_INTERVAL, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MAX_EVENT_LOOP_EXECUTE_TIME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MAX_WORKER_EXECUTE_TIME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(HA_ENABLED, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(QUORUM_SIZE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(HA_GROUP, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(WARNING_EXCEPTION_TIME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(WARNING_EXCEPTION_TIME_UNIT, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(PREFER_NATIVE_TRANSPORT, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MAX_EVENT_LOOP_EXECUTE_TIME_UNIT, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MAX_WORKER_EXECUTE_TIME_UNIT, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(BLOCKED_THREAD_CHECK_INTERVAL_UNIT, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(DISABLE_TCCL, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(USE_DAEMON_THREAD, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(CLUSTERED, ConfigEntry.fromModule());
-    }
-
-    public static Map<ConfigModule, ConfigEntry> entries() {
-        return Collections.unmodifiableMap(CONFIG_MODULES);
-    }
-
-    public static Optional<ConfigModule> find(String prefix, String name) {
-        return find(CONFIG_MODULES, prefix, name);
-    }
-
-    /**
-     * Registers new known configuration if a prefix is provided (otherwise is ignored)
-     * @param prefix the prefix to register
-     */
-    public static void register(String prefix) {
-        if (prefix != null) {
-            for (Map.Entry<ConfigModule, ConfigEntry> entry : entries().entrySet()) {
-                ConfigModule configModule = entry.getKey().asNamed(prefix);
-                CONFIG_MODULES.put(configModule, ConfigEntry.fromModule());
-            }
-        }
-    }
-
-    /**
-     * Load override configurations (which are defined via environment variables and/or system properties)
-     * @param prefix and optional prefix to use
-     */
-    public static void loadOverrides(String prefix) {
-        load(CONFIG_MODULES, prefix);
+        initModules(
+                VertxConfigEntries.class,
+                WORKER_POOL_SIZE,
+                EVENT_LOOP_POOL_SIZE,
+                INTERNAL_BLOCKING_POOL_SIZE,
+                BLOCKED_THREAD_CHECK_INTERVAL,
+                MAX_EVENT_LOOP_EXECUTE_TIME,
+                MAX_WORKER_EXECUTE_TIME,
+                HA_ENABLED,
+                QUORUM_SIZE,
+                HA_GROUP,
+                WARNING_EXCEPTION_TIME,
+                WARNING_EXCEPTION_TIME_UNIT,
+                PREFER_NATIVE_TRANSPORT,
+                MAX_EVENT_LOOP_EXECUTE_TIME_UNIT,
+                MAX_WORKER_EXECUTE_TIME_UNIT,
+                BLOCKED_THREAD_CHECK_INTERVAL_UNIT,
+                DISABLE_TCCL,
+                USE_DAEMON_THREAD,
+                CLUSTERED);
     }
 }

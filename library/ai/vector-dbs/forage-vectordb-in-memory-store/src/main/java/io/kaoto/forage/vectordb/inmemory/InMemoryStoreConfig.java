@@ -1,9 +1,6 @@
 package io.kaoto.forage.vectordb.inmemory;
 
-import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 
 import static io.kaoto.forage.vectordb.inmemory.InMemoryStoreConfigEntries.FILE_SOURCE;
@@ -32,14 +29,12 @@ import static io.kaoto.forage.vectordb.inmemory.InMemoryStoreConfigEntries.OVERL
  *   <li><strong>OVERLAP_SIZE</strong> - The maximum size of the overlap, defined in characters. Only full sentences are considered for the overlap..</li>
  * </ul>
  *
- * @see Config
- * @see ConfigStore
- * @see ConfigModule
+ * @see AbstractConfig
+ * @see io.kaoto.forage.core.util.config.ConfigStore
+ * @see io.kaoto.forage.core.util.config.ConfigModule
  * @since 1.0
  */
-public class InMemoryStoreConfig implements Config {
-
-    private final String prefix;
+public class InMemoryStoreConfig extends AbstractConfig {
 
     /**
      * Creates a new InMemory configuration using default (non-prefixed) properties.
@@ -49,16 +44,7 @@ public class InMemoryStoreConfig implements Config {
     }
 
     public InMemoryStoreConfig(String prefix) {
-        this.prefix = prefix;
-
-        // First register new configuration modules. This happens only if a prefix is provided
-        InMemoryStoreConfigEntries.register(prefix);
-
-        // Then, loads the configurations from the properties file associated with this Config module
-        ConfigStore.getInstance().load(InMemoryStoreConfig.class, this, this::register);
-
-        // Lastly, load the overrides defined in system properties and environment variables
-        InMemoryStoreConfigEntries.loadOverrides(prefix);
+        super(prefix, InMemoryStoreConfigEntries.class);
     }
 
     @Override
@@ -72,7 +58,7 @@ public class InMemoryStoreConfig implements Config {
      * <p>Path to a file to be loaded into store via {@link dev.langchain4j.data.document.Document#from}.</p>
      */
     public String fileSource() {
-        return ConfigStore.getInstance().get(FILE_SOURCE.asNamed(prefix)).orElse(null);
+        return get(FILE_SOURCE).orElse(null);
     }
 
     /**
@@ -81,10 +67,7 @@ public class InMemoryStoreConfig implements Config {
      * <p>The maximum size of the segment, defined in characters.</p>
      */
     public Integer maxSize() {
-        return ConfigStore.getInstance()
-                .get(MAX_SIZE.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(MAX_SIZE).map(Integer::parseInt).orElse(null);
     }
 
     /**
@@ -93,16 +76,6 @@ public class InMemoryStoreConfig implements Config {
      * <p>The maximum size of the overlap, defined in characters. Only full sentences are considered for the overlap.</p>
      */
     public Integer overlapSize() {
-        return ConfigStore.getInstance()
-                .get(OVERLAP_SIZE.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = InMemoryStoreConfigEntries.find(prefix, name);
-
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        return get(OVERLAP_SIZE).map(Integer::parseInt).orElse(null);
     }
 }

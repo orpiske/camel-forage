@@ -1,9 +1,6 @@
 package io.kaoto.forage.vectordb.redis;
 
-import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 import io.kaoto.forage.core.util.config.MissingConfigException;
 
 import static io.kaoto.forage.vectordb.redis.RedisConfigEntries.DIMENSION;
@@ -76,45 +73,28 @@ import static io.kaoto.forage.vectordb.redis.RedisConfigEntries.USER;
  * </ul>
  *
  * <p>This class automatically registers itself and its configuration parameters with the
- * {@link ConfigStore} during construction, making the configuration values available
+ * {@link io.kaoto.forage.core.util.config.ConfigStore} during construction, making the configuration values available
  * to other components in the framework.
  *
- * @see Config
- * @see ConfigStore
- * @see ConfigModule
+ * @see AbstractConfig
+ * @see io.kaoto.forage.core.util.config.ConfigStore
+ * @see io.kaoto.forage.core.util.config.ConfigModule
  * @since 1.0
  */
-public class RedisConfig implements Config {
+public class RedisConfig extends AbstractConfig {
 
     private static final String DEFAULT_HOST = "localhost";
     private static final int DEFAULT_PORT = 6379;
     private static final String DEFAULT_PREFIX = "embedding:";
     private static final String DEFAULT_INDEX_NAME = "embedding-index";
     private static final String DEFAULT_DISTANCE_METRIC = "COSINE";
-    private final String prefix;
 
     public RedisConfig() {
         this(null);
     }
 
     public RedisConfig(String prefix) {
-        this.prefix = prefix;
-
-        // First register new configuration modules. This happens only if a prefix is provided
-        RedisConfigEntries.register(prefix);
-
-        // Then, loads the configurations from the properties file associated with this Config module
-        ConfigStore.getInstance().load(RedisConfig.class, this, this::register);
-
-        // Lastly, load the overrides defined in system properties and environment variables
-        RedisConfigEntries.loadOverrides(prefix);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = RedisConfigEntries.find(prefix, name);
-
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        super(prefix, RedisConfigEntries.class);
     }
 
     @Override
@@ -136,7 +116,7 @@ public class RedisConfig implements Config {
      * @return the Redis server host, never null
      */
     public String host() {
-        return ConfigStore.getInstance().get(HOST.asNamed(prefix)).orElse(DEFAULT_HOST);
+        return get(HOST).orElse(DEFAULT_HOST);
     }
 
     /**
@@ -153,10 +133,7 @@ public class RedisConfig implements Config {
      * @return the Redis server port
      */
     public int port() {
-        return ConfigStore.getInstance()
-                .get(PORT.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(DEFAULT_PORT);
+        return get(PORT).map(Integer::parseInt).orElse(DEFAULT_PORT);
     }
 
     /**
@@ -173,7 +150,7 @@ public class RedisConfig implements Config {
      * @return the Redis username, or null if not configured
      */
     public String user() {
-        return ConfigStore.getInstance().get(USER.asNamed(prefix)).orElse(null);
+        return get(USER).orElse(null);
     }
 
     /**
@@ -190,7 +167,7 @@ public class RedisConfig implements Config {
      * @return the Redis password, or null if not configured
      */
     public String password() {
-        return ConfigStore.getInstance().get(PASSWORD.asNamed(prefix)).orElse(null);
+        return get(PASSWORD).orElse(null);
     }
 
     /**
@@ -208,8 +185,7 @@ public class RedisConfig implements Config {
      * @throws MissingConfigException if dimension is not configured
      */
     public int dimension() {
-        return ConfigStore.getInstance()
-                .get(DIMENSION.asNamed(prefix))
+        return get(DIMENSION)
                 .map(Integer::parseInt)
                 .orElseThrow(() -> new MissingConfigException("Vector dimension is required but not configured"));
     }
@@ -228,7 +204,7 @@ public class RedisConfig implements Config {
      * @return the key prefix for vector storage, never null
      */
     public String prefix() {
-        return ConfigStore.getInstance().get(PREFIX.asNamed(prefix)).orElse(DEFAULT_PREFIX);
+        return get(PREFIX).orElse(DEFAULT_PREFIX);
     }
 
     /**
@@ -245,7 +221,7 @@ public class RedisConfig implements Config {
      * @return the vector index name, never null
      */
     public String indexName() {
-        return ConfigStore.getInstance().get(INDEX_NAME.asNamed(prefix)).orElse(DEFAULT_INDEX_NAME);
+        return get(INDEX_NAME).orElse(DEFAULT_INDEX_NAME);
     }
 
     /**
@@ -262,7 +238,7 @@ public class RedisConfig implements Config {
      * @return the metadata fields as a comma-separated string, or null if not configured
      */
     public String metadataFields() {
-        return ConfigStore.getInstance().get(METADATA_FIELDS.asNamed(prefix)).orElse(null);
+        return get(METADATA_FIELDS).orElse(null);
     }
 
     /**
@@ -281,6 +257,6 @@ public class RedisConfig implements Config {
      * @return the distance metric, never null
      */
     public String distanceMetric() {
-        return ConfigStore.getInstance().get(DISTANCE_METRIC.asNamed(prefix)).orElse(DEFAULT_DISTANCE_METRIC);
+        return get(DISTANCE_METRIC).orElse(DEFAULT_DISTANCE_METRIC);
     }
 }

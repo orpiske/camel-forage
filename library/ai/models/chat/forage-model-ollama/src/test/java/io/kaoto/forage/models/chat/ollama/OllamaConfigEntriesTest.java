@@ -2,6 +2,7 @@ package io.kaoto.forage.models.chat.ollama;
 
 import java.util.Map;
 import java.util.Optional;
+import io.kaoto.forage.core.util.config.ConfigEntries;
 import io.kaoto.forage.core.util.config.ConfigEntry;
 import io.kaoto.forage.core.util.config.ConfigModule;
 
@@ -66,7 +67,7 @@ class OllamaConfigEntriesTest {
         @Test
         @DisplayName("Should return immutable map from entries()")
         void shouldReturnImmutableMapFromEntries() {
-            Map<ConfigModule, ConfigEntry> entries = OllamaConfigEntries.entries();
+            Map<ConfigModule, ConfigEntry> entries = ConfigEntries.entriesOf(OllamaConfigEntries.class);
 
             assertThat(entries).isNotNull();
             assertThat(entries).isNotEmpty();
@@ -78,7 +79,7 @@ class OllamaConfigEntriesTest {
         @Test
         @DisplayName("Should contain all ConfigModules in entries map")
         void shouldContainAllConfigModulesInEntriesMap() {
-            Map<ConfigModule, ConfigEntry> entries = OllamaConfigEntries.entries();
+            Map<ConfigModule, ConfigEntry> entries = ConfigEntries.entriesOf(OllamaConfigEntries.class);
 
             assertThat(entries).containsKey(OllamaConfigEntries.BASE_URL);
             assertThat(entries).containsKey(OllamaConfigEntries.MODEL_NAME);
@@ -94,7 +95,7 @@ class OllamaConfigEntriesTest {
         @Test
         @DisplayName("Should have correct environment variable mappings")
         void shouldHaveCorrectEnvironmentVariableMappings() {
-            Map<ConfigModule, ConfigEntry> entries = OllamaConfigEntries.entries();
+            Map<ConfigModule, ConfigEntry> entries = ConfigEntries.entriesOf(OllamaConfigEntries.class);
 
             // Note: We can't directly inspect the environment variable names from ConfigEntry
             // but we can verify that all entries exist and are not null
@@ -117,7 +118,8 @@ class OllamaConfigEntriesTest {
         @Test
         @DisplayName("Should find ConfigModule without prefix")
         void shouldFindConfigModuleWithoutPrefix() {
-            Optional<ConfigModule> found = OllamaConfigEntries.find(null, "forage.ollama.base.url");
+            Optional<ConfigModule> found = ConfigEntries.find(
+                    ConfigEntries.getModules(OllamaConfigEntries.class), null, "forage.ollama.base.url");
 
             assertThat(found.get()).isEqualTo(OllamaConfigEntries.BASE_URL);
         }
@@ -129,31 +131,47 @@ class OllamaConfigEntriesTest {
             String prefix2 = "test2";
 
             // Test all configuration modules with different prefixes
-            assertThat(OllamaConfigEntries.find(prefix1, prefix1 + ".ollama.base.url"))
+            assertThat(ConfigEntries.find(
+                            ConfigEntries.getModules(OllamaConfigEntries.class), prefix1, prefix1 + ".ollama.base.url"))
                     .isNotNull();
-            assertThat(OllamaConfigEntries.find(prefix1, prefix1 + ".ollama.model.name"))
+            assertThat(ConfigEntries.find(
+                            ConfigEntries.getModules(OllamaConfigEntries.class),
+                            prefix1,
+                            prefix1 + ".ollama.model.name"))
                     .isNotNull();
-            assertThat(OllamaConfigEntries.find(prefix1, prefix1 + ".ollama.temperature"))
+            assertThat(ConfigEntries.find(
+                            ConfigEntries.getModules(OllamaConfigEntries.class),
+                            prefix1,
+                            prefix1 + ".ollama.temperature"))
                     .isNotNull();
 
-            assertThat(OllamaConfigEntries.find(prefix2, prefix2 + ".ollama.base.url"))
+            assertThat(ConfigEntries.find(
+                            ConfigEntries.getModules(OllamaConfigEntries.class), prefix2, prefix2 + ".ollama.base.url"))
                     .isNotNull();
-            assertThat(OllamaConfigEntries.find(prefix2, prefix2 + ".ollama.model.name"))
+            assertThat(ConfigEntries.find(
+                            ConfigEntries.getModules(OllamaConfigEntries.class),
+                            prefix2,
+                            prefix2 + ".ollama.model.name"))
                     .isNotNull();
-            assertThat(OllamaConfigEntries.find(prefix2, prefix2 + ".ollama.temperature"))
+            assertThat(ConfigEntries.find(
+                            ConfigEntries.getModules(OllamaConfigEntries.class),
+                            prefix2,
+                            prefix2 + ".ollama.temperature"))
                     .isNotNull();
         }
 
         @Test
         @DisplayName("Should return Optional.empty for unknown configuration name")
         void shouldReturnEmptyForUnknownConfigurationName() {
-            assertThat(OllamaConfigEntries.find(null, "unknown.config")).isEqualTo(Optional.empty());
+            assertThat(ConfigEntries.find(ConfigEntries.getModules(OllamaConfigEntries.class), null, "unknown.config"))
+                    .isEqualTo(Optional.empty());
         }
 
         @Test
         @DisplayName("Should return Optional.empty for unknown prefixed configuration name")
         void shouldReturnEmptyForUnknownPrefixedConfigurationName() {
-            assertThat(OllamaConfigEntries.find("prefix", "prefix.unknown.config"))
+            assertThat(ConfigEntries.find(
+                            ConfigEntries.getModules(OllamaConfigEntries.class), "prefix", "prefix.unknown.config"))
                     .isEqualTo(Optional.empty());
         }
     }
@@ -166,7 +184,7 @@ class OllamaConfigEntriesTest {
         @DisplayName("Should register configurations without prefix")
         void shouldRegisterConfigurationsWithoutPrefix() {
             // This should not throw any exception
-            OllamaConfigEntries.register(null);
+            ConfigEntries.registerPrefix(OllamaConfigEntries.class, null);
 
             // Verify registration occurred by checking if we can create a config
             OllamaConfig config = new OllamaConfig();
@@ -179,7 +197,7 @@ class OllamaConfigEntriesTest {
             String prefix = "testprefix";
 
             // This should not throw any exception
-            OllamaConfigEntries.register(prefix);
+            ConfigEntries.registerPrefix(OllamaConfigEntries.class, prefix);
 
             // Verify that prefixed configuration works
             System.setProperty("forage." + prefix + ".ollama.base.url", "http://prefixed-server:11434");
@@ -194,8 +212,8 @@ class OllamaConfigEntriesTest {
             String prefix1 = "app1";
             String prefix2 = "app2";
 
-            OllamaConfigEntries.register(prefix1);
-            OllamaConfigEntries.register(prefix2);
+            ConfigEntries.registerPrefix(OllamaConfigEntries.class, prefix1);
+            ConfigEntries.registerPrefix(OllamaConfigEntries.class, prefix2);
 
             // Set different values for each prefix
             System.setProperty("forage." + prefix1 + ".ollama.model.name", "model1");

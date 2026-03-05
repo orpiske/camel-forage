@@ -1,11 +1,6 @@
 package io.kaoto.forage.vectordb.weaviate;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import io.kaoto.forage.core.util.config.ConfigEntries;
-import io.kaoto.forage.core.util.config.ConfigEntry;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigTag;
 
@@ -128,54 +123,21 @@ public final class WeaviateConfigEntries extends ConfigEntries {
             false,
             ConfigTag.ADVANCED);
 
-    private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
-
     static {
-        init();
-    }
-
-    static void init() {
-        CONFIG_MODULES.put(API_KEY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(SCHEME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(HOST, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(PORT, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(USE_GRPC_FOR_INSERTS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(SECURED_GRPC, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(GRPC_PORT, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(OBJECT_CLASS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(AVOID_DUPS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(CONSISTENCY_LEVEL, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(METADATA_KEYS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TEXT_FIELD_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(METADATA_FIELD_NAME, ConfigEntry.fromModule());
-    }
-
-    public static Map<ConfigModule, ConfigEntry> entries() {
-        return Collections.unmodifiableMap(CONFIG_MODULES);
-    }
-
-    public static Optional<ConfigModule> find(String prefix, String name) {
-        return find(CONFIG_MODULES, prefix, name);
-    }
-
-    /**
-     * Registers new known configuration if a prefix is provided (otherwise is ignored)
-     * @param prefix the prefix to register
-     */
-    public static void register(String prefix) {
-        if (prefix != null) {
-            for (Map.Entry<ConfigModule, ConfigEntry> entry : entries().entrySet()) {
-                ConfigModule configModule = entry.getKey().asNamed(prefix);
-                CONFIG_MODULES.put(configModule, ConfigEntry.fromModule());
-            }
-        }
-    }
-
-    /**
-     * Load override configurations (which are defined via environment variables and/or system properties)
-     * @param prefix and optional prefix to use
-     */
-    public static void loadOverrides(String prefix) {
-        load(CONFIG_MODULES, prefix);
+        initModules(
+                WeaviateConfigEntries.class,
+                API_KEY,
+                SCHEME,
+                HOST,
+                PORT,
+                USE_GRPC_FOR_INSERTS,
+                SECURED_GRPC,
+                GRPC_PORT,
+                OBJECT_CLASS,
+                AVOID_DUPS,
+                CONSISTENCY_LEVEL,
+                METADATA_KEYS,
+                TEXT_FIELD_NAME,
+                METADATA_FIELD_NAME);
     }
 }

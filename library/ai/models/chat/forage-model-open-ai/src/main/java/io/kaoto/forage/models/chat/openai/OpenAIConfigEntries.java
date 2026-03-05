@@ -1,11 +1,6 @@
 package io.kaoto.forage.models.chat.openai;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import io.kaoto.forage.core.util.config.ConfigEntries;
-import io.kaoto.forage.core.util.config.ConfigEntry;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigTag;
 
@@ -119,53 +114,20 @@ public final class OpenAIConfigEntries extends ConfigEntries {
             false,
             ConfigTag.ADVANCED);
 
-    private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
-
     static {
-        init();
-    }
-
-    static void init() {
-        CONFIG_MODULES.put(API_KEY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MODEL_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(BASE_URL, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TEMPERATURE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MAX_TOKENS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TOP_P, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(FREQUENCY_PENALTY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(PRESENCE_PENALTY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(LOG_REQUESTS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(LOG_RESPONSES, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TIMEOUT, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(HTTP1_1, ConfigEntry.fromModule());
-    }
-
-    public static Map<ConfigModule, ConfigEntry> entries() {
-        return Collections.unmodifiableMap(CONFIG_MODULES);
-    }
-
-    public static Optional<ConfigModule> find(String prefix, String name) {
-        return find(CONFIG_MODULES, prefix, name);
-    }
-
-    /**
-     * Registers new known configuration if a prefix is provided (otherwise is ignored)
-     * @param prefix the prefix to register
-     */
-    public static void register(String prefix) {
-        if (prefix != null) {
-            for (Map.Entry<ConfigModule, ConfigEntry> entry : entries().entrySet()) {
-                ConfigModule configModule = entry.getKey().asNamed(prefix);
-                CONFIG_MODULES.put(configModule, ConfigEntry.fromModule());
-            }
-        }
-    }
-
-    /**
-     * Load override configurations (which are defined via environment variables and/or system properties)
-     * @param prefix and optional prefix to use
-     */
-    public static void loadOverrides(String prefix) {
-        load(CONFIG_MODULES, prefix);
+        initModules(
+                OpenAIConfigEntries.class,
+                API_KEY,
+                MODEL_NAME,
+                BASE_URL,
+                TEMPERATURE,
+                MAX_TOKENS,
+                TOP_P,
+                FREQUENCY_PENALTY,
+                PRESENCE_PENALTY,
+                LOG_REQUESTS,
+                LOG_RESPONSES,
+                TIMEOUT,
+                HTTP1_1);
     }
 }

@@ -73,11 +73,11 @@ public class JdbcModuleDescriptor implements ForageModuleDescriptor<DataSourceFa
         props.put(quarkusPrefix + "jdbc.min-size", String.valueOf(config.minSize()));
         props.put(quarkusPrefix + "jdbc.max-size", String.valueOf(config.minSize()));
         props.put(quarkusPrefix + "jdbc.acquisition-timeout", config.acquisitionTimeoutSeconds() + "S");
-        props.put(quarkusPrefix + "jdbc.validation-query-sql", config.validationTimeoutSeconds() + "S");
+        props.put(quarkusPrefix + "jdbc.validation-query-timeout", config.validationTimeoutSeconds() + "S");
         props.put(quarkusPrefix + "jdbc.leak-detection-interval", config.leakTimeoutMinutes() + "M");
 
         if (config.transactionEnabled()) {
-            props.put("quarkus.datasource.transaction-isolation", "READ_COMMITTED");
+            props.put(quarkusPrefix + "jdbc.transaction-isolation-level", "READ_COMMITTED");
             props.put(
                     "quarkus.transaction-manager.default-transaction-timeout",
                     config.transactionTimeoutSeconds() + "S");

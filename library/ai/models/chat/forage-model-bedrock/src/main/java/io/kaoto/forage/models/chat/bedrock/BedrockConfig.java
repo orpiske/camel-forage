@@ -1,10 +1,6 @@
 package io.kaoto.forage.models.chat.bedrock;
 
-import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.core.util.config.MissingConfigException;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 
 import static io.kaoto.forage.models.chat.bedrock.BedrockConfigEntries.ACCESS_KEY_ID;
 import static io.kaoto.forage.models.chat.bedrock.BedrockConfigEntries.MAX_TOKENS;
@@ -58,14 +54,12 @@ import static io.kaoto.forage.models.chat.bedrock.BedrockConfigEntries.TOP_P;
  * AWS credentials are sensitive information and should be properly secured. Never commit credentials
  * to version control. Use environment variables, AWS credential files, or IAM roles in production.
  *
- * @see Config
- * @see ConfigStore
- * @see ConfigModule
+ * @see AbstractConfig
+ * @see io.kaoto.forage.core.util.config.ConfigStore
+ * @see io.kaoto.forage.core.util.config.ConfigModule
  * @since 1.0
  */
-public class BedrockConfig implements Config {
-
-    private final String prefix;
+public class BedrockConfig extends AbstractConfig {
 
     /**
      * Constructs a new BedrockConfig with no prefix.
@@ -80,23 +74,7 @@ public class BedrockConfig implements Config {
      * @param prefix the optional prefix for this configuration instance
      */
     public BedrockConfig(String prefix) {
-        this.prefix = prefix;
-
-        // First register new configuration modules. This happens only if a prefix is provided
-        BedrockConfigEntries.register(prefix);
-
-        // Then, loads the configurations from the properties file associated with this Config module
-        ConfigStore.getInstance().load(BedrockConfig.class, this, this::register);
-
-        // Lastly, load the overrides defined in system properties and environment variables
-        BedrockConfigEntries.loadOverrides(prefix);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = BedrockConfigEntries.find(prefix, name);
-
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        super(prefix, BedrockConfigEntries.class);
     }
 
     /**
@@ -123,7 +101,7 @@ public class BedrockConfig implements Config {
      * @return the AWS region, never null
      */
     public String region() {
-        return ConfigStore.getInstance().get(REGION.asNamed(prefix)).orElse(REGION.defaultValue());
+        return get(REGION).orElse(REGION.defaultValue());
     }
 
     /**
@@ -145,12 +123,10 @@ public class BedrockConfig implements Config {
      * </ol>
      *
      * @return the Bedrock model identifier
-     * @throws MissingConfigException if no model ID is configured
+     * @throws io.kaoto.forage.core.util.config.MissingConfigException if no model ID is configured
      */
     public String modelId() {
-        return ConfigStore.getInstance()
-                .get(MODEL_ID.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing Bedrock model ID"));
+        return getRequired(MODEL_ID, "Missing Bedrock model ID");
     }
 
     /**
@@ -161,7 +137,7 @@ public class BedrockConfig implements Config {
      * @return the AWS access key ID, or null if not configured
      */
     public String accessKeyId() {
-        return ConfigStore.getInstance().get(ACCESS_KEY_ID.asNamed(prefix)).orElse(null);
+        return get(ACCESS_KEY_ID).orElse(null);
     }
 
     /**
@@ -172,7 +148,7 @@ public class BedrockConfig implements Config {
      * @return the AWS secret access key, or null if not configured
      */
     public String secretAccessKey() {
-        return ConfigStore.getInstance().get(SECRET_ACCESS_KEY.asNamed(prefix)).orElse(null);
+        return get(SECRET_ACCESS_KEY).orElse(null);
     }
 
     /**
@@ -186,10 +162,7 @@ public class BedrockConfig implements Config {
      * @return the temperature value, or null if not configured
      */
     public Double temperature() {
-        return ConfigStore.getInstance()
-                .get(TEMPERATURE.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(TEMPERATURE).map(Double::parseDouble).orElse(null);
     }
 
     /**
@@ -200,10 +173,7 @@ public class BedrockConfig implements Config {
      * @return the maximum tokens value, or null if not configured
      */
     public Integer maxTokens() {
-        return ConfigStore.getInstance()
-                .get(MAX_TOKENS.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(MAX_TOKENS).map(Integer::parseInt).orElse(null);
     }
 
     /**
@@ -217,9 +187,6 @@ public class BedrockConfig implements Config {
      * @return the top-P value, or null if not configured
      */
     public Double topP() {
-        return ConfigStore.getInstance()
-                .get(TOP_P.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(TOP_P).map(Double::parseDouble).orElse(null);
     }
 }

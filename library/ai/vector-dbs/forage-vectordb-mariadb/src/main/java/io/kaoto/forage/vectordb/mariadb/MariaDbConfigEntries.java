@@ -1,11 +1,6 @@
 package io.kaoto.forage.vectordb.mariadb;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import io.kaoto.forage.core.util.config.ConfigEntries;
-import io.kaoto.forage.core.util.config.ConfigEntry;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigTag;
 
@@ -110,44 +105,19 @@ public final class MariaDbConfigEntries extends ConfigEntries {
             false,
             ConfigTag.ADVANCED);
 
-    private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
-
     static {
-        init();
-    }
-
-    static void init() {
-        CONFIG_MODULES.put(URL, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(USER, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(PASSWORD, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TABLE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(DISTANCE_TYPE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(ID_FIELD_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(EMBEDDING_FIELD_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(CONTENT_FIELD_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(CREATE_TABLE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(DROP_TABLE_FIRST, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(DIMENSION, ConfigEntry.fromModule());
-    }
-
-    public static Map<ConfigModule, ConfigEntry> entries() {
-        return Collections.unmodifiableMap(CONFIG_MODULES);
-    }
-
-    public static Optional<ConfigModule> find(String prefix, String name) {
-        return find(CONFIG_MODULES, prefix, name);
-    }
-
-    public static void register(String prefix) {
-        if (prefix != null) {
-            for (Map.Entry<ConfigModule, ConfigEntry> entry : entries().entrySet()) {
-                ConfigModule configModule = entry.getKey().asNamed(prefix);
-                CONFIG_MODULES.put(configModule, ConfigEntry.fromModule());
-            }
-        }
-    }
-
-    public static void loadOverrides(String prefix) {
-        load(CONFIG_MODULES, prefix);
+        initModules(
+                MariaDbConfigEntries.class,
+                URL,
+                USER,
+                PASSWORD,
+                TABLE,
+                DISTANCE_TYPE,
+                ID_FIELD_NAME,
+                EMBEDDING_FIELD_NAME,
+                CONTENT_FIELD_NAME,
+                CREATE_TABLE,
+                DROP_TABLE_FIRST,
+                DIMENSION);
     }
 }

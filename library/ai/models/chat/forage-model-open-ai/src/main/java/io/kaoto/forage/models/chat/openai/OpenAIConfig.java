@@ -1,11 +1,7 @@
 package io.kaoto.forage.models.chat.openai;
 
 import java.time.Duration;
-import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.core.util.config.MissingConfigException;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 
 import static io.kaoto.forage.models.chat.openai.OpenAIConfigEntries.API_KEY;
 import static io.kaoto.forage.models.chat.openai.OpenAIConfigEntries.BASE_URL;
@@ -75,17 +71,15 @@ import static io.kaoto.forage.models.chat.openai.OpenAIConfigEntries.TOP_P;
  * in production environments.
  *
  * <p>This class automatically registers itself and its configuration parameters with the
- * {@link ConfigStore} during construction, making the configuration values available
+ * {@link io.kaoto.forage.core.util.config.ConfigStore} during construction, making the configuration values available
  * to other components in the framework.
  *
- * @see Config
- * @see ConfigStore
- * @see ConfigModule
+ * @see AbstractConfig
+ * @see io.kaoto.forage.core.util.config.ConfigStore
+ * @see io.kaoto.forage.core.util.config.ConfigModule
  * @since 1.0
  */
-public class OpenAIConfig implements Config {
-
-    private final String prefix;
+public class OpenAIConfig extends AbstractConfig {
 
     /**
      * Constructs a new OpenAIConfig and registers configuration parameters with the ConfigStore.
@@ -107,23 +101,7 @@ public class OpenAIConfig implements Config {
     }
 
     public OpenAIConfig(String prefix) {
-        this.prefix = prefix;
-
-        // First register new configuration modules. This happens only if a prefix is provided
-        OpenAIConfigEntries.register(prefix);
-
-        // Then, loads the configurations from the properties file associated with this Config module
-        ConfigStore.getInstance().load(OpenAIConfig.class, this, this::register);
-
-        // Lastly, load the overrides defined in system properties and environment variables
-        OpenAIConfigEntries.loadOverrides(prefix);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = OpenAIConfigEntries.find(prefix, name);
-
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        super(prefix, OpenAIConfigEntries.class);
     }
 
     /**
@@ -158,12 +136,10 @@ public class OpenAIConfig implements Config {
      * </ol>
      *
      * @return the OpenAI API key
-     * @throws MissingConfigException if no API key is configured
+     * @throws io.kaoto.forage.core.util.config.MissingConfigException if no API key is configured
      */
     public String apiKey() {
-        return ConfigStore.getInstance()
-                .get(API_KEY.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing OpenAI API key"));
+        return getRequired(API_KEY, "Missing OpenAI API key");
     }
 
     /**
@@ -192,7 +168,7 @@ public class OpenAIConfig implements Config {
      * @return the OpenAI model name, never null
      */
     public String modelName() {
-        return ConfigStore.getInstance().get(MODEL_NAME.asNamed(prefix)).orElse(MODEL_NAME.defaultValue());
+        return get(MODEL_NAME).orElse(MODEL_NAME.defaultValue());
     }
 
     /**
@@ -212,7 +188,7 @@ public class OpenAIConfig implements Config {
      * @return the base URL, or null if not configured (uses OpenAI's default)
      */
     public String baseUrl() {
-        return ConfigStore.getInstance().get(BASE_URL.asNamed(prefix)).orElse(null);
+        return get(BASE_URL).orElse(null);
     }
 
     /**
@@ -235,10 +211,7 @@ public class OpenAIConfig implements Config {
      * @return the temperature value, or null if not configured
      */
     public Double temperature() {
-        return ConfigStore.getInstance()
-                .get(TEMPERATURE.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(TEMPERATURE).map(Double::parseDouble).orElse(null);
     }
 
     /**
@@ -261,10 +234,7 @@ public class OpenAIConfig implements Config {
      * @return the maximum tokens value, or null if not configured
      */
     public Integer maxTokens() {
-        return ConfigStore.getInstance()
-                .get(MAX_TOKENS.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(MAX_TOKENS).map(Integer::parseInt).orElse(null);
     }
 
     /**
@@ -287,10 +257,7 @@ public class OpenAIConfig implements Config {
      * @return the top-P value, or null if not configured
      */
     public Double topP() {
-        return ConfigStore.getInstance()
-                .get(TOP_P.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(TOP_P).map(Double::parseDouble).orElse(null);
     }
 
     /**
@@ -312,10 +279,7 @@ public class OpenAIConfig implements Config {
      * @return the frequency penalty value, or null if not configured
      */
     public Double frequencyPenalty() {
-        return ConfigStore.getInstance()
-                .get(FREQUENCY_PENALTY.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(FREQUENCY_PENALTY).map(Double::parseDouble).orElse(null);
     }
 
     /**
@@ -337,10 +301,7 @@ public class OpenAIConfig implements Config {
      * @return the presence penalty value, or null if not configured
      */
     public Double presencePenalty() {
-        return ConfigStore.getInstance()
-                .get(PRESENCE_PENALTY.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(PRESENCE_PENALTY).map(Double::parseDouble).orElse(null);
     }
 
     /**
@@ -363,10 +324,7 @@ public class OpenAIConfig implements Config {
      * @return true if request logging is enabled, false if disabled, null if not configured
      */
     public Boolean logRequests() {
-        return ConfigStore.getInstance()
-                .get(LOG_REQUESTS.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(null);
+        return get(LOG_REQUESTS).map(Boolean::parseBoolean).orElse(null);
     }
 
     /**
@@ -389,23 +347,14 @@ public class OpenAIConfig implements Config {
      * @return true if response logging is enabled, false if disabled, null if not configured
      */
     public Boolean logResponses() {
-        return ConfigStore.getInstance()
-                .get(LOG_RESPONSES.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(null);
+        return get(LOG_RESPONSES).map(Boolean::parseBoolean).orElse(null);
     }
 
     public Duration timeout() {
-        return ConfigStore.getInstance()
-                .get(TIMEOUT.asNamed(prefix))
-                .map(Duration::parse)
-                .orElse(null);
+        return get(TIMEOUT).map(Duration::parse).orElse(null);
     }
 
     public Boolean http1_1() {
-        return ConfigStore.getInstance()
-                .get(HTTP1_1.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(null);
+        return get(HTTP1_1).map(Boolean::parseBoolean).orElse(null);
     }
 }

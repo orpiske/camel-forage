@@ -1,11 +1,6 @@
 package io.kaoto.forage.vectordb.infinispan;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import io.kaoto.forage.core.util.config.ConfigEntries;
-import io.kaoto.forage.core.util.config.ConfigEntry;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigTag;
 
@@ -146,48 +141,23 @@ public final class InfinispanConfigEntries extends ConfigEntries {
             false,
             ConfigTag.SECURITY);
 
-    private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
-
     static {
-        init();
-    }
-
-    static void init() {
-        CONFIG_MODULES.put(CACHE_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(DIMENSION, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(DISTANCE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(SIMILARITY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(CACHE_CONFIG, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(PACKAGE_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(FILE_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(LANGCHAIN_ITEM_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(METADATA_ITEM_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(REGISTER_SCHEMA, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(CREATE_CACHE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(HOST, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(PORT, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(USERNAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(PASSWORD, ConfigEntry.fromModule());
-    }
-
-    public static Map<ConfigModule, ConfigEntry> entries() {
-        return Collections.unmodifiableMap(CONFIG_MODULES);
-    }
-
-    public static Optional<ConfigModule> find(String prefix, String name) {
-        return find(CONFIG_MODULES, prefix, name);
-    }
-
-    public static void register(String prefix) {
-        if (prefix != null) {
-            for (Map.Entry<ConfigModule, ConfigEntry> entry : entries().entrySet()) {
-                ConfigModule configModule = entry.getKey().asNamed(prefix);
-                CONFIG_MODULES.put(configModule, ConfigEntry.fromModule());
-            }
-        }
-    }
-
-    public static void loadOverrides(String prefix) {
-        load(CONFIG_MODULES, prefix);
+        initModules(
+                InfinispanConfigEntries.class,
+                CACHE_NAME,
+                DIMENSION,
+                DISTANCE,
+                SIMILARITY,
+                CACHE_CONFIG,
+                PACKAGE_NAME,
+                FILE_NAME,
+                LANGCHAIN_ITEM_NAME,
+                METADATA_ITEM_NAME,
+                REGISTER_SCHEMA,
+                CREATE_CACHE,
+                HOST,
+                PORT,
+                USERNAME,
+                PASSWORD);
     }
 }

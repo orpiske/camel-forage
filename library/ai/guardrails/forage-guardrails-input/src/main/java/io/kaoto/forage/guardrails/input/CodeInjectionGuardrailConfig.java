@@ -2,14 +2,11 @@ package io.kaoto.forage.guardrails.input;
 
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.Optional;
 import java.util.Set;
 import org.apache.camel.component.langchain4j.agent.api.guardrails.CodeInjectionGuardrail.InjectionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 
 import static io.kaoto.forage.guardrails.input.CodeInjectionGuardrailConfigEntries.DETECT_TYPES;
 import static io.kaoto.forage.guardrails.input.CodeInjectionGuardrailConfigEntries.STRICT;
@@ -17,28 +14,16 @@ import static io.kaoto.forage.guardrails.input.CodeInjectionGuardrailConfigEntri
 /**
  * Configuration class for code injection guardrail.
  */
-public class CodeInjectionGuardrailConfig implements Config {
+public class CodeInjectionGuardrailConfig extends AbstractConfig {
 
     private static final Logger LOG = LoggerFactory.getLogger(CodeInjectionGuardrailConfig.class);
-
-    private final String prefix;
 
     public CodeInjectionGuardrailConfig() {
         this(null);
     }
 
     public CodeInjectionGuardrailConfig(String prefix) {
-        this.prefix = prefix;
-
-        CodeInjectionGuardrailConfigEntries.register(prefix);
-        ConfigStore.getInstance().load(CodeInjectionGuardrailConfig.class, this, this::register);
-        CodeInjectionGuardrailConfigEntries.loadOverrides(prefix);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = CodeInjectionGuardrailConfigEntries.find(prefix, name);
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        super(prefix, CodeInjectionGuardrailConfigEntries.class);
     }
 
     @Override
@@ -47,15 +32,11 @@ public class CodeInjectionGuardrailConfig implements Config {
     }
 
     public boolean strict() {
-        return ConfigStore.getInstance()
-                .get(STRICT.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(false);
+        return get(STRICT).map(Boolean::parseBoolean).orElse(false);
     }
 
     public Set<InjectionType> detectTypes() {
-        String typesStr = ConfigStore.getInstance()
-                .get(DETECT_TYPES.asNamed(prefix))
+        String typesStr = get(DETECT_TYPES)
                 .orElse(
                         "SHELL_COMMAND,SQL_INJECTION,JAVASCRIPT,HTML_XSS,PATH_TRAVERSAL,COMMAND_CHAINING,TEMPLATE_INJECTION");
 

@@ -1,10 +1,7 @@
 package io.kaoto.forage.vectordb.neo4j;
 
 import java.time.Duration;
-import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 import io.kaoto.forage.core.util.config.MissingConfigException;
 
 import static io.kaoto.forage.vectordb.neo4j.Neo4jConfigEntries.AUTO_CREATE_FULL_TEXT;
@@ -93,15 +90,15 @@ import static io.kaoto.forage.vectordb.neo4j.Neo4jConfigEntries.WITH_ENCRYPTION;
  * }</pre>
  *
  * <p>This class automatically registers itself and its configuration parameters with the
- * {@link ConfigStore} during construction, making the configuration values available
+ * {@link io.kaoto.forage.core.util.config.ConfigStore} during construction, making the configuration values available
  * to other components in the framework.
  *
- * @see Config
- * @see ConfigStore
- * @see ConfigModule
+ * @see AbstractConfig
+ * @see io.kaoto.forage.core.util.config.ConfigStore
+ * @see io.kaoto.forage.core.util.config.ConfigModule
  * @since 1.0
  */
-public class Neo4jConfig implements Config {
+public class Neo4jConfig extends AbstractConfig {
 
     private static final String DEFAULT_URI = "bolt://localhost:7687";
     private static final String DEFAULT_USER = "neo4j";
@@ -119,30 +116,13 @@ public class Neo4jConfig implements Config {
     private static final int DEFAULT_CONNECTION_ACQUISITION_TIMEOUT = 60;
     private static final int DEFAULT_AWAIT_INDEX_TIMEOUT = 60;
     private static final boolean DEFAULT_AUTO_CREATE_FULL_TEXT = false;
-    private final String prefix;
 
     public Neo4jConfig() {
         this(null);
     }
 
     public Neo4jConfig(String prefix) {
-        this.prefix = prefix;
-
-        // First register new configuration modules. This happens only if a prefix is provided
-        Neo4jConfigEntries.register(prefix);
-
-        // Then, loads the configurations from the properties file associated with this Config module
-        ConfigStore.getInstance().load(Neo4jConfig.class, this, this::register);
-
-        // Lastly, load the overrides defined in system properties and environment variables
-        Neo4jConfigEntries.loadOverrides(prefix);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = Neo4jConfigEntries.find(prefix, name);
-
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        super(prefix, Neo4jConfigEntries.class);
     }
 
     @Override
@@ -154,80 +134,77 @@ public class Neo4jConfig implements Config {
      * Returns the Neo4j server URI.
      */
     public String uri() {
-        return ConfigStore.getInstance().get(URI.asNamed(prefix)).orElse(DEFAULT_URI);
+        return get(URI).orElse(DEFAULT_URI);
     }
 
     /**
      * Returns the Neo4j username.
      */
     public String user() {
-        return ConfigStore.getInstance().get(USER.asNamed(prefix)).orElse(DEFAULT_USER);
+        return get(USER).orElse(DEFAULT_USER);
     }
 
     /**
      * Returns the Neo4j password.
      */
     public String password() {
-        return ConfigStore.getInstance()
-                .get(PASSWORD.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Neo4j password is required but not configured"));
+        return getRequired(PASSWORD, "Neo4j password is required but not configured");
     }
 
     /**
      * Returns the database name.
      */
     public String databaseName() {
-        return ConfigStore.getInstance().get(DATABASE_NAME.asNamed(prefix)).orElse(DEFAULT_DATABASE_NAME);
+        return get(DATABASE_NAME).orElse(DEFAULT_DATABASE_NAME);
     }
 
     /**
      * Returns the vector index name.
      */
     public String indexName() {
-        return ConfigStore.getInstance().get(INDEX_NAME.asNamed(prefix)).orElse(DEFAULT_INDEX_NAME);
+        return get(INDEX_NAME).orElse(DEFAULT_INDEX_NAME);
     }
 
     /**
      * Returns the node label.
      */
     public String label() {
-        return ConfigStore.getInstance().get(LABEL.asNamed(prefix)).orElse(DEFAULT_LABEL);
+        return get(LABEL).orElse(DEFAULT_LABEL);
     }
 
     /**
      * Returns the embedding property name.
      */
     public String embeddingProperty() {
-        return ConfigStore.getInstance().get(EMBEDDING_PROPERTY.asNamed(prefix)).orElse(DEFAULT_EMBEDDING_PROPERTY);
+        return get(EMBEDDING_PROPERTY).orElse(DEFAULT_EMBEDDING_PROPERTY);
     }
 
     /**
      * Returns the text property name.
      */
     public String textProperty() {
-        return ConfigStore.getInstance().get(TEXT_PROPERTY.asNamed(prefix)).orElse(DEFAULT_TEXT_PROPERTY);
+        return get(TEXT_PROPERTY).orElse(DEFAULT_TEXT_PROPERTY);
     }
 
     /**
      * Returns the ID property name.
      */
     public String idProperty() {
-        return ConfigStore.getInstance().get(ID_PROPERTY.asNamed(prefix)).orElse(DEFAULT_ID_PROPERTY);
+        return get(ID_PROPERTY).orElse(DEFAULT_ID_PROPERTY);
     }
 
     /**
      * Returns the metadata prefix.
      */
     public String metadataPrefix() {
-        return ConfigStore.getInstance().get(METADATA_PREFIX.asNamed(prefix)).orElse(DEFAULT_METADATA_PREFIX);
+        return get(METADATA_PREFIX).orElse(DEFAULT_METADATA_PREFIX);
     }
 
     /**
      * Returns the dimension of the vectors.
      */
     public int dimension() {
-        return ConfigStore.getInstance()
-                .get(DIMENSION.asNamed(prefix))
+        return get(DIMENSION)
                 .map(Integer::parseInt)
                 .orElseThrow(() -> new MissingConfigException("Vector dimension is required but not configured"));
     }
@@ -236,48 +213,36 @@ public class Neo4jConfig implements Config {
      * Returns whether SSL encryption is enabled.
      */
     public boolean withEncryption() {
-        return ConfigStore.getInstance()
-                .get(WITH_ENCRYPTION.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(DEFAULT_WITH_ENCRYPTION);
+        return get(WITH_ENCRYPTION).map(Boolean::parseBoolean).orElse(DEFAULT_WITH_ENCRYPTION);
     }
 
     /**
      * Returns the connection timeout duration.
      */
     public Duration connectionTimeout() {
-        return Duration.ofSeconds(ConfigStore.getInstance()
-                .get(CONNECTION_TIMEOUT.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(DEFAULT_CONNECTION_TIMEOUT));
+        return Duration.ofSeconds(get(CONNECTION_TIMEOUT).map(Integer::parseInt).orElse(DEFAULT_CONNECTION_TIMEOUT));
     }
 
     /**
      * Returns the maximum connection lifetime duration.
      */
     public Duration maxConnectionLifetime() {
-        return Duration.ofMinutes(ConfigStore.getInstance()
-                .get(MAX_CONNECTION_LIFETIME.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(DEFAULT_MAX_CONNECTION_LIFETIME));
+        return Duration.ofMinutes(
+                get(MAX_CONNECTION_LIFETIME).map(Integer::parseInt).orElse(DEFAULT_MAX_CONNECTION_LIFETIME));
     }
 
     /**
      * Returns the maximum connection pool size.
      */
     public int maxConnectionPoolSize() {
-        return ConfigStore.getInstance()
-                .get(MAX_CONNECTION_POOL_SIZE.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(DEFAULT_MAX_CONNECTION_POOL_SIZE);
+        return get(MAX_CONNECTION_POOL_SIZE).map(Integer::parseInt).orElse(DEFAULT_MAX_CONNECTION_POOL_SIZE);
     }
 
     /**
      * Returns the connection acquisition timeout duration.
      */
     public Duration connectionAcquisitionTimeout() {
-        return Duration.ofSeconds(ConfigStore.getInstance()
-                .get(CONNECTION_ACQUISITION_TIMEOUT.asNamed(prefix))
+        return Duration.ofSeconds(get(CONNECTION_ACQUISITION_TIMEOUT)
                 .map(Integer::parseInt)
                 .orElse(DEFAULT_CONNECTION_ACQUISITION_TIMEOUT));
     }
@@ -286,60 +251,49 @@ public class Neo4jConfig implements Config {
      * Returns the index creation timeout duration.
      */
     public Duration awaitIndexTimeout() {
-        return Duration.ofSeconds(ConfigStore.getInstance()
-                .get(AWAIT_INDEX_TIMEOUT.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(DEFAULT_AWAIT_INDEX_TIMEOUT));
+        return Duration.ofSeconds(
+                get(AWAIT_INDEX_TIMEOUT).map(Integer::parseInt).orElse(DEFAULT_AWAIT_INDEX_TIMEOUT));
     }
 
     /**
      * Returns the custom retrieval query.
      */
     public String retrievalQuery() {
-        return ConfigStore.getInstance().get(RETRIEVAL_QUERY.asNamed(prefix)).orElse(null);
+        return get(RETRIEVAL_QUERY).orElse(null);
     }
 
     /**
      * Returns the custom entity creation query.
      */
     public String entityCreationQuery() {
-        return ConfigStore.getInstance()
-                .get(ENTITY_CREATION_QUERY.asNamed(prefix))
-                .orElse(null);
+        return get(ENTITY_CREATION_QUERY).orElse(null);
     }
 
     /**
      * Returns the full text index name.
      */
     public String fullTextIndexName() {
-        return ConfigStore.getInstance()
-                .get(FULL_TEXT_INDEX_NAME.asNamed(prefix))
-                .orElse(null);
+        return get(FULL_TEXT_INDEX_NAME).orElse(null);
     }
 
     /**
      * Returns the full text query.
      */
     public String fullTextQuery() {
-        return ConfigStore.getInstance().get(FULL_TEXT_QUERY.asNamed(prefix)).orElse(null);
+        return get(FULL_TEXT_QUERY).orElse(null);
     }
 
     /**
      * Returns the full text retrieval query.
      */
     public String fullTextRetrievalQuery() {
-        return ConfigStore.getInstance()
-                .get(FULL_TEXT_RETRIEVAL_QUERY.asNamed(prefix))
-                .orElse(null);
+        return get(FULL_TEXT_RETRIEVAL_QUERY).orElse(null);
     }
 
     /**
      * Returns whether to auto create full text index.
      */
     public boolean autoCreateFullText() {
-        return ConfigStore.getInstance()
-                .get(AUTO_CREATE_FULL_TEXT.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(DEFAULT_AUTO_CREATE_FULL_TEXT);
+        return get(AUTO_CREATE_FULL_TEXT).map(Boolean::parseBoolean).orElse(DEFAULT_AUTO_CREATE_FULL_TEXT);
     }
 }

@@ -872,10 +872,12 @@ public class CodeScanner {
     }
 
     /**
-     * Checks if a class declaration implements the Config interface.
+     * Checks if a class declaration implements Config or extends AbstractConfig.
      */
     private boolean implementsConfig(ClassOrInterfaceDeclaration classDecl) {
-        return classDecl.getImplementedTypes().stream().anyMatch(impl -> "Config".equals(impl.getNameAsString()));
+        return classDecl.getImplementedTypes().stream().anyMatch(impl -> "Config".equals(impl.getNameAsString()))
+                || classDecl.getExtendedTypes().stream()
+                        .anyMatch(ext -> "AbstractConfig".equals(ext.getNameAsString()));
     }
 
     /**

@@ -1,11 +1,6 @@
 package io.kaoto.forage.vectordb.neo4j;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import io.kaoto.forage.core.util.config.ConfigEntries;
-import io.kaoto.forage.core.util.config.ConfigEntry;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigTag;
 
@@ -204,56 +199,31 @@ public final class Neo4jConfigEntries extends ConfigEntries {
             false,
             ConfigTag.ADVANCED);
 
-    private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
-
     static {
-        init();
-    }
-
-    static void init() {
-        CONFIG_MODULES.put(INDEX_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(METADATA_PREFIX, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(EMBEDDING_PROPERTY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(ID_PROPERTY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(LABEL, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TEXT_PROPERTY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(DATABASE_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(RETRIEVAL_QUERY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(DIMENSION, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(AWAIT_INDEX_TIMEOUT, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(FULL_TEXT_INDEX_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(FULL_TEXT_QUERY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(FULL_TEXT_RETRIEVAL_QUERY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(AUTO_CREATE_FULL_TEXT, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(ENTITY_CREATION_QUERY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(URI, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(USER, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(PASSWORD, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(WITH_ENCRYPTION, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(CONNECTION_TIMEOUT, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MAX_CONNECTION_LIFETIME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MAX_CONNECTION_POOL_SIZE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(CONNECTION_ACQUISITION_TIMEOUT, ConfigEntry.fromModule());
-    }
-
-    public static Map<ConfigModule, ConfigEntry> entries() {
-        return Collections.unmodifiableMap(CONFIG_MODULES);
-    }
-
-    public static Optional<ConfigModule> find(String prefix, String name) {
-        return find(CONFIG_MODULES, prefix, name);
-    }
-
-    public static void register(String prefix) {
-        if (prefix != null) {
-            for (Map.Entry<ConfigModule, ConfigEntry> entry : entries().entrySet()) {
-                ConfigModule configModule = entry.getKey().asNamed(prefix);
-                CONFIG_MODULES.put(configModule, ConfigEntry.fromModule());
-            }
-        }
-    }
-
-    public static void loadOverrides(String prefix) {
-        load(CONFIG_MODULES, prefix);
+        initModules(
+                Neo4jConfigEntries.class,
+                INDEX_NAME,
+                METADATA_PREFIX,
+                EMBEDDING_PROPERTY,
+                ID_PROPERTY,
+                LABEL,
+                TEXT_PROPERTY,
+                DATABASE_NAME,
+                RETRIEVAL_QUERY,
+                DIMENSION,
+                AWAIT_INDEX_TIMEOUT,
+                FULL_TEXT_INDEX_NAME,
+                FULL_TEXT_QUERY,
+                FULL_TEXT_RETRIEVAL_QUERY,
+                AUTO_CREATE_FULL_TEXT,
+                ENTITY_CREATION_QUERY,
+                URI,
+                USER,
+                PASSWORD,
+                WITH_ENCRYPTION,
+                CONNECTION_TIMEOUT,
+                MAX_CONNECTION_LIFETIME,
+                MAX_CONNECTION_POOL_SIZE,
+                CONNECTION_ACQUISITION_TIMEOUT);
     }
 }

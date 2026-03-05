@@ -104,7 +104,7 @@ public class ServiceLoaderHelper {
      *         {@code false} otherwise
      */
     private static <T> boolean isEquals(String name, ServiceLoader.Provider<T> p) {
-        LOG.info(
+        LOG.trace(
                 "Checking if {} provider for {} equals to {}",
                 name,
                 p.getClass().getName(),

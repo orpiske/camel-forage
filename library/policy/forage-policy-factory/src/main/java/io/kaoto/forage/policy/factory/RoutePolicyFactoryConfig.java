@@ -1,7 +1,7 @@
 package io.kaoto.forage.policy.factory;
 
 import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigStore;
 
@@ -12,13 +12,11 @@ import io.kaoto.forage.core.util.config.ConfigStore;
  * The configuration follows the pattern:
  * {@code camel.forage.route.policy.<routeId>.name}
  *
- * @see Config
+ * @see AbstractConfig
  * @see RoutePolicyFactoryConfigEntries
  * @since 1.0
  */
-public class RoutePolicyFactoryConfig implements Config {
-
-    private final String prefix;
+public class RoutePolicyFactoryConfig extends AbstractConfig {
 
     /**
      * Creates a new RoutePolicyFactoryConfig with no prefix.
@@ -33,22 +31,12 @@ public class RoutePolicyFactoryConfig implements Config {
      * @param prefix optional prefix for named configurations
      */
     public RoutePolicyFactoryConfig(String prefix) {
-        this.prefix = prefix;
-
-        RoutePolicyFactoryConfigEntries.register(prefix);
-        ConfigStore.getInstance().load(RoutePolicyFactoryConfig.class, this, this::register);
-        RoutePolicyFactoryConfigEntries.loadOverrides(prefix);
+        super(prefix, RoutePolicyFactoryConfigEntries.class);
     }
 
     @Override
     public String name() {
         return "forage-policy-factory";
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = RoutePolicyFactoryConfigEntries.find(prefix, name);
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
     }
 
     /**

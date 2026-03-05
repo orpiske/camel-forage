@@ -24,6 +24,7 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import io.kaoto.forage.core.common.VersionHelper;
 import io.kaoto.forage.core.jdbc.DataSourceProvider;
+import io.kaoto.forage.core.util.config.ConfigEntries;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigStore;
 import io.kaoto.forage.jdbc.common.DataSourceFactoryConfig;
@@ -137,7 +138,7 @@ public class TestDataSourceCommand extends CamelCommand {
         }
 
         // Register prefixed configuration modules if dataSourceName is provided
-        DataSourceFactoryConfigEntries.register(dataSourceName);
+        ConfigEntries.registerPrefix(DataSourceFactoryConfigEntries.class, dataSourceName);
 
         // Read and parse application.properties
         List<String> lines = Files.readAllLines(propertiesFile.toPath(), StandardCharsets.UTF_8);
@@ -157,7 +158,8 @@ public class TestDataSourceCommand extends CamelCommand {
                 // Only process forage.jdbc.* or forage.{prefix}.jdbc.* properties
                 if (key.startsWith("forage.") && key.contains(".jdbc.")) {
                     // First try to find with null prefix (for default unprefixed properties like forage.jdbc.*)
-                    Optional<ConfigModule> configModule = DataSourceFactoryConfigEntries.find(null, key);
+                    Optional<ConfigModule> configModule = ConfigEntries.find(
+                            ConfigEntries.getModules(DataSourceFactoryConfigEntries.class), null, key);
 
                     if (configModule.isPresent()) {
                         ConfigModule module = configModule.get();
@@ -169,7 +171,8 @@ public class TestDataSourceCommand extends CamelCommand {
                         ConfigStore.getInstance().set(module, value);
                     } else if (dataSourceName != null) {
                         // Try to find with the prefix (for prefixed properties like forage.dataSource.jdbc.*)
-                        configModule = DataSourceFactoryConfigEntries.find(dataSourceName, key);
+                        configModule = ConfigEntries.find(
+                                ConfigEntries.getModules(DataSourceFactoryConfigEntries.class), dataSourceName, key);
                         configModule.ifPresent(
                                 module -> ConfigStore.getInstance().set(module, value));
                     }
@@ -178,7 +181,7 @@ public class TestDataSourceCommand extends CamelCommand {
         }
 
         // Load overrides from environment variables and system properties
-        DataSourceFactoryConfigEntries.loadOverrides(dataSourceName);
+        ConfigEntries.loadOverridesFor(DataSourceFactoryConfigEntries.class, dataSourceName);
     }
 
     /**

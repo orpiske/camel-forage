@@ -1,5 +1,7 @@
 package io.kaoto.forage.models.chat.ollama;
 
+import io.kaoto.forage.core.util.config.ConfigEntries;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -12,7 +14,7 @@ class OllamaConfigEntriesIsolationTests {
     void shouldWorkEndToEndWithConfigurationLoading() {
         // Register with a specific prefix
         String prefix = "integration";
-        OllamaConfigEntries.register(prefix);
+        ConfigEntries.registerPrefix(OllamaConfigEntries.class, prefix);
 
         // Set up configuration values
         System.setProperty("forage." + prefix + ".ollama.base.url", "http://integration-test:11434");

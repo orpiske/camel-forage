@@ -1,11 +1,6 @@
 package io.kaoto.forage.jms.common;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import io.kaoto.forage.core.util.config.ConfigEntries;
-import io.kaoto.forage.core.util.config.ConfigEntry;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigTag;
 
@@ -246,64 +241,31 @@ public final class ConnectionFactoryConfigEntries extends ConfigEntries {
             false,
             ConfigTag.ADVANCED);
 
-    private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
-
     static {
-        init();
-    }
-
-    static void init() {
-        CONFIG_MODULES.put(JMS_KIND, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(BROKER_URL, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(USERNAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(PASSWORD, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(CLIENT_ID, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(POOL_ENABLED, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MAX_CONNECTIONS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MAX_SESSIONS_PER_CONNECTION, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(IDLE_TIMEOUT_MILLIS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(EXPIRY_TIMEOUT_MILLIS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(CONNECTION_TIMEOUT_MILLIS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(BLOCK_IF_FULL, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(BLOCK_IF_FULL_TIMEOUT_MILLIS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_ENABLED, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_TIMEOUT_SECONDS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_NODE_ID, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_OBJECT_STORE_ID, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_ENABLE_RECOVERY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_RECOVERY_MODULES, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_EXPIRY_SCANNERS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_XA_RESOURCE_ORPHAN_FILTERS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_OBJECT_STORE_DIRECTORY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_OBJECT_STORE_TYPE, ConfigEntry.fromModule());
-    }
-
-    public static Map<ConfigModule, ConfigEntry> entries() {
-        return Collections.unmodifiableMap(CONFIG_MODULES);
-    }
-
-    public static Optional<ConfigModule> find(String prefix, String name) {
-        return find(CONFIG_MODULES, prefix, name);
-    }
-
-    /**
-     * Registers new known configuration if a prefix is provided (otherwise is ignored)
-     * @param prefix the prefix to register
-     */
-    public static void register(String prefix) {
-        if (prefix != null) {
-            for (Map.Entry<ConfigModule, ConfigEntry> entry : entries().entrySet()) {
-                ConfigModule configModule = entry.getKey().asNamed(prefix);
-                CONFIG_MODULES.put(configModule, ConfigEntry.fromModule());
-            }
-        }
-    }
-
-    /**
-     * Load override configurations (which are defined via environment variables and/or system properties)
-     * @param prefix and optional prefix to use
-     */
-    public static void loadOverrides(String prefix) {
-        load(CONFIG_MODULES, prefix);
+        initModules(
+                ConnectionFactoryConfigEntries.class,
+                JMS_KIND,
+                BROKER_URL,
+                USERNAME,
+                PASSWORD,
+                CLIENT_ID,
+                POOL_ENABLED,
+                MAX_CONNECTIONS,
+                MAX_SESSIONS_PER_CONNECTION,
+                IDLE_TIMEOUT_MILLIS,
+                EXPIRY_TIMEOUT_MILLIS,
+                CONNECTION_TIMEOUT_MILLIS,
+                BLOCK_IF_FULL,
+                BLOCK_IF_FULL_TIMEOUT_MILLIS,
+                TRANSACTION_ENABLED,
+                TRANSACTION_TIMEOUT_SECONDS,
+                TRANSACTION_NODE_ID,
+                TRANSACTION_OBJECT_STORE_ID,
+                TRANSACTION_ENABLE_RECOVERY,
+                TRANSACTION_RECOVERY_MODULES,
+                TRANSACTION_EXPIRY_SCANNERS,
+                TRANSACTION_XA_RESOURCE_ORPHAN_FILTERS,
+                TRANSACTION_OBJECT_STORE_DIRECTORY,
+                TRANSACTION_OBJECT_STORE_TYPE);
     }
 }

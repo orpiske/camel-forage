@@ -1,10 +1,6 @@
 package io.kaoto.forage.models.chat.google;
 
-import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.core.util.config.MissingConfigException;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 
 import static io.kaoto.forage.models.chat.google.GoogleConfigEntries.API_KEY;
 import static io.kaoto.forage.models.chat.google.GoogleConfigEntries.LOG_REQUESTS;
@@ -51,17 +47,15 @@ import static io.kaoto.forage.models.chat.google.GoogleConfigEntries.TIMEOUT;
  * in production environments.
  *
  * <p>This class automatically registers itself and its configuration parameters with the
- * {@link ConfigStore} during construction, making the configuration values available
+ * {@link io.kaoto.forage.core.util.config.ConfigStore} during construction, making the configuration values available
  * to other components in the framework.
  *
- * @see Config
- * @see ConfigStore
- * @see ConfigModule
+ * @see AbstractConfig
+ * @see io.kaoto.forage.core.util.config.ConfigStore
+ * @see io.kaoto.forage.core.util.config.ConfigModule
  * @since 1.0
  */
-public class GoogleConfig implements Config {
-
-    private final String prefix;
+public class GoogleConfig extends AbstractConfig {
 
     /**
      * Constructs a new GoogleConfig and registers configuration parameters with the ConfigStore.
@@ -82,23 +76,7 @@ public class GoogleConfig implements Config {
     }
 
     public GoogleConfig(String prefix) {
-        this.prefix = prefix;
-
-        // First register new configuration modules. This happens only if a prefix is provided
-        GoogleConfigEntries.register(prefix);
-
-        // Then, loads the configurations from the properties file associated with this Config module
-        ConfigStore.getInstance().load(GoogleConfig.class, this, this::register);
-
-        // Lastly, load the overrides defined in system properties and environment variables
-        GoogleConfigEntries.loadOverrides(prefix);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = GoogleConfigEntries.find(prefix, name);
-
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        super(prefix, GoogleConfigEntries.class);
     }
 
     /**
@@ -133,12 +111,10 @@ public class GoogleConfig implements Config {
      * </ol>
      *
      * @return the Google AI API key
-     * @throws MissingConfigException if no API key is configured
+     * @throws io.kaoto.forage.core.util.config.MissingConfigException if no API key is configured
      */
     public String apiKey() {
-        return ConfigStore.getInstance()
-                .get(API_KEY.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing Google API key"));
+        return getRequired(API_KEY, "Missing Google API key");
     }
 
     /**
@@ -163,32 +139,21 @@ public class GoogleConfig implements Config {
      * </ol>
      *
      * @return the Google Gemini model name
-     * @throws MissingConfigException if no model name is configured
+     * @throws io.kaoto.forage.core.util.config.MissingConfigException if no model name is configured
      */
     public String modelName() {
-        return ConfigStore.getInstance()
-                .get(MODEL_NAME.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing Google model name"));
+        return getRequired(MODEL_NAME, "Missing Google model name");
     }
 
     public Double temperature() {
-        return ConfigStore.getInstance()
-                .get(TEMPERATURE.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(TEMPERATURE).map(Double::parseDouble).orElse(null);
     }
 
     public Integer timeout() {
-        return ConfigStore.getInstance()
-                .get(TIMEOUT.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(TIMEOUT).map(Integer::parseInt).orElse(null);
     }
 
     public Boolean logRequestsAndResponses() {
-        return ConfigStore.getInstance()
-                .get(LOG_REQUESTS.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(null);
+        return get(LOG_REQUESTS).map(Boolean::parseBoolean).orElse(null);
     }
 }

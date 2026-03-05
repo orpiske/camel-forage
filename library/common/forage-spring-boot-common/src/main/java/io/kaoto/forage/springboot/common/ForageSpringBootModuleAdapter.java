@@ -78,9 +78,9 @@ public class ForageSpringBootModuleAdapter<C extends Config, P extends BeanProvi
     }
 
     private void registerBeans(BeanDefinitionRegistry registry, Set<String> prefixes) {
-        LOG.info("Registering Forage {} beans for prefixes: {}", descriptor.modulePrefix(), prefixes);
+        LOG.debug("Registering Forage {} beans for prefixes: {}", descriptor.modulePrefix(), prefixes);
         boolean isFirst = true;
-        for (String name : prefixes) {
+        for (String name : prefixes.stream().sorted().toList()) {
             if (!registry.containsBeanDefinition(name)) {
                 registerPrimaryBean(registry, name, isFirst);
             } else {
@@ -153,8 +153,8 @@ public class ForageSpringBootModuleAdapter<C extends Config, P extends BeanProvi
         }
 
         if (provider == null) {
-            LOG.error("No {} provider found for class: {}", descriptor.modulePrefix(), providerClassName);
-            return null;
+            throw new IllegalStateException(
+                    "No " + descriptor.modulePrefix() + " provider found for class: " + providerClassName);
         }
 
         return provider.get().create(name);

@@ -1,10 +1,6 @@
 package io.kaoto.forage.models.chat.huggingface;
 
-import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.core.util.config.MissingConfigException;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 
 import static io.kaoto.forage.models.chat.huggingface.HuggingFaceConfigEntries.API_KEY;
 import static io.kaoto.forage.models.chat.huggingface.HuggingFaceConfigEntries.DO_SAMPLE;
@@ -73,14 +69,12 @@ import static io.kaoto.forage.models.chat.huggingface.HuggingFaceConfigEntries.W
  * to version control. Use environment variables or secure configuration management systems
  * in production environments.
  *
- * @see Config
- * @see ConfigStore
- * @see ConfigModule
+ * @see AbstractConfig
+ * @see io.kaoto.forage.core.util.config.ConfigStore
+ * @see io.kaoto.forage.core.util.config.ConfigModule
  * @since 1.0
  */
-public class HuggingFaceConfig implements Config {
-
-    private final String prefix;
+public class HuggingFaceConfig extends AbstractConfig {
 
     /**
      * Constructs a new HuggingFaceConfig and registers configuration parameters with the ConfigStore.
@@ -90,23 +84,7 @@ public class HuggingFaceConfig implements Config {
     }
 
     public HuggingFaceConfig(String prefix) {
-        this.prefix = prefix;
-
-        // First register new configuration modules. This happens only if a prefix is provided
-        HuggingFaceConfigEntries.register(prefix);
-
-        // Then, loads the configurations from the properties file associated with this Config module
-        ConfigStore.getInstance().load(HuggingFaceConfig.class, this, this::register);
-
-        // Lastly, load the overrides defined in system properties and environment variables
-        HuggingFaceConfigEntries.loadOverrides(prefix);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = HuggingFaceConfigEntries.find(prefix, name);
-
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        super(prefix, HuggingFaceConfigEntries.class);
     }
 
     /**
@@ -130,12 +108,10 @@ public class HuggingFaceConfig implements Config {
      * </ol>
      *
      * @return the HuggingFace API key
-     * @throws MissingConfigException if no API key is configured
+     * @throws io.kaoto.forage.core.util.config.MissingConfigException if no API key is configured
      */
     public String apiKey() {
-        return ConfigStore.getInstance()
-                .get(API_KEY.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing HuggingFace API key"));
+        return getRequired(API_KEY, "Missing HuggingFace API key");
     }
 
     /**
@@ -152,7 +128,7 @@ public class HuggingFaceConfig implements Config {
      * @return the HuggingFace model ID, or null if not configured
      */
     public String modelId() {
-        return ConfigStore.getInstance().get(MODEL_ID.asNamed(prefix)).orElse(null);
+        return get(MODEL_ID).orElse(null);
     }
 
     /**
@@ -172,10 +148,7 @@ public class HuggingFaceConfig implements Config {
      * @return the temperature value, or null if not configured
      */
     public Double temperature() {
-        return ConfigStore.getInstance()
-                .get(TEMPERATURE.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(TEMPERATURE).map(Double::parseDouble).orElse(null);
     }
 
     /**
@@ -187,10 +160,7 @@ public class HuggingFaceConfig implements Config {
      * @return the maximum new tokens limit, or null if not configured
      */
     public Integer maxNewTokens() {
-        return ConfigStore.getInstance()
-                .get(MAX_NEW_TOKENS.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(MAX_NEW_TOKENS).map(Integer::parseInt).orElse(null);
     }
 
     /**
@@ -202,10 +172,7 @@ public class HuggingFaceConfig implements Config {
      * @return the top-k value, or null if not configured
      */
     public Integer topK() {
-        return ConfigStore.getInstance()
-                .get(TOP_K.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(TOP_K).map(Integer::parseInt).orElse(null);
     }
 
     /**
@@ -219,10 +186,7 @@ public class HuggingFaceConfig implements Config {
      * @return the top-p value, or null if not configured
      */
     public Double topP() {
-        return ConfigStore.getInstance()
-                .get(TOP_P.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(TOP_P).map(Double::parseDouble).orElse(null);
     }
 
     /**
@@ -234,10 +198,7 @@ public class HuggingFaceConfig implements Config {
      * @return true if sampling is enabled, false if disabled, or null if not configured
      */
     public Boolean doSample() {
-        return ConfigStore.getInstance()
-                .get(DO_SAMPLE.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(null);
+        return get(DO_SAMPLE).map(Boolean::parseBoolean).orElse(null);
     }
 
     /**
@@ -256,10 +217,7 @@ public class HuggingFaceConfig implements Config {
      * @return the repetition penalty value, or null if not configured
      */
     public Double repetitionPenalty() {
-        return ConfigStore.getInstance()
-                .get(REPETITION_PENALTY.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(REPETITION_PENALTY).map(Double::parseDouble).orElse(null);
     }
 
     /**
@@ -271,10 +229,7 @@ public class HuggingFaceConfig implements Config {
      * @return true to return full text, false to return only generated text, or null if not configured
      */
     public Boolean returnFullText() {
-        return ConfigStore.getInstance()
-                .get(RETURN_FULL_TEXT.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(null);
+        return get(RETURN_FULL_TEXT).map(Boolean::parseBoolean).orElse(null);
     }
 
     /**
@@ -286,10 +241,7 @@ public class HuggingFaceConfig implements Config {
      * @return true to wait for model, false to fail fast, or null if not configured
      */
     public Boolean waitForModel() {
-        return ConfigStore.getInstance()
-                .get(WAIT_FOR_MODEL.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(null);
+        return get(WAIT_FOR_MODEL).map(Boolean::parseBoolean).orElse(null);
     }
 
     /**
@@ -301,10 +253,7 @@ public class HuggingFaceConfig implements Config {
      * @return the timeout in seconds, or null if not configured
      */
     public Integer timeoutSeconds() {
-        return ConfigStore.getInstance()
-                .get(TIMEOUT.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(TIMEOUT).map(Integer::parseInt).orElse(null);
     }
 
     /**
@@ -316,10 +265,7 @@ public class HuggingFaceConfig implements Config {
      * @return the maximum retry attempts, or null if not configured
      */
     public Integer maxRetries() {
-        return ConfigStore.getInstance()
-                .get(MAX_RETRIES.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(MAX_RETRIES).map(Integer::parseInt).orElse(null);
     }
 
     /**
@@ -334,9 +280,6 @@ public class HuggingFaceConfig implements Config {
      * @return true if request and response logging is enabled, false if disabled, or null if not configured
      */
     public Boolean logRequestsAndResponses() {
-        return ConfigStore.getInstance()
-                .get(LOG_REQUESTS_AND_RESPONSES.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(null);
+        return get(LOG_REQUESTS_AND_RESPONSES).map(Boolean::parseBoolean).orElse(null);
     }
 }

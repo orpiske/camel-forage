@@ -55,7 +55,7 @@ public class JmsModuleDescriptor implements ForageModuleDescriptor<ConnectionFac
     @Override
     public Map<String, String> translateProperties(String prefix, ConnectionFactoryConfig config) {
         Map<String, String> props = new HashMap<>();
-        String named = prefix != null ? prefix : "<default>";
+        String named = prefix;
 
         if ("artemis".equals(config.jmsKind())) {
             String property = "quarkus.artemis.";

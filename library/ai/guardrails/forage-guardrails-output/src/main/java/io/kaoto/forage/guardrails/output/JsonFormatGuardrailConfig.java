@@ -1,10 +1,7 @@
 package io.kaoto.forage.guardrails.output;
 
 import java.util.Arrays;
-import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 
 import static io.kaoto.forage.guardrails.output.JsonFormatGuardrailConfigEntries.ALLOW_ARRAY;
 import static io.kaoto.forage.guardrails.output.JsonFormatGuardrailConfigEntries.EXTRACT_JSON;
@@ -13,26 +10,14 @@ import static io.kaoto.forage.guardrails.output.JsonFormatGuardrailConfigEntries
 /**
  * Configuration class for JSON format guardrail.
  */
-public class JsonFormatGuardrailConfig implements Config {
-
-    private final String prefix;
+public class JsonFormatGuardrailConfig extends AbstractConfig {
 
     public JsonFormatGuardrailConfig() {
         this(null);
     }
 
     public JsonFormatGuardrailConfig(String prefix) {
-        this.prefix = prefix;
-
-        JsonFormatGuardrailConfigEntries.register(prefix);
-        ConfigStore.getInstance().load(JsonFormatGuardrailConfig.class, this, this::register);
-        JsonFormatGuardrailConfigEntries.loadOverrides(prefix);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = JsonFormatGuardrailConfigEntries.find(prefix, name);
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        super(prefix, JsonFormatGuardrailConfigEntries.class);
     }
 
     @Override
@@ -41,8 +26,7 @@ public class JsonFormatGuardrailConfig implements Config {
     }
 
     public String[] requiredFields() {
-        return ConfigStore.getInstance()
-                .get(REQUIRED_FIELDS.asNamed(prefix))
+        return get(REQUIRED_FIELDS)
                 .map(s -> Arrays.stream(s.split(","))
                         .map(String::trim)
                         .filter(f -> !f.isEmpty())
@@ -51,16 +35,10 @@ public class JsonFormatGuardrailConfig implements Config {
     }
 
     public boolean extractJson() {
-        return ConfigStore.getInstance()
-                .get(EXTRACT_JSON.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(true);
+        return get(EXTRACT_JSON).map(Boolean::parseBoolean).orElse(true);
     }
 
     public boolean allowArray() {
-        return ConfigStore.getInstance()
-                .get(ALLOW_ARRAY.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(true);
+        return get(ALLOW_ARRAY).map(Boolean::parseBoolean).orElse(true);
     }
 }

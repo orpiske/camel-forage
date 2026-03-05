@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -16,6 +15,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,7 +69,7 @@ public final class ConfigStore {
 
     private static ConfigStore INSTANCE;
     private final Properties properties = new Properties();
-    private final List<ConfigResolver> resolvers = new ArrayList<>();
+    private final List<ConfigResolver> resolvers = new CopyOnWriteArrayList<>();
     private ClassLoader classLoader;
 
     /**
@@ -153,7 +153,7 @@ public final class ConfigStore {
      */
     public <T extends Config> void load(Class<T> clazz, T instance, BiConsumer<String, String> registerFunction) {
         final String fileName = asProperties(instance);
-        LOG.info("Adding {} to {}", clazz, fileName);
+        LOG.debug("Adding {} to {}", clazz, fileName);
 
         loadProperties(registerFunction, loadPropertiesWithPriority(instance, fileName));
     }
@@ -243,7 +243,7 @@ public final class ConfigStore {
         }
 
         if (is == null && classLoader != null) {
-            LOG.info("Trying to use the classloader to read {}", file);
+            LOG.debug("Trying to use the classloader to read {}", file);
             final URL resource = classLoader.getResource(asClasspathPath(instance));
             if (resource != null) {
                 try {
@@ -255,7 +255,7 @@ public final class ConfigStore {
         }
 
         if (is == null) {
-            LOG.info("Loading defaults from the forage component");
+            LOG.debug("Loading defaults from the forage component");
             is = classLoader == null
                     ? ConfigStore.class.getResourceAsStream("/" + instance.name() + ".properties")
                     : classLoader.getResourceAsStream("/" + instance.name() + ".properties");
@@ -264,7 +264,7 @@ public final class ConfigStore {
         try {
             Properties props = new Properties();
             if (is != null) {
-                LOG.info("Loading defaults from the forage component");
+                LOG.debug("Loading defaults from the forage component");
                 try (InputStream stream = is) {
                     props.load(stream);
                 }

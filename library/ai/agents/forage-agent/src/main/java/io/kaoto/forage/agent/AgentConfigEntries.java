@@ -1,11 +1,6 @@
 package io.kaoto.forage.agent;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import io.kaoto.forage.core.util.config.ConfigEntries;
-import io.kaoto.forage.core.util.config.ConfigEntry;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigTag;
 
@@ -345,78 +340,38 @@ public final class AgentConfigEntries extends ConfigEntries {
             false,
             ConfigTag.COMMON);
 
-    private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
-
     static {
-        init();
-    }
-
-    static void init() {
-        // Core
-        CONFIG_MODULES.put(MODEL_KIND, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(FEATURES, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MEMORY_KIND, ConfigEntry.fromModule());
-
-        // Common model config
-        CONFIG_MODULES.put(API_KEY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(BASE_URL, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MODEL_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TEMPERATURE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MAX_TOKENS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TOP_P, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TOP_K, ConfigEntry.fromModule());
-
-        // Azure specific
-        CONFIG_MODULES.put(ENDPOINT, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(DEPLOYMENT_NAME, ConfigEntry.fromModule());
-
-        // Logging
-        CONFIG_MODULES.put(LOG_REQUESTS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(LOG_RESPONSES, ConfigEntry.fromModule());
-
-        // Memory
-        CONFIG_MODULES.put(MEMORY_MAX_MESSAGES, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MEMORY_REDIS_HOST, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MEMORY_REDIS_PORT, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MEMORY_REDIS_PASSWORD, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MEMORY_INFINISPAN_SERVER_LIST, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MEMORY_INFINISPAN_CACHE_NAME, ConfigEntry.fromModule());
-
-        // embedding store
-        CONFIG_MODULES.put(EMBEDDING_STORE_FILE_SOURCE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(EMBEDDING_STORE_MAX_SIZE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(EMBEDDING_STORE_OVERLAP_SIZE, ConfigEntry.fromModule());
-
-        // RAG
-        CONFIG_MODULES.put(EMBEDDING_MODEL_API_KEY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(EMBEDDING_MODEL_BASE_URL, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(EMBEDDING_MODEL_MODEL_NAME, ConfigEntry.fromModule());
-        //        CONFIG_MODULES.put(EMBEDDING_MODEL_CUSTOM_HEADERS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(EMBEDDING_MODEL_TIMEOUT, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(EMBEDDING_MODEL_MAX_RETRIES, ConfigEntry.fromModule());
-
-        CONFIG_MODULES.put(DEFAULT_RAG_MAX_RESULTS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(DEFAULT_RAG_MIN_SCORE, ConfigEntry.fromModule());
-    }
-
-    public static Map<ConfigModule, ConfigEntry> entries() {
-        return Collections.unmodifiableMap(CONFIG_MODULES);
-    }
-
-    public static Optional<ConfigModule> find(String prefix, String name) {
-        return find(CONFIG_MODULES, prefix, name);
-    }
-
-    public static void register(String prefix) {
-        if (prefix != null) {
-            for (Map.Entry<ConfigModule, ConfigEntry> entry : entries().entrySet()) {
-                ConfigModule configModule = entry.getKey().asNamed(prefix);
-                CONFIG_MODULES.put(configModule, ConfigEntry.fromModule());
-            }
-        }
-    }
-
-    public static void loadOverrides(String prefix) {
-        load(CONFIG_MODULES, prefix);
+        initModules(
+                AgentConfigEntries.class,
+                MODEL_KIND,
+                FEATURES,
+                MEMORY_KIND,
+                API_KEY,
+                BASE_URL,
+                MODEL_NAME,
+                TEMPERATURE,
+                MAX_TOKENS,
+                TOP_P,
+                TOP_K,
+                ENDPOINT,
+                DEPLOYMENT_NAME,
+                LOG_REQUESTS,
+                LOG_RESPONSES,
+                MEMORY_MAX_MESSAGES,
+                MEMORY_REDIS_HOST,
+                MEMORY_REDIS_PORT,
+                MEMORY_REDIS_PASSWORD,
+                MEMORY_INFINISPAN_SERVER_LIST,
+                MEMORY_INFINISPAN_CACHE_NAME,
+                EMBEDDING_STORE_FILE_SOURCE,
+                EMBEDDING_STORE_MAX_SIZE,
+                EMBEDDING_STORE_OVERLAP_SIZE,
+                EMBEDDING_MODEL_API_KEY,
+                EMBEDDING_MODEL_BASE_URL,
+                EMBEDDING_MODEL_MODEL_NAME,
+                EMBEDDING_MODEL_TIMEOUT,
+                EMBEDDING_MODEL_MAX_RETRIES,
+                DEFAULT_RAG_MAX_RESULTS,
+                DEFAULT_RAG_MIN_SCORE);
     }
 }

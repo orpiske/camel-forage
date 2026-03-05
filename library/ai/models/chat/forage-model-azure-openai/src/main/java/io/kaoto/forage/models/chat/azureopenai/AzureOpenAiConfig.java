@@ -1,10 +1,6 @@
 package io.kaoto.forage.models.chat.azureopenai;
 
-import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.core.util.config.MissingConfigException;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 
 import static io.kaoto.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.API_KEY;
 import static io.kaoto.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.DEPLOYMENT_NAME;
@@ -63,17 +59,15 @@ import static io.kaoto.forage.models.chat.azureopenai.AzureOpenAiConfigEntries.U
  * in production environments.
  *
  * <p>This class automatically registers itself and its configuration parameters with the
- * {@link ConfigStore} during construction, making the configuration values available
+ * {@link io.kaoto.forage.core.util.config.ConfigStore} during construction, making the configuration values available
  * to other components in the framework.
  *
- * @see Config
- * @see ConfigStore
- * @see ConfigModule
+ * @see AbstractConfig
+ * @see io.kaoto.forage.core.util.config.ConfigStore
+ * @see io.kaoto.forage.core.util.config.ConfigModule
  * @since 1.0
  */
-public class AzureOpenAiConfig implements Config {
-
-    private final String prefix;
+public class AzureOpenAiConfig extends AbstractConfig {
 
     /**
      * Constructs a new AzureOpenAiConfig and registers configuration parameters with the ConfigStore.
@@ -95,23 +89,7 @@ public class AzureOpenAiConfig implements Config {
     }
 
     public AzureOpenAiConfig(String prefix) {
-        this.prefix = prefix;
-
-        // First register new configuration modules. This happens only if a prefix is provided
-        AzureOpenAiConfigEntries.register(prefix);
-
-        // Then, loads the configurations from the properties file associated with this Config module
-        ConfigStore.getInstance().load(AzureOpenAiConfig.class, this, this::register);
-
-        // Lastly, load the overrides defined in system properties and environment variables
-        AzureOpenAiConfigEntries.loadOverrides(prefix);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = AzureOpenAiConfigEntries.find(prefix, name);
-
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        super(prefix, AzureOpenAiConfigEntries.class);
     }
 
     /**
@@ -146,12 +124,10 @@ public class AzureOpenAiConfig implements Config {
      * </ol>
      *
      * @return the Azure OpenAI API key
-     * @throws MissingConfigException if no API key is configured
+     * @throws io.kaoto.forage.core.util.config.MissingConfigException if no API key is configured
      */
     public String apiKey() {
-        return ConfigStore.getInstance()
-                .get(API_KEY.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing Azure OpenAI API key"));
+        return getRequired(API_KEY, "Missing Azure OpenAI API key");
     }
 
     /**
@@ -171,12 +147,10 @@ public class AzureOpenAiConfig implements Config {
      * </ol>
      *
      * @return the Azure OpenAI endpoint URL
-     * @throws MissingConfigException if no endpoint is configured
+     * @throws io.kaoto.forage.core.util.config.MissingConfigException if no endpoint is configured
      */
     public String endpoint() {
-        return ConfigStore.getInstance()
-                .get(ENDPOINT.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing Azure OpenAI endpoint"));
+        return getRequired(ENDPOINT, "Missing Azure OpenAI endpoint");
     }
 
     /**
@@ -201,12 +175,10 @@ public class AzureOpenAiConfig implements Config {
      * </ol>
      *
      * @return the Azure OpenAI deployment name
-     * @throws MissingConfigException if no deployment name is configured
+     * @throws io.kaoto.forage.core.util.config.MissingConfigException if no deployment name is configured
      */
     public String deploymentName() {
-        return ConfigStore.getInstance()
-                .get(DEPLOYMENT_NAME.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing Azure OpenAI deployment name"));
+        return getRequired(DEPLOYMENT_NAME, "Missing Azure OpenAI deployment name");
     }
 
     /**
@@ -232,7 +204,7 @@ public class AzureOpenAiConfig implements Config {
      * @return the Azure OpenAI service version, or null if not configured (uses service default)
      */
     public String serviceVersion() {
-        return ConfigStore.getInstance().get(SERVICE_VERSION.asNamed(prefix)).orElse(null);
+        return get(SERVICE_VERSION).orElse(null);
     }
 
     /**
@@ -252,10 +224,7 @@ public class AzureOpenAiConfig implements Config {
      * @return the temperature value, or null if not configured (uses service default)
      */
     public Double temperature() {
-        return ConfigStore.getInstance()
-                .get(TEMPERATURE.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(TEMPERATURE).map(Double::parseDouble).orElse(null);
     }
 
     /**
@@ -275,10 +244,7 @@ public class AzureOpenAiConfig implements Config {
      * @return the maximum tokens limit, or null if not configured (uses service default)
      */
     public Integer maxTokens() {
-        return ConfigStore.getInstance()
-                .get(MAX_TOKENS.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(MAX_TOKENS).map(Integer::parseInt).orElse(null);
     }
 
     /**
@@ -298,10 +264,7 @@ public class AzureOpenAiConfig implements Config {
      * @return the top-p value, or null if not configured (uses service default)
      */
     public Double topP() {
-        return ConfigStore.getInstance()
-                .get(TOP_P.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(TOP_P).map(Double::parseDouble).orElse(null);
     }
 
     /**
@@ -320,10 +283,7 @@ public class AzureOpenAiConfig implements Config {
      * @return the presence penalty value, or null if not configured (uses service default)
      */
     public Double presencePenalty() {
-        return ConfigStore.getInstance()
-                .get(PRESENCE_PENALTY.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(PRESENCE_PENALTY).map(Double::parseDouble).orElse(null);
     }
 
     /**
@@ -342,10 +302,7 @@ public class AzureOpenAiConfig implements Config {
      * @return the frequency penalty value, or null if not configured (uses service default)
      */
     public Double frequencyPenalty() {
-        return ConfigStore.getInstance()
-                .get(FREQUENCY_PENALTY.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(FREQUENCY_PENALTY).map(Double::parseDouble).orElse(null);
     }
 
     /**
@@ -365,10 +322,7 @@ public class AzureOpenAiConfig implements Config {
      * @return the seed value, or null if not configured (non-deterministic mode)
      */
     public Long seed() {
-        return ConfigStore.getInstance()
-                .get(SEED.asNamed(prefix))
-                .map(Long::parseLong)
-                .orElse(null);
+        return get(SEED).map(Long::parseLong).orElse(null);
     }
 
     /**
@@ -387,7 +341,7 @@ public class AzureOpenAiConfig implements Config {
      * @return the user identifier, or null if not configured
      */
     public String user() {
-        return ConfigStore.getInstance().get(USER.asNamed(prefix)).orElse(null);
+        return get(USER).orElse(null);
     }
 
     /**
@@ -406,10 +360,7 @@ public class AzureOpenAiConfig implements Config {
      * @return the timeout in seconds, or null if not configured (uses default of 60 seconds)
      */
     public Integer timeoutSeconds() {
-        return ConfigStore.getInstance()
-                .get(TIMEOUT.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(TIMEOUT).map(Integer::parseInt).orElse(null);
     }
 
     /**
@@ -429,10 +380,7 @@ public class AzureOpenAiConfig implements Config {
      * @return the maximum retry attempts, or null if not configured (uses service default)
      */
     public Integer maxRetries() {
-        return ConfigStore.getInstance()
-                .get(MAX_RETRIES.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(MAX_RETRIES).map(Integer::parseInt).orElse(null);
     }
 
     /**
@@ -448,9 +396,6 @@ public class AzureOpenAiConfig implements Config {
      * @return true if request and response logging is enabled, false if disabled, or null if not configured
      */
     public Boolean logRequestsAndResponses() {
-        return ConfigStore.getInstance()
-                .get(LOG_REQUESTS_AND_RESPONSES.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(null);
+        return get(LOG_REQUESTS_AND_RESPONSES).map(Boolean::parseBoolean).orElse(null);
     }
 }

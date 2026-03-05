@@ -1,11 +1,8 @@
 package io.kaoto.forage.agent.factory;
 
 import java.util.List;
-import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 import io.kaoto.forage.core.util.config.ConfigHelper;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
 
 import static io.kaoto.forage.agent.factory.AgentFactoryConfigEntries.GUARDRAILS_INPUT_CLASSES;
 import static io.kaoto.forage.agent.factory.AgentFactoryConfigEntries.GUARDRAILS_OUTPUT_CLASSES;
@@ -24,32 +21,14 @@ import static io.kaoto.forage.agent.factory.AgentFactoryConfigEntries.PROVIDER_M
  * <p>This configuration is typically used by the MultiAgentFactory for agent setups,
  * supporting both single-agent and multi-agent scenarios.
  */
-public class AgentFactoryConfig implements Config {
-
-    private final String prefix;
+public class AgentFactoryConfig extends AbstractConfig {
 
     public AgentFactoryConfig() {
         this(null);
     }
 
     public AgentFactoryConfig(String prefix) {
-        this.prefix = prefix;
-
-        // First register new configuration modules. This happens only if a prefix is provided
-        AgentFactoryConfigEntries.register(prefix);
-
-        // Then, loads the configurations from the properties file associated with this Config module
-        ConfigStore.getInstance().load(AgentFactoryConfig.class, this, this::register);
-
-        // Lastly, load the overrides defined in system properties and environment variables
-        AgentFactoryConfigEntries.loadOverrides(prefix);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = AgentFactoryConfigEntries.find(prefix, name);
-
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        super(prefix, AgentFactoryConfigEntries.class);
     }
 
     @Override
@@ -58,32 +37,26 @@ public class AgentFactoryConfig implements Config {
     }
 
     public String providerModelFactoryClass() {
-        return ConfigStore.getInstance()
-                .get(PROVIDER_MODEL_FACTORY_CLASS.asNamed(prefix))
-                .orElse(null);
+        return get(PROVIDER_MODEL_FACTORY_CLASS).orElse(null);
     }
 
     public List<String> providerFeatures() {
-        return ConfigHelper.readAsList(PROVIDER_FEATURES.asNamed(prefix));
+        return ConfigHelper.readAsList(PROVIDER_FEATURES.asNamed(prefix()));
     }
 
     public String providerFeaturesMemoryFactoryClass() {
-        return ConfigStore.getInstance()
-                .get(PROVIDER_FEATURES_MEMORY_FACTORY_CLASS.asNamed(prefix))
-                .orElse(null);
+        return get(PROVIDER_FEATURES_MEMORY_FACTORY_CLASS).orElse(null);
     }
 
     public String providerAgentClass() {
-        return ConfigStore.getInstance()
-                .get(PROVIDER_AGENT_CLASS.asNamed(prefix))
-                .orElse(null);
+        return get(PROVIDER_AGENT_CLASS).orElse(null);
     }
 
     public List<String> guardrailsInputClasses() {
-        return ConfigHelper.readAsList(GUARDRAILS_INPUT_CLASSES.asNamed(prefix));
+        return ConfigHelper.readAsList(GUARDRAILS_INPUT_CLASSES.asNamed(prefix()));
     }
 
     public List<String> guardrailsOutputClasses() {
-        return ConfigHelper.readAsList(GUARDRAILS_OUTPUT_CLASSES.asNamed(prefix));
+        return ConfigHelper.readAsList(GUARDRAILS_OUTPUT_CLASSES.asNamed(prefix()));
     }
 }

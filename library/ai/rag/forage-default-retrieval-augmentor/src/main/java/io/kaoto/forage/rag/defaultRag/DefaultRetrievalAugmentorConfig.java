@@ -1,9 +1,6 @@
 package io.kaoto.forage.rag.defaultRag;
 
-import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.rag.RetrievalAugmentor;
 
@@ -31,9 +28,7 @@ import static io.kaoto.forage.rag.defaultRag.DefaultRetrievalAugmentorConfigEntr
  * @see ConfigModule
  * @since 1.0
  */
-public class DefaultRetrievalAugmentorConfig implements Config {
-
-    private final String prefix;
+public class DefaultRetrievalAugmentorConfig extends AbstractConfig {
 
     /**
      * Constructs a new DefaultRetrievalAugmentorConfig and registers configuration parameters with the ConfigStore.
@@ -43,23 +38,7 @@ public class DefaultRetrievalAugmentorConfig implements Config {
     }
 
     public DefaultRetrievalAugmentorConfig(String prefix) {
-        this.prefix = prefix;
-
-        // First register new configuration modules. This happens only if a prefix is provided
-        DefaultRetrievalAugmentorConfigEntries.register(prefix);
-
-        // Then, loads the configurations from the properties file associated with this Config module
-        ConfigStore.getInstance().load(DefaultRetrievalAugmentorConfig.class, this, this::register);
-
-        // Lastly, load the overrides defined in system properties and environment variables
-        DefaultRetrievalAugmentorConfigEntries.loadOverrides(prefix);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = DefaultRetrievalAugmentorConfigEntries.find(prefix, name);
-
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        super(prefix, DefaultRetrievalAugmentorConfigEntries.class);
     }
 
     /**
@@ -76,10 +55,7 @@ public class DefaultRetrievalAugmentorConfig implements Config {
      * <p>The maximum number of Contents to retrieve.</p>
      */
     public Integer maxResults() {
-        return ConfigStore.getInstance()
-                .get(MAX_RESULTS.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(MAX_RESULTS).map(Integer::parseInt).orElse(null);
     }
 
     /**
@@ -89,9 +65,6 @@ public class DefaultRetrievalAugmentorConfig implements Config {
      * from the results.</p>
      */
     public Double minScore() {
-        return ConfigStore.getInstance()
-                .get(MIN_SCORE.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(MIN_SCORE).map(Double::parseDouble).orElse(null);
     }
 }

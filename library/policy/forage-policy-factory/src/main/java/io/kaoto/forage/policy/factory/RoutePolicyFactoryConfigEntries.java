@@ -1,11 +1,6 @@
 package io.kaoto.forage.policy.factory;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import io.kaoto.forage.core.util.config.ConfigEntries;
-import io.kaoto.forage.core.util.config.ConfigEntry;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigTag;
 
@@ -41,57 +36,8 @@ public final class RoutePolicyFactoryConfigEntries extends ConfigEntries {
             false,
             ConfigTag.COMMON);
 
-    private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
-
     static {
-        init();
-    }
-
-    static void init() {
-        CONFIG_MODULES.put(ENABLED, ConfigEntry.fromModule());
-    }
-
-    /**
-     * Returns all registered configuration entries.
-     *
-     * @return an unmodifiable map of configuration entries
-     */
-    public static Map<ConfigModule, ConfigEntry> entries() {
-        return Collections.unmodifiableMap(CONFIG_MODULES);
-    }
-
-    /**
-     * Finds a configuration module by prefix and name.
-     *
-     * @param prefix optional prefix for named configurations
-     * @param name the configuration name
-     * @return an Optional containing the ConfigModule, or empty if not found
-     */
-    public static Optional<ConfigModule> find(String prefix, String name) {
-        return find(CONFIG_MODULES, prefix, name);
-    }
-
-    /**
-     * Registers configuration modules for a specific prefix.
-     *
-     * @param prefix the prefix to register
-     */
-    public static void register(String prefix) {
-        if (prefix != null) {
-            for (Map.Entry<ConfigModule, ConfigEntry> entry : entries().entrySet()) {
-                ConfigModule configModule = entry.getKey().asNamed(prefix);
-                CONFIG_MODULES.put(configModule, ConfigEntry.fromModule());
-            }
-        }
-    }
-
-    /**
-     * Loads override configurations from system properties and environment variables.
-     *
-     * @param prefix optional prefix to use
-     */
-    public static void loadOverrides(String prefix) {
-        load(CONFIG_MODULES, prefix);
+        initModules(RoutePolicyFactoryConfigEntries.class, ENABLED);
     }
 
     /**

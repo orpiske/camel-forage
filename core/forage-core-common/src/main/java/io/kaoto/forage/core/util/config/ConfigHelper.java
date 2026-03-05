@@ -97,7 +97,7 @@ public final class ConfigHelper {
     static Optional<String> getSpringBootProperty(String propertyName) {
         Properties springBootProps = ConfigHelper.getSpringBootConfig();
         if (springBootProps != null) {
-            LOG.info("Loading {} from Spring Boot", propertyName);
+            LOG.trace("Loading {} from Spring Boot", propertyName);
             String propertyValue = (String) springBootProps.get(propertyName);
             if (propertyValue != null) {
                 return Optional.of(propertyValue);
@@ -109,7 +109,7 @@ public final class ConfigHelper {
     static Optional<String> getQuarkusProperty(String propertyName) {
         SmallRyeConfig config = ConfigHelper.getQuarkusConfig();
         if (config != null) {
-            LOG.info("Loading {} from Quarkus", propertyName);
+            LOG.trace("Loading {} from Quarkus", propertyName);
             Optional<String> quarkusValue = config.getOptionalValue(propertyName, String.class);
             if (quarkusValue.isPresent()) {
                 return quarkusValue;
@@ -121,7 +121,7 @@ public final class ConfigHelper {
     static Optional<String> getCamelMainProperty(String propertyName) {
         Properties camelMainProps = ConfigHelper.getCamelMainConfig();
         if (camelMainProps != null) {
-            LOG.info("Loading {} from Camel main", propertyName);
+            LOG.trace("Loading {} from Camel main", propertyName);
             String mainPropertyValue = (String) camelMainProps.get(propertyName);
             if (mainPropertyValue != null) {
                 return Optional.of(mainPropertyValue);
@@ -154,7 +154,7 @@ public final class ConfigHelper {
 
                 if (result != null) {
                     String version = result.toString();
-                    LOG.info("Spring Boot environment detected, {} version", version);
+                    LOG.debug("Spring Boot environment detected, {} version", version);
                     return true;
                 }
             } catch (ClassNotFoundException e) {
@@ -181,7 +181,7 @@ public final class ConfigHelper {
             try {
                 Class<?> quarkusClass = Class.forName("io.quarkus.runtime.Application");
                 quarkusClass.getMethod("getName"); // if we can find this method, declare runtime quarkus
-                LOG.info("Quarkus environment detected");
+                LOG.debug("Quarkus environment detected");
 
                 return true;
             } catch (ClassNotFoundException e) {
@@ -239,7 +239,7 @@ public final class ConfigHelper {
                     .toAbsolutePath()
                     .toFile();
             if (file.exists()) {
-                LOG.info("Loading application.properties from working directory: {}", file.getAbsolutePath());
+                LOG.debug("Loading application.properties from working directory: {}", file.getAbsolutePath());
                 input = new java.io.FileInputStream(file);
             }
         } catch (IOException ex) {
@@ -250,7 +250,7 @@ public final class ConfigHelper {
         if (input == null) {
             input = ConfigHelper.class.getClassLoader().getResourceAsStream("application.properties");
             if (input != null) {
-                LOG.info("Loading application.properties from classpath");
+                LOG.debug("Loading application.properties from classpath");
             }
         }
 

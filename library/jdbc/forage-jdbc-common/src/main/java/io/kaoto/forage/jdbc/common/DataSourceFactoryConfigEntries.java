@@ -1,11 +1,6 @@
 package io.kaoto.forage.jdbc.common;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import io.kaoto.forage.core.util.config.ConfigEntries;
-import io.kaoto.forage.core.util.config.ConfigEntry;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigTag;
 
@@ -396,79 +391,46 @@ public final class DataSourceFactoryConfigEntries extends ConfigEntries {
             false,
             ConfigTag.ADVANCED);
 
-    private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
-
     static {
-        init();
-    }
-
-    static void init() {
-        CONFIG_MODULES.put(DB_KIND, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(JDBC_URL, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(USERNAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(PASSWORD, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(INITIAL_SIZE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MIN_SIZE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MAX_SIZE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(ACQUISITION_TIMEOUT_SECONDS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(VALIDATION_TIMEOUT_SECONDS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(LEAK_TIMEOUT_MINUTES, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(IDLE_VALIDATION_TIMEOUT_MINUTES, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_TIMEOUT_SECONDS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_ENABLED, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_NODE_ID, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_OBJECT_STORE_ID, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_ENABLE_RECOVERY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_RECOVERY_MODULES, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_EXPIRY_SCANNERS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_XA_RESOURCE_ORPHAN_FILTERS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_OBJECT_STORE_DIRECTORY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_OBJECT_STORE_TYPE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_OBJECT_STORE_DATASOURCE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_OBJECT_STORE_CREATE_TABLE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_OBJECT_STORE_DROP_TABLE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(TRANSACTION_OBJECT_STORE_TABLE_PREFIX, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(AGGREGATION_REPOSITORY_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(AGGREGATION_REPOSITORY_HEADERS_TO_STORE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(AGGREGATION_REPOSITORY_STORE_BODY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(AGGREGATION_REPOSITORY_DEAD_LETTER_URI, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(AGGREGATION_REPOSITORY_ALLOW_SERIALIZED_HEADERS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(AGGREGATION_REPOSITORY_MAXIMUM_REDELIVERIES, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(AGGREGATION_REPOSITORY_USE_RECOVERY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(AGGREGATION_REPOSITORY_PROPAGATION_BEHAVIOUR_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(AGGREGATION_REPOSITORY_ENABLED, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(ENABLE_IDEMPOTENT_REPOSITORY, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(IDEMPOTENT_REPOSITORY_TABLE_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(IDEMPOTENT_REPOSITORY_TABLE_IF_NOT_EXISTS, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(IDEMPOTENT_REPOSITORY_PROCESSOR_NAME, ConfigEntry.fromModule());
-    }
-
-    public static Map<ConfigModule, ConfigEntry> entries() {
-        return Collections.unmodifiableMap(CONFIG_MODULES);
-    }
-
-    public static Optional<ConfigModule> find(String prefix, String name) {
-        return find(CONFIG_MODULES, prefix, name);
-    }
-
-    /**
-     * Registers new known configuration if a prefix is provided (otherwise is ignored)
-     * @param prefix the prefix to register
-     */
-    public static void register(String prefix) {
-        if (prefix != null) {
-            for (Map.Entry<ConfigModule, ConfigEntry> entry : entries().entrySet()) {
-                ConfigModule configModule = entry.getKey().asNamed(prefix);
-                CONFIG_MODULES.put(configModule, ConfigEntry.fromModule());
-            }
-        }
-    }
-
-    /**
-     * Load override configurations (which are defined via environment variables and/or system properties)
-     * @param prefix and optional prefix to use
-     */
-    public static void loadOverrides(String prefix) {
-        load(CONFIG_MODULES, prefix);
+        initModules(
+                DataSourceFactoryConfigEntries.class,
+                DB_KIND,
+                JDBC_URL,
+                USERNAME,
+                PASSWORD,
+                INITIAL_SIZE,
+                MIN_SIZE,
+                MAX_SIZE,
+                ACQUISITION_TIMEOUT_SECONDS,
+                VALIDATION_TIMEOUT_SECONDS,
+                LEAK_TIMEOUT_MINUTES,
+                IDLE_VALIDATION_TIMEOUT_MINUTES,
+                TRANSACTION_TIMEOUT_SECONDS,
+                TRANSACTION_ENABLED,
+                TRANSACTION_NODE_ID,
+                TRANSACTION_OBJECT_STORE_ID,
+                TRANSACTION_ENABLE_RECOVERY,
+                TRANSACTION_RECOVERY_MODULES,
+                TRANSACTION_EXPIRY_SCANNERS,
+                TRANSACTION_XA_RESOURCE_ORPHAN_FILTERS,
+                TRANSACTION_OBJECT_STORE_DIRECTORY,
+                TRANSACTION_OBJECT_STORE_TYPE,
+                TRANSACTION_OBJECT_STORE_DATASOURCE,
+                TRANSACTION_OBJECT_STORE_CREATE_TABLE,
+                TRANSACTION_OBJECT_STORE_DROP_TABLE,
+                TRANSACTION_OBJECT_STORE_TABLE_PREFIX,
+                AGGREGATION_REPOSITORY_NAME,
+                AGGREGATION_REPOSITORY_HEADERS_TO_STORE,
+                AGGREGATION_REPOSITORY_STORE_BODY,
+                AGGREGATION_REPOSITORY_DEAD_LETTER_URI,
+                AGGREGATION_REPOSITORY_ALLOW_SERIALIZED_HEADERS,
+                AGGREGATION_REPOSITORY_MAXIMUM_REDELIVERIES,
+                AGGREGATION_REPOSITORY_USE_RECOVERY,
+                AGGREGATION_REPOSITORY_PROPAGATION_BEHAVIOUR_NAME,
+                AGGREGATION_REPOSITORY_ENABLED,
+                ENABLE_IDEMPOTENT_REPOSITORY,
+                IDEMPOTENT_REPOSITORY_TABLE_NAME,
+                IDEMPOTENT_REPOSITORY_TABLE_IF_NOT_EXISTS,
+                IDEMPOTENT_REPOSITORY_PROCESSOR_NAME);
     }
 }

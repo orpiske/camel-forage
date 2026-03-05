@@ -2,6 +2,7 @@ package io.kaoto.forage.guardrails.input;
 
 import java.util.Map;
 import java.util.Optional;
+import io.kaoto.forage.core.util.config.ConfigEntries;
 import io.kaoto.forage.core.util.config.ConfigEntry;
 import io.kaoto.forage.core.util.config.ConfigModule;
 
@@ -47,7 +48,7 @@ class PiiDetectorGuardrailConfigEntriesTest {
         @Test
         @DisplayName("Should return immutable map from entries()")
         void shouldReturnImmutableMapFromEntries() {
-            Map<ConfigModule, ConfigEntry> entries = PiiDetectorGuardrailConfigEntries.entries();
+            Map<ConfigModule, ConfigEntry> entries = ConfigEntries.entriesOf(PiiDetectorGuardrailConfigEntries.class);
 
             assertThat(entries).isNotNull();
             assertThat(entries).isNotEmpty();
@@ -58,7 +59,7 @@ class PiiDetectorGuardrailConfigEntriesTest {
         @Test
         @DisplayName("Should contain all ConfigModules in entries map")
         void shouldContainAllConfigModulesInEntriesMap() {
-            Map<ConfigModule, ConfigEntry> entries = PiiDetectorGuardrailConfigEntries.entries();
+            Map<ConfigModule, ConfigEntry> entries = ConfigEntries.entriesOf(PiiDetectorGuardrailConfigEntries.class);
 
             assertThat(entries).containsKey(PiiDetectorGuardrailConfigEntries.DETECT_TYPES);
             assertThat(entries).containsKey(PiiDetectorGuardrailConfigEntries.BLOCK_ON_DETECTION);
@@ -72,8 +73,10 @@ class PiiDetectorGuardrailConfigEntriesTest {
         @Test
         @DisplayName("Should find ConfigModule without prefix")
         void shouldFindConfigModuleWithoutPrefix() {
-            Optional<ConfigModule> found =
-                    PiiDetectorGuardrailConfigEntries.find(null, "forage.guardrail.pii.detect.types");
+            Optional<ConfigModule> found = ConfigEntries.find(
+                    ConfigEntries.getModules(PiiDetectorGuardrailConfigEntries.class),
+                    null,
+                    "forage.guardrail.pii.detect.types");
 
             assertThat(found).isPresent();
             assertThat(found.get()).isEqualTo(PiiDetectorGuardrailConfigEntries.DETECT_TYPES);
@@ -82,7 +85,8 @@ class PiiDetectorGuardrailConfigEntriesTest {
         @Test
         @DisplayName("Should return Optional.empty for unknown configuration name")
         void shouldReturnEmptyForUnknownConfigurationName() {
-            assertThat(PiiDetectorGuardrailConfigEntries.find(null, "unknown.config"))
+            assertThat(ConfigEntries.find(
+                            ConfigEntries.getModules(PiiDetectorGuardrailConfigEntries.class), null, "unknown.config"))
                     .isEmpty();
         }
     }
@@ -94,7 +98,7 @@ class PiiDetectorGuardrailConfigEntriesTest {
         @Test
         @DisplayName("Should register configurations without prefix")
         void shouldRegisterConfigurationsWithoutPrefix() {
-            PiiDetectorGuardrailConfigEntries.register(null);
+            ConfigEntries.registerPrefix(PiiDetectorGuardrailConfigEntries.class, null);
 
             PiiDetectorGuardrailConfig config = new PiiDetectorGuardrailConfig();
             assertThat(config).isNotNull();
@@ -105,7 +109,7 @@ class PiiDetectorGuardrailConfigEntriesTest {
         void shouldRegisterConfigurationsWithPrefix() {
             String prefix = "testpii";
 
-            PiiDetectorGuardrailConfigEntries.register(prefix);
+            ConfigEntries.registerPrefix(PiiDetectorGuardrailConfigEntries.class, prefix);
 
             System.setProperty("forage." + prefix + ".guardrail.pii.detect.types", "EMAIL,PHONE");
 

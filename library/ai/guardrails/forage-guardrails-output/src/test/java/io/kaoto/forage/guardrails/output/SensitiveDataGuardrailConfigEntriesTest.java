@@ -2,6 +2,7 @@ package io.kaoto.forage.guardrails.output;
 
 import java.util.Map;
 import java.util.Optional;
+import io.kaoto.forage.core.util.config.ConfigEntries;
 import io.kaoto.forage.core.util.config.ConfigEntry;
 import io.kaoto.forage.core.util.config.ConfigModule;
 
@@ -51,7 +52,7 @@ class SensitiveDataGuardrailConfigEntriesTest {
         @Test
         @DisplayName("Should return immutable map from entries()")
         void shouldReturnImmutableMapFromEntries() {
-            Map<ConfigModule, ConfigEntry> entries = SensitiveDataGuardrailConfigEntries.entries();
+            Map<ConfigModule, ConfigEntry> entries = ConfigEntries.entriesOf(SensitiveDataGuardrailConfigEntries.class);
 
             assertThat(entries).isNotNull();
             assertThat(entries).isNotEmpty();
@@ -62,7 +63,7 @@ class SensitiveDataGuardrailConfigEntriesTest {
         @Test
         @DisplayName("Should contain all ConfigModules in entries map")
         void shouldContainAllConfigModulesInEntriesMap() {
-            Map<ConfigModule, ConfigEntry> entries = SensitiveDataGuardrailConfigEntries.entries();
+            Map<ConfigModule, ConfigEntry> entries = ConfigEntries.entriesOf(SensitiveDataGuardrailConfigEntries.class);
 
             assertThat(entries).containsKey(SensitiveDataGuardrailConfigEntries.DETECT_TYPES);
             assertThat(entries).containsKey(SensitiveDataGuardrailConfigEntries.ACTION);
@@ -77,8 +78,10 @@ class SensitiveDataGuardrailConfigEntriesTest {
         @Test
         @DisplayName("Should find ConfigModule without prefix")
         void shouldFindConfigModuleWithoutPrefix() {
-            Optional<ConfigModule> found =
-                    SensitiveDataGuardrailConfigEntries.find(null, "forage.guardrail.sensitive.data.action");
+            Optional<ConfigModule> found = ConfigEntries.find(
+                    ConfigEntries.getModules(SensitiveDataGuardrailConfigEntries.class),
+                    null,
+                    "forage.guardrail.sensitive.data.action");
 
             assertThat(found).isPresent();
             assertThat(found.get()).isEqualTo(SensitiveDataGuardrailConfigEntries.ACTION);
@@ -87,7 +90,10 @@ class SensitiveDataGuardrailConfigEntriesTest {
         @Test
         @DisplayName("Should return Optional.empty for unknown configuration name")
         void shouldReturnEmptyForUnknownConfigurationName() {
-            assertThat(SensitiveDataGuardrailConfigEntries.find(null, "unknown.config"))
+            assertThat(ConfigEntries.find(
+                            ConfigEntries.getModules(SensitiveDataGuardrailConfigEntries.class),
+                            null,
+                            "unknown.config"))
                     .isEmpty();
         }
     }
@@ -99,7 +105,7 @@ class SensitiveDataGuardrailConfigEntriesTest {
         @Test
         @DisplayName("Should register configurations without prefix")
         void shouldRegisterConfigurationsWithoutPrefix() {
-            SensitiveDataGuardrailConfigEntries.register(null);
+            ConfigEntries.registerPrefix(SensitiveDataGuardrailConfigEntries.class, null);
 
             SensitiveDataGuardrailConfig config = new SensitiveDataGuardrailConfig();
             assertThat(config).isNotNull();
@@ -110,7 +116,7 @@ class SensitiveDataGuardrailConfigEntriesTest {
         void shouldRegisterConfigurationsWithPrefix() {
             String prefix = "testsensitive";
 
-            SensitiveDataGuardrailConfigEntries.register(prefix);
+            ConfigEntries.registerPrefix(SensitiveDataGuardrailConfigEntries.class, prefix);
 
             System.setProperty("forage." + prefix + ".guardrail.sensitive.data.action", "REDACT");
 

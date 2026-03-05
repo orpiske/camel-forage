@@ -4,10 +4,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 
 import static io.kaoto.forage.agent.AgentConfigEntries.API_KEY;
 import static io.kaoto.forage.agent.AgentConfigEntries.BASE_URL;
@@ -48,26 +45,14 @@ import static io.kaoto.forage.agent.AgentConfigEntries.TOP_P;
  * <p>Supports both default configurations and prefixed configurations for multi-agent scenarios.
  * Prefixes are auto-detected from properties like {@code myagent.agent.model.kind}.
  */
-public class AgentConfig implements Config {
-
-    private final String prefix;
+public class AgentConfig extends AbstractConfig {
 
     public AgentConfig() {
         this(null);
     }
 
     public AgentConfig(String prefix) {
-        this.prefix = prefix;
-
-        AgentConfigEntries.register(prefix);
-        ConfigStore.getInstance().load(AgentConfig.class, this, this::register);
-        AgentConfigEntries.loadOverrides(prefix);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = AgentConfigEntries.find(prefix, name);
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        super(prefix, AgentConfigEntries.class);
     }
 
     @Override
@@ -78,13 +63,15 @@ public class AgentConfig implements Config {
     // Core configuration
 
     public String modelKind() {
-        return ConfigStore.getInstance().get(MODEL_KIND.asNamed(prefix)).orElse(null);
+        return get(MODEL_KIND).orElse(null);
     }
 
     public List<String> features() {
-        return ConfigStore.getInstance()
-                .get(FEATURES.asNamed(prefix))
-                .map(s -> Arrays.asList(s.split(",")))
+        return get(FEATURES)
+                .map(s -> Arrays.stream(s.split(","))
+                        .map(String::trim)
+                        .filter(token -> !token.isEmpty())
+                        .toList())
                 .orElse(Collections.emptyList());
     }
 
@@ -93,180 +80,126 @@ public class AgentConfig implements Config {
     }
 
     public String memoryKind() {
-        return ConfigStore.getInstance().get(MEMORY_KIND.asNamed(prefix)).orElse(null);
+        return get(MEMORY_KIND).orElse(null);
     }
 
     // Common model configuration
 
     public String apiKey() {
-        return ConfigStore.getInstance().get(API_KEY.asNamed(prefix)).orElse(null);
+        return get(API_KEY).orElse(null);
     }
 
     public String baseUrl() {
-        return ConfigStore.getInstance().get(BASE_URL.asNamed(prefix)).orElse(null);
+        return get(BASE_URL).orElse(null);
     }
 
     public String modelName() {
-        return ConfigStore.getInstance().get(MODEL_NAME.asNamed(prefix)).orElse(null);
+        return get(MODEL_NAME).orElse(null);
     }
 
     public Double temperature() {
-        return ConfigStore.getInstance()
-                .get(TEMPERATURE.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(TEMPERATURE).map(Double::parseDouble).orElse(null);
     }
 
     public Integer maxTokens() {
-        return ConfigStore.getInstance()
-                .get(MAX_TOKENS.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(MAX_TOKENS).map(Integer::parseInt).orElse(null);
     }
 
     public Double topP() {
-        return ConfigStore.getInstance()
-                .get(TOP_P.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(TOP_P).map(Double::parseDouble).orElse(null);
     }
 
     public Integer topK() {
-        return ConfigStore.getInstance()
-                .get(TOP_K.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(TOP_K).map(Integer::parseInt).orElse(null);
     }
 
     // Azure OpenAI specific
 
     public String endpoint() {
-        return ConfigStore.getInstance().get(ENDPOINT.asNamed(prefix)).orElse(null);
+        return get(ENDPOINT).orElse(null);
     }
 
     public String deploymentName() {
-        return ConfigStore.getInstance().get(DEPLOYMENT_NAME.asNamed(prefix)).orElse(null);
+        return get(DEPLOYMENT_NAME).orElse(null);
     }
 
     // Logging
 
     public Boolean logRequests() {
-        return ConfigStore.getInstance()
-                .get(LOG_REQUESTS.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(null);
+        return get(LOG_REQUESTS).map(Boolean::parseBoolean).orElse(null);
     }
 
     public Boolean logResponses() {
-        return ConfigStore.getInstance()
-                .get(LOG_RESPONSES.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(null);
+        return get(LOG_RESPONSES).map(Boolean::parseBoolean).orElse(null);
     }
 
     // Memory configuration
 
     public Integer memoryMaxMessages() {
-        return ConfigStore.getInstance()
-                .get(MEMORY_MAX_MESSAGES.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(20);
+        return get(MEMORY_MAX_MESSAGES).map(Integer::parseInt).orElse(20);
     }
 
     // Redis memory
 
     public String memoryRedisHost() {
-        return ConfigStore.getInstance().get(MEMORY_REDIS_HOST.asNamed(prefix)).orElse("localhost");
+        return get(MEMORY_REDIS_HOST).orElse("localhost");
     }
 
     public Integer memoryRedisPort() {
-        return ConfigStore.getInstance()
-                .get(MEMORY_REDIS_PORT.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(6379);
+        return get(MEMORY_REDIS_PORT).map(Integer::parseInt).orElse(6379);
     }
 
     public String memoryRedisPassword() {
-        return ConfigStore.getInstance()
-                .get(MEMORY_REDIS_PASSWORD.asNamed(prefix))
-                .orElse(null);
+        return get(MEMORY_REDIS_PASSWORD).orElse(null);
     }
 
     // Infinispan memory
 
     public String memoryInfinispanServerList() {
-        return ConfigStore.getInstance()
-                .get(MEMORY_INFINISPAN_SERVER_LIST.asNamed(prefix))
-                .orElse("localhost:11222");
+        return get(MEMORY_INFINISPAN_SERVER_LIST).orElse("localhost:11222");
     }
 
     public String memoryInfinispanCacheName() {
-        return ConfigStore.getInstance()
-                .get(MEMORY_INFINISPAN_CACHE_NAME.asNamed(prefix))
-                .orElse("chat-memory");
+        return get(MEMORY_INFINISPAN_CACHE_NAME).orElse("chat-memory");
     }
 
     // EmbeddingStore
 
     public String fileSource() {
-        return ConfigStore.getInstance()
-                .get(EMBEDDING_STORE_FILE_SOURCE.asNamed(prefix))
-                .orElse(null);
+        return get(EMBEDDING_STORE_FILE_SOURCE).orElse(null);
     }
 
     public Integer embeddingStoreMaxSize() {
-        return ConfigStore.getInstance()
-                .get(EMBEDDING_STORE_MAX_SIZE.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(EMBEDDING_STORE_MAX_SIZE).map(Integer::parseInt).orElse(null);
     }
 
     public Integer embeddingStoreOverlapSize() {
-        return ConfigStore.getInstance()
-                .get(EMBEDDING_STORE_OVERLAP_SIZE.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(EMBEDDING_STORE_OVERLAP_SIZE).map(Integer::parseInt).orElse(null);
     }
 
     // RAG
 
     public String embeddingModelBaseUrl() {
-        return ConfigStore.getInstance()
-                .get(EMBEDDING_MODEL_BASE_URL.asNamed(prefix))
-                .orElse(BASE_URL.defaultValue());
+        return get(EMBEDDING_MODEL_BASE_URL).orElse(BASE_URL.defaultValue());
     }
 
     public String embeddingModelName() {
-        return ConfigStore.getInstance()
-                .get(EMBEDDING_MODEL_MODEL_NAME.asNamed(prefix))
-                .orElse(MODEL_NAME.defaultValue());
+        return get(EMBEDDING_MODEL_MODEL_NAME).orElse(MODEL_NAME.defaultValue());
     }
 
     public Integer embeddingModelMaxRetries() {
-        return ConfigStore.getInstance()
-                .get(EMBEDDING_MODEL_MAX_RETRIES.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(EMBEDDING_MODEL_MAX_RETRIES).map(Integer::parseInt).orElse(null);
     }
 
     public Duration embeddingModelTimeout() {
-        return ConfigStore.getInstance()
-                .get(EMBEDDING_MODEL_TIMEOUT.asNamed(prefix))
-                .map(Duration::parse)
-                .orElse(null);
+        return get(EMBEDDING_MODEL_TIMEOUT).map(Duration::parse).orElse(null);
     }
 
     public Integer defaultRagMaxResults() {
-        return ConfigStore.getInstance()
-                .get(DEFAULT_RAG_MAX_RESULTS.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(DEFAULT_RAG_MAX_RESULTS).map(Integer::parseInt).orElse(null);
     }
 
     public Double defaultRagMinScore() {
-        return ConfigStore.getInstance()
-                .get(DEFAULT_RAG_MIN_SCORE.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(DEFAULT_RAG_MIN_SCORE).map(Double::parseDouble).orElse(null);
     }
 }

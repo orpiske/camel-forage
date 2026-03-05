@@ -1,12 +1,9 @@
 package io.kaoto.forage.memory.chat.infinispan;
 
-import java.util.Optional;
 import org.infinispan.client.hotrod.configuration.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 
 import static io.kaoto.forage.memory.chat.infinispan.InfinispanConfigEntries.CACHE_NAME;
 import static io.kaoto.forage.memory.chat.infinispan.InfinispanConfigEntries.CONNECTION_TIMEOUT;
@@ -92,14 +89,12 @@ import static io.kaoto.forage.memory.chat.infinispan.InfinispanConfigEntries.USE
  * @see PersistentInfinispanStore
  * @since 1.0
  */
-public class InfinispanConfig implements Config {
+public class InfinispanConfig extends AbstractConfig {
     private static final Logger LOG = LoggerFactory.getLogger(InfinispanConfig.class);
-
-    private final String prefix;
 
     /**
      * Creates a new Infinispan configuration instance and registers configuration entries
-     * with the central {@link ConfigStore}.
+     * with the central configuration store.
      *
      * <p>This constructor automatically registers all Infinispan configuration parameters
      * and their corresponding environment variable mappings. It also sets up the
@@ -110,16 +105,7 @@ public class InfinispanConfig implements Config {
     }
 
     public InfinispanConfig(String prefix) {
-        this.prefix = prefix;
-
-        // First register new configuration modules. This happens only if a prefix is provided
-        InfinispanConfigEntries.register(prefix);
-
-        // Then, loads the configurations from the properties file associated with this Config module
-        ConfigStore.getInstance().load(InfinispanConfig.class, this, this::register);
-
-        // Lastly, load the overrides defined in system properties and environment variables
-        InfinispanConfigEntries.loadOverrides(prefix);
+        super(prefix, InfinispanConfigEntries.class);
     }
 
     /**
@@ -128,7 +114,7 @@ public class InfinispanConfig implements Config {
      * @return the server list in format "host1:port1,host2:port2", defaults to "localhost:11222" if not configured
      */
     public String serverList() {
-        return ConfigStore.getInstance().get(SERVER_LIST.asNamed(prefix)).orElse(SERVER_LIST.defaultValue());
+        return get(SERVER_LIST).orElse(SERVER_LIST.defaultValue());
     }
 
     /**
@@ -137,7 +123,7 @@ public class InfinispanConfig implements Config {
      * @return the cache name, defaults to "chat-memory" if not configured
      */
     public String cacheName() {
-        return ConfigStore.getInstance().get(CACHE_NAME.asNamed(prefix)).orElse(CACHE_NAME.defaultValue());
+        return get(CACHE_NAME).orElse(CACHE_NAME.defaultValue());
     }
 
     /**
@@ -146,7 +132,7 @@ public class InfinispanConfig implements Config {
      * @return the username, or {@code null} if no authentication is required
      */
     public String username() {
-        return ConfigStore.getInstance().get(USERNAME.asNamed(prefix)).orElse(USERNAME.defaultValue());
+        return get(USERNAME).orElse(USERNAME.defaultValue());
     }
 
     /**
@@ -155,7 +141,7 @@ public class InfinispanConfig implements Config {
      * @return the password, or {@code null} if no authentication is required
      */
     public String password() {
-        return ConfigStore.getInstance().get(PASSWORD.asNamed(prefix)).orElse(PASSWORD.defaultValue());
+        return get(PASSWORD).orElse(PASSWORD.defaultValue());
     }
 
     /**
@@ -164,7 +150,7 @@ public class InfinispanConfig implements Config {
      * @return the realm, defaults to "default" if not configured
      */
     public String realm() {
-        return ConfigStore.getInstance().get(REALM.asNamed(prefix)).orElse(REALM.defaultValue());
+        return get(REALM).orElse(REALM.defaultValue());
     }
 
     /**
@@ -173,7 +159,7 @@ public class InfinispanConfig implements Config {
      * @return the SASL mechanism, defaults to "DIGEST-MD5" if not configured
      */
     public String saslMechanism() {
-        return ConfigStore.getInstance().get(SASL_MECHANISM.asNamed(prefix)).orElse(SASL_MECHANISM.defaultValue());
+        return get(SASL_MECHANISM).orElse(SASL_MECHANISM.defaultValue());
     }
 
     /**
@@ -183,8 +169,7 @@ public class InfinispanConfig implements Config {
      * @throws IllegalArgumentException if the configured timeout value is not a valid integer
      */
     public int connectionTimeout() {
-        return ConfigStore.getInstance()
-                .get(CONNECTION_TIMEOUT.asNamed(prefix))
+        return get(CONNECTION_TIMEOUT)
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -202,8 +187,7 @@ public class InfinispanConfig implements Config {
      * @throws IllegalArgumentException if the configured timeout value is not a valid integer
      */
     public int socketTimeout() {
-        return ConfigStore.getInstance()
-                .get(SOCKET_TIMEOUT.asNamed(prefix))
+        return get(SOCKET_TIMEOUT)
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -221,8 +205,7 @@ public class InfinispanConfig implements Config {
      * @throws IllegalArgumentException if the configured value is not a valid integer
      */
     public int maxRetries() {
-        return ConfigStore.getInstance()
-                .get(MAX_RETRIES.asNamed(prefix))
+        return get(MAX_RETRIES)
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -240,8 +223,7 @@ public class InfinispanConfig implements Config {
      * @throws IllegalArgumentException if the configured value is not a valid integer
      */
     public int poolMaxActive() {
-        return ConfigStore.getInstance()
-                .get(POOL_MAX_ACTIVE.asNamed(prefix))
+        return get(POOL_MAX_ACTIVE)
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -259,8 +241,7 @@ public class InfinispanConfig implements Config {
      * @throws IllegalArgumentException if the configured value is not a valid integer
      */
     public int poolMinIdle() {
-        return ConfigStore.getInstance()
-                .get(POOL_MIN_IDLE.asNamed(prefix))
+        return get(POOL_MIN_IDLE)
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -278,8 +259,7 @@ public class InfinispanConfig implements Config {
      * @throws IllegalArgumentException if the configured value is not a valid integer
      */
     public int poolMaxWait() {
-        return ConfigStore.getInstance()
-                .get(POOL_MAX_WAIT.asNamed(prefix))
+        return get(POOL_MAX_WAIT)
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -301,13 +281,6 @@ public class InfinispanConfig implements Config {
     @Override
     public String name() {
         return "forage-memory-infinispan";
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = InfinispanConfigEntries.find(prefix, name);
-
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
     }
 
     public ConfigurationBuilder toConfigurationBuilder() {

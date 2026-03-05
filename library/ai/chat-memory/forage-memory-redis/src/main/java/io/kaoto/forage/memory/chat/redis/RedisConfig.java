@@ -1,9 +1,6 @@
 package io.kaoto.forage.memory.chat.redis;
 
-import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 
 import static io.kaoto.forage.memory.chat.redis.RedisConfigEntries.DATABASE;
 import static io.kaoto.forage.memory.chat.redis.RedisConfigEntries.HOST;
@@ -88,13 +85,11 @@ import static io.kaoto.forage.memory.chat.redis.RedisConfigEntries.TIMEOUT;
  * @see PersistentRedisStore
  * @since 1.0
  */
-public class RedisConfig implements Config {
-
-    private final String prefix;
+public class RedisConfig extends AbstractConfig {
 
     /**
      * Creates a new Redis configuration instance and registers configuration entries
-     * with the central {@link ConfigStore}.
+     * with the central configuration store.
      *
      * <p>This constructor automatically registers all Redis configuration parameters
      * and their corresponding environment variable mappings. It also sets up the
@@ -105,16 +100,7 @@ public class RedisConfig implements Config {
     }
 
     public RedisConfig(String prefix) {
-        this.prefix = prefix;
-
-        // First register new configuration modules. This happens only if a prefix is provided
-        RedisConfigEntries.register(prefix);
-
-        // Then, loads the configurations from the properties file associated with this Config module
-        ConfigStore.getInstance().load(RedisConfig.class, this, this::register);
-
-        // Lastly, load the overrides defined in system properties and environment variables
-        RedisConfigEntries.loadOverrides(prefix);
+        super(prefix, RedisConfigEntries.class);
     }
 
     /**
@@ -123,7 +109,7 @@ public class RedisConfig implements Config {
      * @return the Redis server hostname, defaults to "localhost" if not configured
      */
     public String host() {
-        return ConfigStore.getInstance().get(HOST.asNamed(prefix)).orElse(HOST.defaultValue());
+        return get(HOST).orElse(HOST.defaultValue());
     }
 
     /**
@@ -133,8 +119,7 @@ public class RedisConfig implements Config {
      * @throws NumberFormatException if the configured port value is not a valid integer
      */
     public int port() {
-        return ConfigStore.getInstance()
-                .get(PORT.asNamed(prefix))
+        return get(PORT)
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -151,7 +136,7 @@ public class RedisConfig implements Config {
      * @return the Redis password, or {@code null} if no authentication is required
      */
     public String password() {
-        return ConfigStore.getInstance().get(PASSWORD.asNamed(prefix)).orElse(PASSWORD.defaultValue());
+        return get(PASSWORD).orElse(PASSWORD.defaultValue());
     }
 
     /**
@@ -161,8 +146,7 @@ public class RedisConfig implements Config {
      * @throws NumberFormatException if the configured database value is not a valid integer
      */
     public int database() {
-        return ConfigStore.getInstance()
-                .get(DATABASE.asNamed(prefix))
+        return get(DATABASE)
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -180,8 +164,7 @@ public class RedisConfig implements Config {
      * @throws NumberFormatException if the configured timeout value is not a valid integer
      */
     public int timeout() {
-        return ConfigStore.getInstance()
-                .get(TIMEOUT.asNamed(prefix))
+        return get(TIMEOUT)
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -199,8 +182,7 @@ public class RedisConfig implements Config {
      * @throws IllegalArgumentException if the configured value is not a valid integer
      */
     public int poolMaxTotal() {
-        return ConfigStore.getInstance()
-                .get(POOL_MAX_TOTAL.asNamed(prefix))
+        return get(POOL_MAX_TOTAL)
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -218,8 +200,7 @@ public class RedisConfig implements Config {
      * @throws IllegalArgumentException if the configured value is not a valid integer
      */
     public int poolMaxIdle() {
-        return ConfigStore.getInstance()
-                .get(POOL_MAX_IDLE.asNamed(prefix))
+        return get(POOL_MAX_IDLE)
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -237,8 +218,7 @@ public class RedisConfig implements Config {
      * @throws IllegalArgumentException if the configured value is not a valid integer
      */
     public int poolMinIdle() {
-        return ConfigStore.getInstance()
-                .get(POOL_MIN_IDLE.asNamed(prefix))
+        return get(POOL_MIN_IDLE)
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -256,8 +236,7 @@ public class RedisConfig implements Config {
      * @throws IllegalArgumentException if the configured value is not a valid boolean
      */
     public boolean poolTestOnBorrow() {
-        return ConfigStore.getInstance()
-                .get(POOL_TEST_ON_BORROW.asNamed(prefix))
+        return get(POOL_TEST_ON_BORROW)
                 .map(value -> {
                     if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
                         return Boolean.parseBoolean(value);
@@ -275,8 +254,7 @@ public class RedisConfig implements Config {
      * @throws IllegalArgumentException if the configured value is not a valid boolean
      */
     public boolean poolTestOnReturn() {
-        return ConfigStore.getInstance()
-                .get(POOL_TEST_ON_RETURN.asNamed(prefix))
+        return get(POOL_TEST_ON_RETURN)
                 .map(value -> {
                     if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
                         return Boolean.parseBoolean(value);
@@ -294,8 +272,7 @@ public class RedisConfig implements Config {
      * @throws IllegalArgumentException if the configured value is not a valid boolean
      */
     public boolean poolTestWhileIdle() {
-        return ConfigStore.getInstance()
-                .get(POOL_TEST_WHILE_IDLE.asNamed(prefix))
+        return get(POOL_TEST_WHILE_IDLE)
                 .map(value -> {
                     if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
                         return Boolean.parseBoolean(value);
@@ -313,8 +290,7 @@ public class RedisConfig implements Config {
      * @throws IllegalArgumentException if the configured value is not a valid integer
      */
     public int poolMaxWaitMillis() {
-        return ConfigStore.getInstance()
-                .get(POOL_MAX_WAIT_MILLIS.asNamed(prefix))
+        return get(POOL_MAX_WAIT_MILLIS)
                 .map(value -> {
                     try {
                         return Integer.parseInt(value);
@@ -336,12 +312,5 @@ public class RedisConfig implements Config {
     @Override
     public String name() {
         return "forage-memory-redis";
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = RedisConfigEntries.find(prefix, name);
-
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
     }
 }

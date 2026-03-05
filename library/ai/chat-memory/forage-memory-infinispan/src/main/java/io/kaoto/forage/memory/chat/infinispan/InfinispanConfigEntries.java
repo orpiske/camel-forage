@@ -1,11 +1,6 @@
 package io.kaoto.forage.memory.chat.infinispan;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import io.kaoto.forage.core.util.config.ConfigEntries;
-import io.kaoto.forage.core.util.config.ConfigEntry;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigTag;
 
@@ -119,53 +114,20 @@ public final class InfinispanConfigEntries extends ConfigEntries {
             false,
             ConfigTag.ADVANCED);
 
-    private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
-
     static {
-        init();
-    }
-
-    static void init() {
-        CONFIG_MODULES.put(SERVER_LIST, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(CACHE_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(USERNAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(PASSWORD, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(REALM, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(SASL_MECHANISM, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(CONNECTION_TIMEOUT, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(SOCKET_TIMEOUT, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(MAX_RETRIES, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(POOL_MAX_ACTIVE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(POOL_MIN_IDLE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(POOL_MAX_WAIT, ConfigEntry.fromModule());
-    }
-
-    public static Map<ConfigModule, ConfigEntry> entries() {
-        return Collections.unmodifiableMap(CONFIG_MODULES);
-    }
-
-    public static Optional<ConfigModule> find(String prefix, String name) {
-        return find(CONFIG_MODULES, prefix, name);
-    }
-
-    /**
-     * Registers new known configuration if a prefix is provided (otherwise is ignored)
-     * @param prefix the prefix to register
-     */
-    public static void register(String prefix) {
-        if (prefix != null) {
-            for (Map.Entry<ConfigModule, ConfigEntry> entry : entries().entrySet()) {
-                ConfigModule configModule = entry.getKey().asNamed(prefix);
-                CONFIG_MODULES.put(configModule, ConfigEntry.fromModule());
-            }
-        }
-    }
-
-    /**
-     * Load override configurations (which are defined via environment variables and/or system properties)
-     * @param prefix and optional prefix to use
-     */
-    public static void loadOverrides(String prefix) {
-        load(CONFIG_MODULES, prefix);
+        initModules(
+                InfinispanConfigEntries.class,
+                SERVER_LIST,
+                CACHE_NAME,
+                USERNAME,
+                PASSWORD,
+                REALM,
+                SASL_MECHANISM,
+                CONNECTION_TIMEOUT,
+                SOCKET_TIMEOUT,
+                MAX_RETRIES,
+                POOL_MAX_ACTIVE,
+                POOL_MIN_IDLE,
+                POOL_MAX_WAIT);
     }
 }

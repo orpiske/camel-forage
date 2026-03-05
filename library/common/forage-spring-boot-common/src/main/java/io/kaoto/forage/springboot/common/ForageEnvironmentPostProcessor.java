@@ -117,7 +117,8 @@ public class ForageEnvironmentPostProcessor implements EnvironmentPostProcessor 
                     props.load(is);
                 }
                 if (!props.isEmpty()) {
-                    String sourceName = FILE_SOURCE_PREFIX + path.getFileName();
+                    String sourceName =
+                            FILE_SOURCE_PREFIX + path.toAbsolutePath().normalize();
                     LOG.info("Loaded {} Forage properties from file: {}", props.size(), path);
                     environment.getPropertySources().addLast(new PropertiesPropertySource(sourceName, props));
                 }
@@ -135,7 +136,7 @@ public class ForageEnvironmentPostProcessor implements EnvironmentPostProcessor 
                 props.load(is);
             }
             if (!props.isEmpty()) {
-                String sourceName = sourcePrefix + resource.getFilename();
+                String sourceName = sourcePrefix + resource.getDescription();
                 if (!environment.getPropertySources().contains(sourceName)) {
                     LOG.info("Loaded {} Forage properties from classpath: {}", props.size(), resource.getFilename());
                     environment.getPropertySources().addLast(new PropertiesPropertySource(sourceName, props));

@@ -84,7 +84,7 @@ public class ForageConnectionFactoryAutoConfiguration {
             log.info("Registered default ConnectionFactory bean");
             return connectionFactory;
         }
-        log.debug("No single ConnectionFactory provider found, skipping default creation");
-        return null;
+        throw new IllegalStateException(
+                "Expected exactly one ConnectionFactoryProvider on the classpath, but found " + providers.size());
     }
 }

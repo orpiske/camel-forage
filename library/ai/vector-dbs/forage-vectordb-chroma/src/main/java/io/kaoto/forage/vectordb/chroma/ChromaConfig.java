@@ -1,11 +1,7 @@
 package io.kaoto.forage.vectordb.chroma;
 
 import java.time.Duration;
-import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.core.util.config.MissingConfigException;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 
 import static io.kaoto.forage.vectordb.chroma.ChromaConfigEntries.COLLECTION_NAME;
 import static io.kaoto.forage.vectordb.chroma.ChromaConfigEntries.LOG_REQUESTS;
@@ -54,17 +50,16 @@ import static io.kaoto.forage.vectordb.chroma.ChromaConfigEntries.URL;
  * }</pre>
  *
  * <p>This class automatically registers itself and its configuration parameters with the
- * {@link ConfigStore} during construction, making the configuration values available
+ * {@link io.kaoto.forage.core.util.config.ConfigStore} during construction, making the configuration values available
  * to other components in the framework.
  *
- * @see Config
- * @see ConfigStore
- * @see ConfigModule
+ * @see AbstractConfig
+ * @see io.kaoto.forage.core.util.config.ConfigStore
+ * @see io.kaoto.forage.core.util.config.ConfigModule
  * @since 1.0
  */
-public class ChromaConfig implements Config {
+public class ChromaConfig extends AbstractConfig {
 
-    private final String prefix;
     public static final int DEFAULT_TIMEOUT = 5;
 
     /**
@@ -85,16 +80,7 @@ public class ChromaConfig implements Config {
     }
 
     public ChromaConfig(String prefix) {
-        this.prefix = prefix;
-
-        // First register new configuration modules. This happens only if a prefix is provided
-        ChromaConfigEntries.register(prefix);
-
-        // Then, loads the configurations from the properties file associated with this Config module
-        ConfigStore.getInstance().load(ChromaConfig.class, this, this::register);
-
-        // Lastly, load the overrides defined in system properties and environment variables
-        ChromaConfigEntries.loadOverrides(prefix);
+        super(prefix, ChromaConfigEntries.class);
     }
 
     @Override
@@ -124,12 +110,10 @@ public class ChromaConfig implements Config {
      * </ul>
      *
      * @return the Chroma server URL
-     * @throws MissingConfigException if no URL is configured
+     * @throws io.kaoto.forage.core.util.config.MissingConfigException if no URL is configured
      */
     public String url() {
-        return ConfigStore.getInstance()
-                .get(URL.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing Chroma URL"));
+        return getRequired(URL, "Missing Chroma URL");
     }
 
     /**
@@ -147,12 +131,10 @@ public class ChromaConfig implements Config {
      * </ol>
      *
      * @return the Chroma collection name
-     * @throws MissingConfigException if no collection name is configured
+     * @throws io.kaoto.forage.core.util.config.MissingConfigException if no collection name is configured
      */
     public String collectionName() {
-        return ConfigStore.getInstance()
-                .get(COLLECTION_NAME.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing Chroma collection name"));
+        return getRequired(COLLECTION_NAME, "Missing Chroma collection name");
     }
 
     /**
@@ -174,10 +156,7 @@ public class ChromaConfig implements Config {
      * @return the timeout duration, or null if not configured
      */
     public Duration timeout() {
-        return ConfigStore.getInstance()
-                .get(TIMEOUT.asNamed(prefix))
-                .map(s -> Duration.ofSeconds(Long.parseLong(s)))
-                .orElse(Duration.ofSeconds(DEFAULT_TIMEOUT));
+        return get(TIMEOUT).map(s -> Duration.ofSeconds(Long.parseLong(s))).orElse(Duration.ofSeconds(DEFAULT_TIMEOUT));
     }
 
     /**
@@ -200,10 +179,7 @@ public class ChromaConfig implements Config {
      * @return true if request logging is enabled, false if disabled, null if not configured
      */
     public Boolean logRequests() {
-        return ConfigStore.getInstance()
-                .get(LOG_REQUESTS.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(true);
+        return get(LOG_REQUESTS).map(Boolean::parseBoolean).orElse(true);
     }
 
     /**
@@ -226,16 +202,6 @@ public class ChromaConfig implements Config {
      * @return true if response logging is enabled, false if disabled, null if not configured
      */
     public Boolean logResponses() {
-        return ConfigStore.getInstance()
-                .get(LOG_RESPONSES.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(true);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = ChromaConfigEntries.find(prefix, name);
-
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        return get(LOG_RESPONSES).map(Boolean::parseBoolean).orElse(true);
     }
 }

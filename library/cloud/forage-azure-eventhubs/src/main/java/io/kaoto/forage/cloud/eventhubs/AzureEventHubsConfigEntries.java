@@ -1,11 +1,6 @@
 package io.kaoto.forage.cloud.eventhubs;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import io.kaoto.forage.core.util.config.ConfigEntries;
-import io.kaoto.forage.core.util.config.ConfigEntry;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigTag;
 import com.azure.messaging.eventhubs.EventHubClientBuilder;
@@ -62,38 +57,13 @@ public final class AzureEventHubsConfigEntries extends ConfigEntries {
             false,
             ConfigTag.ADVANCED);
 
-    private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
-
     static {
-        init();
-    }
-
-    static void init() {
-        CONFIG_MODULES.put(CONSUMER_GROUP, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(EVENTHUB_NAME, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(FULLY_QUALIFIED_NAMESPACE, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(PREFETCH_COUNT, ConfigEntry.fromModule());
-        CONFIG_MODULES.put(CUSTOM_ENDPOINT_ADDRESS, ConfigEntry.fromModule());
-    }
-
-    public static Map<ConfigModule, ConfigEntry> entries() {
-        return Collections.unmodifiableMap(CONFIG_MODULES);
-    }
-
-    public static Optional<ConfigModule> find(String prefix, String name) {
-        return find(CONFIG_MODULES, prefix, name);
-    }
-
-    public static void register(String prefix) {
-        if (prefix != null) {
-            for (Map.Entry<ConfigModule, ConfigEntry> entry : entries().entrySet()) {
-                ConfigModule configModule = entry.getKey().asNamed(prefix);
-                CONFIG_MODULES.put(configModule, ConfigEntry.fromModule());
-            }
-        }
-    }
-
-    public static void loadOverrides(String prefix) {
-        load(CONFIG_MODULES, prefix);
+        initModules(
+                AzureEventHubsConfigEntries.class,
+                CONSUMER_GROUP,
+                EVENTHUB_NAME,
+                FULLY_QUALIFIED_NAMESPACE,
+                PREFETCH_COUNT,
+                CUSTOM_ENDPOINT_ADDRESS);
     }
 }

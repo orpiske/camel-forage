@@ -1,10 +1,6 @@
 package io.kaoto.forage.models.chat.localai;
 
-import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
-import io.kaoto.forage.core.util.config.MissingConfigException;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 
 import static io.kaoto.forage.models.chat.localai.LocalAiConfigEntries.API_KEY;
 import static io.kaoto.forage.models.chat.localai.LocalAiConfigEntries.BASE_URL;
@@ -62,14 +58,12 @@ import static io.kaoto.forage.models.chat.localai.LocalAiConfigEntries.USER;
  * LocalAI typically runs locally, but if using authentication, ensure API keys are properly secured.
  * Never commit API keys to version control.
  *
- * @see Config
- * @see ConfigStore
- * @see ConfigModule
+ * @see AbstractConfig
+ * @see io.kaoto.forage.core.util.config.ConfigStore
+ * @see io.kaoto.forage.core.util.config.ConfigModule
  * @since 1.0
  */
-public class LocalAiConfig implements Config {
-
-    private final String prefix;
+public class LocalAiConfig extends AbstractConfig {
 
     /**
      * Constructs a new LocalAiConfig and registers configuration parameters with the ConfigStore.
@@ -79,23 +73,7 @@ public class LocalAiConfig implements Config {
     }
 
     public LocalAiConfig(String prefix) {
-        this.prefix = prefix;
-
-        // First register new configuration modules. This happens only if a prefix is provided
-        LocalAiConfigEntries.register(prefix);
-
-        // Then, loads the configurations from the properties file associated with this Config module
-        ConfigStore.getInstance().load(LocalAiConfig.class, this, this::register);
-
-        // Lastly, load the overrides defined in system properties and environment variables
-        LocalAiConfigEntries.loadOverrides(prefix);
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = LocalAiConfigEntries.find(prefix, name);
-
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
+        super(prefix, LocalAiConfigEntries.class);
     }
 
     /**
@@ -124,7 +102,7 @@ public class LocalAiConfig implements Config {
      * @return the LocalAI API key, or null if not configured
      */
     public String apiKey() {
-        return ConfigStore.getInstance().get(API_KEY.asNamed(prefix)).orElse(null);
+        return get(API_KEY).orElse(null);
     }
 
     /**
@@ -148,12 +126,10 @@ public class LocalAiConfig implements Config {
      * </ol>
      *
      * @return the LocalAI base URL
-     * @throws MissingConfigException if no base URL is configured
+     * @throws io.kaoto.forage.core.util.config.MissingConfigException if no base URL is configured
      */
     public String baseUrl() {
-        return ConfigStore.getInstance()
-                .get(BASE_URL.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing LocalAI base URL"));
+        return getRequired(BASE_URL, "Missing LocalAI base URL");
     }
 
     /**
@@ -173,7 +149,7 @@ public class LocalAiConfig implements Config {
      * @return the model name, or null if not configured
      */
     public String modelName() {
-        return ConfigStore.getInstance().get(MODEL_NAME.asNamed(prefix)).orElse(null);
+        return get(MODEL_NAME).orElse(null);
     }
 
     /**
@@ -187,10 +163,7 @@ public class LocalAiConfig implements Config {
      * @return the temperature value, or null if not configured
      */
     public Double temperature() {
-        return ConfigStore.getInstance()
-                .get(TEMPERATURE.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(TEMPERATURE).map(Double::parseDouble).orElse(null);
     }
 
     /**
@@ -201,10 +174,7 @@ public class LocalAiConfig implements Config {
      * @return the maximum tokens limit, or null if not configured
      */
     public Integer maxTokens() {
-        return ConfigStore.getInstance()
-                .get(MAX_TOKENS.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(MAX_TOKENS).map(Integer::parseInt).orElse(null);
     }
 
     /**
@@ -217,10 +187,7 @@ public class LocalAiConfig implements Config {
      * @return the top-p value, or null if not configured
      */
     public Double topP() {
-        return ConfigStore.getInstance()
-                .get(TOP_P.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(TOP_P).map(Double::parseDouble).orElse(null);
     }
 
     /**
@@ -231,10 +198,7 @@ public class LocalAiConfig implements Config {
      * @return the presence penalty value, or null if not configured
      */
     public Double presencePenalty() {
-        return ConfigStore.getInstance()
-                .get(PRESENCE_PENALTY.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(PRESENCE_PENALTY).map(Double::parseDouble).orElse(null);
     }
 
     /**
@@ -245,10 +209,7 @@ public class LocalAiConfig implements Config {
      * @return the frequency penalty value, or null if not configured
      */
     public Double frequencyPenalty() {
-        return ConfigStore.getInstance()
-                .get(FREQUENCY_PENALTY.asNamed(prefix))
-                .map(Double::parseDouble)
-                .orElse(null);
+        return get(FREQUENCY_PENALTY).map(Double::parseDouble).orElse(null);
     }
 
     /**
@@ -257,10 +218,7 @@ public class LocalAiConfig implements Config {
      * @return the seed value, or null if not configured
      */
     public Long seed() {
-        return ConfigStore.getInstance()
-                .get(SEED.asNamed(prefix))
-                .map(Long::parseLong)
-                .orElse(null);
+        return get(SEED).map(Long::parseLong).orElse(null);
     }
 
     /**
@@ -269,7 +227,7 @@ public class LocalAiConfig implements Config {
      * @return the user identifier, or null if not configured
      */
     public String user() {
-        return ConfigStore.getInstance().get(USER.asNamed(prefix)).orElse(null);
+        return get(USER).orElse(null);
     }
 
     /**
@@ -278,10 +236,7 @@ public class LocalAiConfig implements Config {
      * @return the timeout in seconds, or null if not configured
      */
     public Integer timeoutSeconds() {
-        return ConfigStore.getInstance()
-                .get(TIMEOUT.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(TIMEOUT).map(Integer::parseInt).orElse(null);
     }
 
     /**
@@ -290,10 +245,7 @@ public class LocalAiConfig implements Config {
      * @return the maximum retry attempts, or null if not configured
      */
     public Integer maxRetries() {
-        return ConfigStore.getInstance()
-                .get(MAX_RETRIES.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElse(null);
+        return get(MAX_RETRIES).map(Integer::parseInt).orElse(null);
     }
 
     /**
@@ -302,9 +254,6 @@ public class LocalAiConfig implements Config {
      * @return true if request and response logging is enabled, false if disabled, or null if not configured
      */
     public Boolean logRequestsAndResponses() {
-        return ConfigStore.getInstance()
-                .get(LOG_REQUESTS_AND_RESPONSES.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(null);
+        return get(LOG_REQUESTS_AND_RESPONSES).map(Boolean::parseBoolean).orElse(null);
     }
 }

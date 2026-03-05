@@ -3,10 +3,7 @@ package io.kaoto.forage.vectordb.weaviate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Optional;
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.core.util.config.AbstractConfig;
 import io.kaoto.forage.core.util.config.MissingConfigException;
 
 import static io.kaoto.forage.vectordb.weaviate.WeaviateConfigEntries.API_KEY;
@@ -23,25 +20,14 @@ import static io.kaoto.forage.vectordb.weaviate.WeaviateConfigEntries.SECURED_GR
 import static io.kaoto.forage.vectordb.weaviate.WeaviateConfigEntries.TEXT_FIELD_NAME;
 import static io.kaoto.forage.vectordb.weaviate.WeaviateConfigEntries.USE_GRPC_FOR_INSERTS;
 
-public class WeaviateConfig implements Config {
-
-    private final String prefix;
+public class WeaviateConfig extends AbstractConfig {
 
     public WeaviateConfig() {
         this(null);
     }
 
     public WeaviateConfig(String prefix) {
-        this.prefix = prefix;
-
-        // First register new configuration modules. This happens only if a prefix is provided
-        WeaviateConfigEntries.register(prefix);
-
-        // Then, loads the configurations from the properties file associated with this Config module
-        ConfigStore.getInstance().load(WeaviateConfig.class, this, this::register);
-
-        // Lastly, load the overrides defined in system properties and environment variables
-        WeaviateConfigEntries.loadOverrides(prefix);
+        super(prefix, WeaviateConfigEntries.class);
     }
 
     @Override
@@ -50,81 +36,61 @@ public class WeaviateConfig implements Config {
     }
 
     public String apiKey() {
-        return ConfigStore.getInstance().get(API_KEY.asNamed(prefix)).orElse(null);
+        return get(API_KEY).orElse(null);
     }
 
     public String scheme() {
-        return ConfigStore.getInstance()
-                .get(SCHEME.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing Weaviate scheme"));
+        return getRequired(SCHEME, "Missing Weaviate scheme");
     }
 
     public String host() {
-        return ConfigStore.getInstance()
-                .get(HOST.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing Weaviate host"));
+        return getRequired(HOST, "Missing Weaviate host");
     }
 
     public Integer port() {
-        return ConfigStore.getInstance()
-                .get(PORT.asNamed(prefix))
-                .map(Integer::parseInt)
-                .orElseThrow(() -> new MissingConfigException("Missing Weaviate port"));
+        return get(PORT).map(Integer::parseInt).orElseThrow(() -> new MissingConfigException("Missing Weaviate port"));
     }
 
     public Boolean useGrpcForInserts() {
-        return ConfigStore.getInstance()
-                .get(USE_GRPC_FOR_INSERTS.asNamed(prefix))
+        return get(USE_GRPC_FOR_INSERTS)
                 .map(Boolean::parseBoolean)
                 .orElseThrow(() -> new MissingConfigException("Missing Weaviate use grpc for inserts"));
     }
 
     public Boolean securedGrpc() {
-        return ConfigStore.getInstance()
-                .get(SECURED_GRPC.asNamed(prefix))
+        return get(SECURED_GRPC)
                 .map(Boolean::parseBoolean)
                 .orElseThrow(() -> new MissingConfigException("Missing Weaviate secured grpc"));
     }
 
     public Integer grpcPort() {
-        return ConfigStore.getInstance()
-                .get(GRPC_PORT.asNamed(prefix))
+        return get(GRPC_PORT)
                 .map(Integer::parseInt)
                 .orElseThrow(() -> new MissingConfigException("Missing Weaviate grpc port"));
     }
 
     public String objectClass() {
-        return ConfigStore.getInstance()
-                .get(OBJECT_CLASS.asNamed(prefix))
-                .orElseThrow(() -> new MissingConfigException("Missing Weaviate object class"));
+        return getRequired(OBJECT_CLASS, "Missing Weaviate object class");
     }
 
     public Boolean avoidDups() {
-        return ConfigStore.getInstance()
-                .get(AVOID_DUPS.asNamed(prefix))
-                .map(Boolean::parseBoolean)
-                .orElse(true);
+        return get(AVOID_DUPS).map(Boolean::parseBoolean).orElse(true);
     }
 
     public String consistencyLevel() {
-        return ConfigStore.getInstance().get(CONSISTENCY_LEVEL.asNamed(prefix)).orElse("ALL");
+        return get(CONSISTENCY_LEVEL).orElse("ALL");
     }
 
     public Collection<String> metadataKeys() {
-        return ConfigStore.getInstance()
-                .get(METADATA_KEYS.asNamed(prefix))
-                .map(Arrays::asList)
-                .orElse(Collections.emptyList());
+        return get(METADATA_KEYS).map(Arrays::asList).orElse(Collections.emptyList());
     }
 
     public String textFieldName() {
-        return ConfigStore.getInstance().get(TEXT_FIELD_NAME.asNamed(prefix)).orElse("text");
+        return get(TEXT_FIELD_NAME).orElse("text");
     }
 
     public String metadataFieldName() {
-        return ConfigStore.getInstance()
-                .get(METADATA_FIELD_NAME.asNamed(prefix))
-                .orElse("_metadata");
+        return get(METADATA_FIELD_NAME).orElse("_metadata");
     }
 
     public String toString() {
@@ -139,12 +105,5 @@ public class WeaviateConfig implements Config {
                         objectClass(),
                         avoidDups().toString(),
                         consistencyLevel().toString());
-    }
-
-    @Override
-    public void register(String name, String value) {
-        Optional<ConfigModule> config = WeaviateConfigEntries.find(prefix, name);
-
-        config.ifPresent(module -> ConfigStore.getInstance().set(module, value));
     }
 }
