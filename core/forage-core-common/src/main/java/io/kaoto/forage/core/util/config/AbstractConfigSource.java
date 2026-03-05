@@ -6,8 +6,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 import org.apache.camel.tooling.model.Strings;
 import org.eclipse.microprofile.config.spi.ConfigSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <p>Helper class to implement a {@link org.eclipse.microprofile.config.spi.ConfigSource}.</p>
@@ -15,8 +13,6 @@ import org.slf4j.LoggerFactory;
  * gathering all the configuration properties without need of the conversion/validation logic</p>
  */
 public abstract class AbstractConfigSource implements ConfigSource {
-
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractConfigSource.class);
 
     protected abstract ConfigurationBuilder builder();
 

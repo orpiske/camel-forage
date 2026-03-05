@@ -125,7 +125,7 @@ public class ForageJdbcProcessor {
                             LOG.warn(warnMsg.formatted(m.getName()));
                         }
                     } catch (Exception e) {
-                        // ignore any error
+                        LOG.trace("Error invoking config method", e);
                     }
                 });
     }

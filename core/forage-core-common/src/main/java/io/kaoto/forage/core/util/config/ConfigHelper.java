@@ -180,8 +180,7 @@ public final class ConfigHelper {
         if (classExists) {
             try {
                 Class<?> quarkusClass = Class.forName("io.quarkus.runtime.Application");
-                Method getName =
-                        quarkusClass.getMethod("getName"); // if we can find this method, declare runtime quarkus
+                quarkusClass.getMethod("getName"); // if we can find this method, declare runtime quarkus
                 LOG.info("Quarkus environment detected");
 
                 return true;
@@ -256,18 +255,12 @@ public final class ConfigHelper {
         }
 
         if (input != null) {
-            try {
+            try (InputStream is = input) {
                 Properties props = new Properties();
-                props.load(input);
+                props.load(is);
                 return props;
             } catch (IOException ex) {
                 LOG.error("Failed to load application.properties", ex);
-            } finally {
-                try {
-                    input.close();
-                } catch (IOException ex) {
-                    // Ignore
-                }
             }
         }
 

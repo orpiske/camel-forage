@@ -254,11 +254,9 @@ public class CodeScanner {
             // Find direct child artifactId element (not inside dependencies, parent, etc.)
             NodeList children = root.getChildNodes();
             for (int i = 0; i < children.getLength(); i++) {
-                if (children.item(i) instanceof Element child) {
-                    if ("artifactId".equals(child.getTagName())) {
-                        String foundArtifactId = child.getTextContent().trim();
-                        return artifactId.equals(foundArtifactId);
-                    }
+                if (children.item(i) instanceof Element child && "artifactId".equals(child.getTagName())) {
+                    String foundArtifactId = child.getTextContent().trim();
+                    return artifactId.equals(foundArtifactId);
                 }
             }
 
@@ -557,7 +555,7 @@ public class CodeScanner {
         classDecl.findAll(FieldDeclaration.class).forEach(field -> {
             if (field.isStatic() && field.isFinal()) {
                 field.getVariables().forEach(variable -> {
-                    if (isConfigModuleField(field, variable)) {
+                    if (isConfigModuleField(field)) {
                         ConfigEntry configProp = extractConfigEntry(variable);
                         if (configProp != null) {
                             log.debug("Extracted configuration property: " + configProp.getName());
@@ -572,7 +570,7 @@ public class CodeScanner {
     /**
      * Checks if a field is a ConfigModule field.
      */
-    private boolean isConfigModuleField(FieldDeclaration field, VariableDeclarator variable) {
+    private boolean isConfigModuleField(FieldDeclaration field) {
         // Check if the field type is ConfigModule
         return field.getElementType().asString().equals("ConfigModule")
                 || field.getElementType().asString().endsWith(".ConfigModule");

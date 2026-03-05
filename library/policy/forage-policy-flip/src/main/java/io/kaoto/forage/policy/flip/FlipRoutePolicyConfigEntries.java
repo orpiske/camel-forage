@@ -25,8 +25,6 @@ public final class FlipRoutePolicyConfigEntries extends ConfigEntries {
      */
     public static final String CONFIG_PREFIX = "camel.forage.route.policy";
 
-    private static final String ROUTE_ID_PLACEHOLDER = "<routeId>";
-
     private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new ConcurrentHashMap<>();
 
     private FlipRoutePolicyConfigEntries() {}

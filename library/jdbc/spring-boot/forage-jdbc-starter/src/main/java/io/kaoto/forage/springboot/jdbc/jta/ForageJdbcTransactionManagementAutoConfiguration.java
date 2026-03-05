@@ -11,13 +11,13 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 @ConditionalOnProperty(value = "forage.jdbc.transaction.enabled", havingValue = "true")
 @EnableTransactionManagement
-public class ForageTransactionManagementAutoConfiguration
+public class ForageJdbcTransactionManagementAutoConfiguration
         extends io.kaoto.forage.springboot.common.jta.ForageTransactionManagementAutoConfiguration {
 
-    private static final Logger log = LoggerFactory.getLogger(ForageTransactionManagementAutoConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(ForageJdbcTransactionManagementAutoConfiguration.class);
 
     @PostConstruct
     public void init() {
-        log.info("JDBC ForageTransactionManagementAutoConfiguration initialized - transaction management enabled");
+        log.info("ForageJdbcTransactionManagementAutoConfiguration initialized - transaction management enabled");
     }
 }

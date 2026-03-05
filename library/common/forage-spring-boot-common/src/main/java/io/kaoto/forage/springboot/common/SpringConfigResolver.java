@@ -1,17 +1,9 @@
 package io.kaoto.forage.springboot.common;
 
-import java.util.Collections;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.Environment;
 import io.kaoto.forage.core.util.config.ConfigResolver;
 
@@ -49,26 +41,7 @@ public class SpringConfigResolver implements ConfigResolver {
 
     @Override
     public Set<String> discoverPrefixes(String regexp) {
-        if (!(environment instanceof ConfigurableEnvironment configurableEnv)) {
-            return Collections.emptySet();
-        }
-
-        Pattern pattern = Pattern.compile(regexp);
-        return StreamSupport.stream(configurableEnv.getPropertySources().spliterator(), false)
-                .filter(ps -> ps instanceof EnumerablePropertySource<?>)
-                .flatMap(ps -> {
-                    String[] names = ((EnumerablePropertySource<?>) ps).getPropertyNames();
-                    return java.util.Arrays.stream(names);
-                })
-                .map(key -> {
-                    Matcher m = pattern.matcher(key);
-                    if (m.find()) {
-                        return m.group(1);
-                    }
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+        return SpringPropertyHelper.discoverPrefixes(environment, regexp);
     }
 
     @Override

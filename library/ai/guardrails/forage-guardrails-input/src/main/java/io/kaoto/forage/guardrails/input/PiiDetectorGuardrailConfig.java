@@ -5,6 +5,8 @@ import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 import org.apache.camel.component.langchain4j.agent.api.guardrails.PiiDetectorGuardrail.PiiType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import io.kaoto.forage.core.util.config.Config;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigStore;
@@ -16,6 +18,8 @@ import static io.kaoto.forage.guardrails.input.PiiDetectorGuardrailConfigEntries
  * Configuration class for PII detector guardrail.
  */
 public class PiiDetectorGuardrailConfig implements Config {
+
+    private static final Logger LOG = LoggerFactory.getLogger(PiiDetectorGuardrailConfig.class);
 
     private final String prefix;
 
@@ -55,7 +59,7 @@ public class PiiDetectorGuardrailConfig implements Config {
                     try {
                         types.add(PiiType.valueOf(s.toUpperCase()));
                     } catch (IllegalArgumentException e) {
-                        // Ignore invalid types
+                        LOG.debug("Ignoring unrecognized type: {}", s);
                     }
                 });
 

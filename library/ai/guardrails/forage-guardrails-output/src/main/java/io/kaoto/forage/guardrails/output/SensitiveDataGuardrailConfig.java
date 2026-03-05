@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.Set;
 import org.apache.camel.component.langchain4j.agent.api.guardrails.SensitiveDataOutputGuardrail.Action;
 import org.apache.camel.component.langchain4j.agent.api.guardrails.SensitiveDataOutputGuardrail.SensitiveDataType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import io.kaoto.forage.core.util.config.Config;
 import io.kaoto.forage.core.util.config.ConfigModule;
 import io.kaoto.forage.core.util.config.ConfigStore;
@@ -18,6 +20,8 @@ import static io.kaoto.forage.guardrails.output.SensitiveDataGuardrailConfigEntr
  * Configuration class for sensitive data output guardrail.
  */
 public class SensitiveDataGuardrailConfig implements Config {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SensitiveDataGuardrailConfig.class);
 
     private final String prefix;
 
@@ -57,7 +61,7 @@ public class SensitiveDataGuardrailConfig implements Config {
                     try {
                         types.add(SensitiveDataType.valueOf(s.toUpperCase()));
                     } catch (IllegalArgumentException e) {
-                        // Ignore invalid types
+                        LOG.debug("Ignoring unrecognized type: {}", s);
                     }
                 });
 

@@ -124,8 +124,6 @@ public class ForageDataSourceAutoConfiguration {
 
         ForageDataSource forageDataSource = new ForageDataSource(dataSource, forageIdRepository);
 
-        // Register aggregation and idempotent repos for the default datasource
-        DataSourceFactoryConfig config = new DataSourceFactoryConfig();
         log.info("Registered default DataSource bean");
         return forageDataSource.dataSource();
     }

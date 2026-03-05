@@ -1,23 +1,17 @@
 package io.kaoto.forage.springboot.jdbc;
 
-import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
 import io.kaoto.forage.core.util.config.ConfigHelper;
 import io.kaoto.forage.jdbc.common.JdbcModuleDescriptor;
 import io.kaoto.forage.springboot.common.ForageSpringBootModuleAdapter;
+import io.kaoto.forage.springboot.common.SpringPropertyHelper;
 
 /**
  * Registers Forage JDBC DataSource bean definitions during Spring's configuration class processing phase.
@@ -84,25 +78,7 @@ class ForageJdbcBeanRegistrar implements ImportBeanDefinitionRegistrar, org.spri
     }
 
     private Set<String> discoverPrefixes(JdbcModuleDescriptor descriptor) {
-        if (!(environment instanceof ConfigurableEnvironment configurableEnv)) {
-            return Set.of();
-        }
-
-        Pattern pattern = Pattern.compile(ConfigHelper.getNamedPropertyRegexp(descriptor.modulePrefix()));
-        return StreamSupport.stream(configurableEnv.getPropertySources().spliterator(), false)
-                .filter(ps -> ps instanceof EnumerablePropertySource<?>)
-                .flatMap(ps -> {
-                    String[] names = ((EnumerablePropertySource<?>) ps).getPropertyNames();
-                    return java.util.Arrays.stream(names);
-                })
-                .map(key -> {
-                    Matcher m = pattern.matcher(key);
-                    if (m.find()) {
-                        return m.group(1);
-                    }
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+        return SpringPropertyHelper.discoverPrefixes(
+                environment, ConfigHelper.getNamedPropertyRegexp(descriptor.modulePrefix()));
     }
 }

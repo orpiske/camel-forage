@@ -3,8 +3,6 @@ package io.kaoto.forage.plugin.datasource;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import io.kaoto.forage.core.common.RuntimeType;
 import io.kaoto.forage.jdbc.common.DataSourceFactoryConfig;
 import io.kaoto.forage.jdbc.common.DataSourceFactoryConfigEntries;
@@ -17,7 +15,6 @@ import io.kaoto.forage.plugin.ExportHelper;
  * <p>Adds quarkus or spring-boot runtime dependencies, thus making export command less verbose.
  */
 public class DatasourceExportCustomizer extends AbstractExportCustomizer<DataSourceFactoryConfig> {
-    private static final Logger LOG = LoggerFactory.getLogger(DatasourceExportCustomizer.class);
 
     @Override
     protected final DataSourceFactoryConfig getConfig(String prefix) {

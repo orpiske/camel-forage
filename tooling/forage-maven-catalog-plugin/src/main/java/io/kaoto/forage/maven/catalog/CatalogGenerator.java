@@ -448,7 +448,7 @@ public class CatalogGenerator {
             ConfigurationModule module = new ConfigurationModule();
             module.setArtifactId(component.getArtifactId());
             module.setGroupId(component.getGroupId());
-            module.setPropertiesFile(resolvePropertiesFileForComponent(component, configMappings.classToConfigName));
+            module.setPropertiesFile(resolvePropertiesFileForComponent(component));
             module.setConfigEntries(new ArrayList<>(component.getConfigurationProperties()));
             modules.add(module);
         }
@@ -478,7 +478,7 @@ public class CatalogGenerator {
     /**
      * Resolves the properties file name for a component by looking at its config classes.
      */
-    private String resolvePropertiesFileForComponent(ForageComponent component, Map<String, String> classToConfigName) {
+    private String resolvePropertiesFileForComponent(ForageComponent component) {
         if (component.getConfigClasses() == null || component.getConfigClasses().isEmpty()) {
             return null;
         }

@@ -1,7 +1,6 @@
 package io.kaoto.forage.integration.tests;
 
 import java.util.ArrayList;
-import java.util.Map;
 import org.citrusframework.TestActionBuilder;
 import org.citrusframework.camel.actions.CamelActionBuilder;
 import org.citrusframework.context.TestContext;
@@ -40,7 +39,6 @@ public class IntegrationTestSetupExtension implements BeforeEachCallback, AfterA
     public static final String RUNTIME_PROPERTY = "INTEGRATION_TEST_RUNTIME";
 
     private boolean runBeforeAll = false;
-    private Map<String, Object> variables;
     private final ArrayList<AutoCloseable> closeables = new ArrayList<>();
     private TestContext previousTestContext;
 

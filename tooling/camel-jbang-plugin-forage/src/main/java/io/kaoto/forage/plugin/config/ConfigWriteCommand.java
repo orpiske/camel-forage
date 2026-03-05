@@ -74,10 +74,8 @@ public class ConfigWriteCommand extends CamelCommand {
                 directory = new File(System.getProperty("user.dir"));
             }
 
-            if (!directory.exists()) {
-                if (!directory.mkdirs()) {
-                    return outputError("Failed to create directory: " + directory.getAbsolutePath());
-                }
+            if (!directory.exists() && !directory.mkdirs()) {
+                return outputError("Failed to create directory: " + directory.getAbsolutePath());
             }
 
             if (delete) {

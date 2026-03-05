@@ -265,19 +265,13 @@ public final class ConfigStore {
             Properties props = new Properties();
             if (is != null) {
                 LOG.info("Loading defaults from the forage component");
-                props.load(is);
+                try (InputStream stream = is) {
+                    props.load(stream);
+                }
             }
             return props;
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    // do nothing
-                }
-            }
         }
     }
 

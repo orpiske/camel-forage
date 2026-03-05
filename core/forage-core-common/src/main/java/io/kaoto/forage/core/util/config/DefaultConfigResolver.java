@@ -8,8 +8,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Default configuration resolver that reads from environment variables, system properties,
@@ -30,8 +28,6 @@ import org.slf4j.LoggerFactory;
  * @since 1.1
  */
 public class DefaultConfigResolver implements ConfigResolver {
-
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultConfigResolver.class);
 
     @Override
     public Optional<String> resolve(String propertyName) {

@@ -1,14 +1,8 @@
 package io.kaoto.forage.springboot.common;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -16,8 +10,6 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.Environment;
 import io.kaoto.forage.core.common.AuxiliaryBeanDescriptor;
 import io.kaoto.forage.core.common.BeanProvider;
@@ -76,37 +68,13 @@ public class ForageSpringBootModuleAdapter<C extends Config, P extends BeanProvi
     }
 
     private boolean hasDefaultProperties() {
-        if (!(environment instanceof ConfigurableEnvironment configurableEnv)) {
-            return false;
-        }
-        Pattern pattern = Pattern.compile(ConfigHelper.getDefaultPropertyRegexp(descriptor.modulePrefix()));
-        return StreamSupport.stream(configurableEnv.getPropertySources().spliterator(), false)
-                .filter(ps -> ps instanceof EnumerablePropertySource<?>)
-                .flatMap(ps -> java.util.Arrays.stream(((EnumerablePropertySource<?>) ps).getPropertyNames()))
-                .anyMatch(key -> pattern.matcher(key).find());
+        return SpringPropertyHelper.hasProperties(
+                environment, ConfigHelper.getDefaultPropertyRegexp(descriptor.modulePrefix()));
     }
 
     private Set<String> discoverPrefixes() {
-        if (!(environment instanceof ConfigurableEnvironment configurableEnv)) {
-            return Collections.emptySet();
-        }
-
-        Pattern pattern = Pattern.compile(ConfigHelper.getNamedPropertyRegexp(descriptor.modulePrefix()));
-        return StreamSupport.stream(configurableEnv.getPropertySources().spliterator(), false)
-                .filter(ps -> ps instanceof EnumerablePropertySource<?>)
-                .flatMap(ps -> {
-                    String[] names = ((EnumerablePropertySource<?>) ps).getPropertyNames();
-                    return java.util.Arrays.stream(names);
-                })
-                .map(key -> {
-                    Matcher m = pattern.matcher(key);
-                    if (m.find()) {
-                        return m.group(1);
-                    }
-                    return null;
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+        return SpringPropertyHelper.discoverPrefixes(
+                environment, ConfigHelper.getNamedPropertyRegexp(descriptor.modulePrefix()));
     }
 
     private void registerBeans(BeanDefinitionRegistry registry, Set<String> prefixes) {

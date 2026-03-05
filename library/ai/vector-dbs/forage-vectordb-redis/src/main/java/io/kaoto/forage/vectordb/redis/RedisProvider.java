@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.kaoto.forage.core.ai.EmbeddingStoreProvider;
 import io.kaoto.forage.core.annotations.ForageBean;
-import dev.langchain4j.community.store.embedding.redis.MetricType;
 import dev.langchain4j.community.store.embedding.redis.RedisEmbeddingStore;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
@@ -101,16 +100,8 @@ public class RedisProvider implements EmbeddingStoreProvider {
             builder.metadataKeys(fieldNames);
         }
 
-        // Set distance metric
-        MetricType mt =
-                switch (distanceMetric.toUpperCase()) {
-                    case "L2" -> MetricType.L2;
-                    case "IP" -> MetricType.IP;
-                    default -> {
-                        LOG.warn("Unknown distance metric: {}, using default (COSINE)", distanceMetric);
-                        yield MetricType.COSINE;
-                    }
-                };
+        // TODO: MetricType is computed but RedisEmbeddingStore.Builder does not expose a metricType() setter.
+        //       Once the langchain4j community redis API adds support, apply distanceMetric here.
 
         return builder.build();
     }

@@ -100,7 +100,7 @@ public class TestDataSourceCommand extends CamelCommand {
 
             DataSourceProvider dataSourceProvider = createDataSourceProvider(dbKind, dbClassLoader);
 
-            return testConnection(dataSourceProvider.create(dataSourceName), dataSourceProvider.getTestQuery(), dbKind);
+            return testConnection(dataSourceProvider.create(dataSourceName), dataSourceProvider.getTestQuery());
         } catch (Exception e) {
             if (jsonOutput) {
                 printJsonError(e.getMessage());
@@ -285,7 +285,7 @@ public class TestDataSourceCommand extends CamelCommand {
      * @param dbKind The database kind (e.g., "postgresql", "mysql")
      * @return 0 if connection test successful, 1 otherwise
      */
-    private int testConnection(DataSource dataSource, String testQuery, String dbKind) {
+    private int testConnection(DataSource dataSource, String testQuery) {
         if (!jsonOutput) {
             printer().println("Establishing database connection...");
         }
@@ -429,41 +429,6 @@ public class TestDataSourceCommand extends CamelCommand {
                 }
             }
             return 1;
-        }
-    }
-
-    /**
-     * Safely closes database resources in reverse order of creation.
-     */
-    private void closeResources(ResultSet resultSet, Statement statement, Connection connection) {
-        if (resultSet != null) {
-            try {
-                resultSet.close();
-            } catch (SQLException e) {
-                if (verbose) {
-                    printer().printErr("Warning: Error closing ResultSet", e);
-                }
-            }
-        }
-
-        if (statement != null) {
-            try {
-                statement.close();
-            } catch (SQLException e) {
-                if (verbose) {
-                    printer().printErr("Warning: Error closing Statement", e);
-                }
-            }
-        }
-
-        if (connection != null) {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                if (verbose) {
-                    printer().printErr("Warning: Error closing Connection", e);
-                }
-            }
         }
     }
 
