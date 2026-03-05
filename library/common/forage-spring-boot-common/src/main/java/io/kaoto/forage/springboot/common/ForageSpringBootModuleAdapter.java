@@ -57,14 +57,33 @@ public class ForageSpringBootModuleAdapter<C extends Config, P extends BeanProvi
         if (!prefixes.isEmpty()) {
             LOG.info("Discovered Forage {} configuration prefixes: {}", descriptor.modulePrefix(), prefixes);
             registerBeans(registry, prefixes);
+        } else if (hasDefaultProperties()) {
+            // Single (non-prefixed) configuration: primary bean is created by the
+            // auto-configuration's @Bean method, but auxiliary beans (aggregation repo,
+            // idempotent repo) still need to be registered here.
+            LOG.info(
+                    "Discovered default Forage {} configuration, registering auxiliary beans",
+                    descriptor.modulePrefix());
+            registerAuxiliaryBeans(registry, null);
         } else {
-            LOG.debug("No Forage {} configuration prefixes found", descriptor.modulePrefix());
+            LOG.debug("No Forage {} configuration found", descriptor.modulePrefix());
         }
     }
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         // No-op — all work is done in postProcessBeanDefinitionRegistry
+    }
+
+    private boolean hasDefaultProperties() {
+        if (!(environment instanceof ConfigurableEnvironment configurableEnv)) {
+            return false;
+        }
+        Pattern pattern = Pattern.compile(ConfigHelper.getDefaultPropertyRegexp(descriptor.modulePrefix()));
+        return StreamSupport.stream(configurableEnv.getPropertySources().spliterator(), false)
+                .filter(ps -> ps instanceof EnumerablePropertySource<?>)
+                .flatMap(ps -> java.util.Arrays.stream(((EnumerablePropertySource<?>) ps).getPropertyNames()))
+                .anyMatch(key -> pattern.matcher(key).find());
     }
 
     private Set<String> discoverPrefixes() {
@@ -96,10 +115,15 @@ public class ForageSpringBootModuleAdapter<C extends Config, P extends BeanProvi
         for (String name : prefixes) {
             if (!registry.containsBeanDefinition(name)) {
                 registerPrimaryBean(registry, name, isFirst);
-                isFirst = false;
             } else {
-                LOG.debug("Bean '{}' already defined, skipping", name);
+                LOG.debug("Bean '{}' already defined, skipping primary registration", name);
+                // Still register auxiliary beans even if the primary bean was already
+                // registered (e.g., by ForageJdbcBeanRegistrar during config processing)
+                if (isFirst) {
+                    registerAuxiliaryBeans(registry, name);
+                }
             }
+            isFirst = false;
         }
     }
 
@@ -133,6 +157,18 @@ public class ForageSpringBootModuleAdapter<C extends Config, P extends BeanProvi
                 LOG.info("Registered auxiliary bean definition: {}", aux.name());
             }
         }
+    }
+
+    /**
+     * Creates the primary bean for the given prefix/name using ServiceLoader discovery.
+     * Exposed for use by {@code ImportBeanDefinitionRegistrar} implementations that need
+     * to delegate bean creation to the adapter.
+     *
+     * @param name the configuration prefix or bean name
+     * @return the created bean, or null if no provider is found
+     */
+    public Object createBean(String name) {
+        return createPrimaryBean(name);
     }
 
     private Object createPrimaryBean(String name) {

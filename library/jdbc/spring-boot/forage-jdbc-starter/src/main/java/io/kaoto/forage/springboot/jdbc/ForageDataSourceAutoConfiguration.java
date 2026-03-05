@@ -6,13 +6,19 @@ import java.util.List;
 import java.util.ServiceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import io.agroal.api.AgroalDataSource;
+import io.agroal.springframework.boot.AgroalDataSourceAutoConfiguration;
 import io.kaoto.forage.core.annotations.FactoryType;
 import io.kaoto.forage.core.annotations.FactoryVariant;
 import io.kaoto.forage.core.annotations.ForageFactory;
@@ -47,7 +53,13 @@ import io.kaoto.forage.springboot.common.ForageSpringBootModuleAdapter;
         autowired = true,
         configClass = DataSourceFactoryConfig.class,
         variant = FactoryVariant.SPRING_BOOT)
-@Configuration
+@AutoConfiguration(
+        before = {
+            DataSourceAutoConfiguration.class,
+            DataSourceTransactionManagerAutoConfiguration.class,
+            AgroalDataSourceAutoConfiguration.class
+        })
+@Import(ForageJdbcBeanRegistrar.class)
 public class ForageDataSourceAutoConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(ForageDataSourceAutoConfiguration.class);
@@ -81,32 +93,40 @@ public class ForageDataSourceAutoConfiguration {
     /**
      * Fallback DataSource bean created when exactly one DataSourceProvider is on the classpath
      * and no named/prefixed configurations are found.
+     *
+     * <p>This bean is only registered when:
+     * <ul>
+     *   <li>No "dataSource" bean already exists (e.g., from the module adapter's prefix discovery)</li>
+     *   <li>Exactly one {@link DataSourceProvider} is on the classpath (via {@link SingleDataSourceProviderCondition})</li>
+     * </ul>
+     *
+     * <p>When multiple providers are present (e.g., postgresql + mysql), named/prefixed configurations
+     * must be used instead, and this fallback is skipped to avoid registering a null bean that would
+     * break Spring Boot Actuator's health checks.
      */
     @Bean("dataSource")
     @ConditionalOnMissingBean(name = "dataSource")
+    @Conditional(SingleDataSourceProviderCondition.class)
     public DataSource forageDefaultDataSource() {
         List<ServiceLoader.Provider<DataSourceProvider>> providers =
                 ServiceLoader.load(DataSourceProvider.class).stream().toList();
-        if (providers.size() == 1) {
-            log.info(
-                    "Creating default DataSource using single provider: {}",
-                    providers.get(0).type().getName());
-            DataSourceProvider dsProvider = providers.get(0).get();
-            AgroalDataSource dataSource = (AgroalDataSource) dsProvider.create(null);
 
-            ForageIdRepository forageIdRepository = null;
-            if (dsProvider instanceof ForageIdRepository forageIdRepo) {
-                forageIdRepository = forageIdRepo;
-            }
+        log.info(
+                "Creating default DataSource using single provider: {}",
+                providers.get(0).type().getName());
+        DataSourceProvider dsProvider = providers.get(0).get();
+        AgroalDataSource dataSource = (AgroalDataSource) dsProvider.create(null);
 
-            ForageDataSource forageDataSource = new ForageDataSource(dataSource, forageIdRepository);
-
-            // Register aggregation and idempotent repos for the default datasource
-            DataSourceFactoryConfig config = new DataSourceFactoryConfig();
-            log.info("Registered default DataSource bean");
-            return forageDataSource.dataSource();
+        ForageIdRepository forageIdRepository = null;
+        if (dsProvider instanceof ForageIdRepository forageIdRepo) {
+            forageIdRepository = forageIdRepo;
         }
-        log.debug("No single DataSource provider found, skipping default DataSource creation");
-        return null;
+
+        ForageDataSource forageDataSource = new ForageDataSource(dataSource, forageIdRepository);
+
+        // Register aggregation and idempotent repos for the default datasource
+        DataSourceFactoryConfig config = new DataSourceFactoryConfig();
+        log.info("Registered default DataSource bean");
+        return forageDataSource.dataSource();
     }
 }

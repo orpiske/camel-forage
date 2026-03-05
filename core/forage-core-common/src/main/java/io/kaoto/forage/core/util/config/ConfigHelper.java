@@ -69,6 +69,14 @@ public final class ConfigHelper {
     private static Properties camelConfig = null;
 
     /**
+     * Re-entrancy guard for {@link #getQuarkusConfig()}.
+     * Prevents infinite recursion when {@code ConfigProvider.getConfig()} is called
+     * during SmallRye's own config building phase (which triggers
+     * {@link io.kaoto.forage.core.common.ForageQuarkusConfigSourceAdapter}).
+     */
+    private static final ThreadLocal<Boolean> quarkusConfigBuilding = ThreadLocal.withInitial(() -> false);
+
+    /**
      * @deprecated Runtime detection is now handled by the {@link ConfigResolver} chain.
      *     Use {@link ConfigStore#registerResolver(ConfigResolver)} to plug in runtime-specific resolvers.
      */
@@ -204,9 +212,21 @@ public final class ConfigHelper {
     }
 
     private static SmallRyeConfig getQuarkusConfig() {
+        if (quarkusConfigBuilding.get()) {
+            // We are already inside ConfigProvider.getConfig() on this thread
+            // (e.g., triggered by ForageQuarkusConfigSourceAdapter).
+            // Returning null prevents infinite recursion; the caller will fall
+            // back to env vars / system props / properties files.
+            return null;
+        }
         if (quarkusConfig == null) {
-            quarkusConfig = (SmallRyeConfig)
-                    org.eclipse.microprofile.config.ConfigProvider.getConfig().unwrap(SmallRyeConfig.class);
+            quarkusConfigBuilding.set(true);
+            try {
+                quarkusConfig = (SmallRyeConfig) org.eclipse.microprofile.config.ConfigProvider.getConfig()
+                        .unwrap(SmallRyeConfig.class);
+            } finally {
+                quarkusConfigBuilding.set(false);
+            }
         }
         return quarkusConfig;
     }
