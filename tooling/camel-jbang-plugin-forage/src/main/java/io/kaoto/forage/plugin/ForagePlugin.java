@@ -15,8 +15,6 @@ import io.kaoto.forage.core.common.RuntimeType;
 import io.kaoto.forage.plugin.config.ConfigCommand;
 import io.kaoto.forage.plugin.config.ConfigReadCommand;
 import io.kaoto.forage.plugin.config.ConfigWriteCommand;
-import io.kaoto.forage.plugin.datasource.DataSourceCommand;
-import io.kaoto.forage.plugin.datasource.TestDataSourceCommand;
 import picocli.CommandLine;
 
 @CamelJBangPlugin(name = "camel-jbang-plugin-forage", firstVersion = "4.16.0")
@@ -32,11 +30,6 @@ public class ForagePlugin implements Plugin {
                                 new CommandLine(new ConfigCommand(main))
                                         .addSubcommand("read", new CommandLine(new ConfigReadCommand(main)))
                                         .addSubcommand("write", new CommandLine(new ConfigWriteCommand(main))))
-                        .addSubcommand(
-                                "datasource",
-                                new CommandLine(new DataSourceCommand(main))
-                                        .addSubcommand(
-                                                "test-connection", new CommandLine(new TestDataSourceCommand(main))))
                         .addSubcommand("export", new Export(main))
                         .addSubcommand("run", new ForageRun(main)));
     }

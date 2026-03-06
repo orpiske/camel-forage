@@ -20,7 +20,11 @@ import com.ibm.msg.client.jakarta.wmq.common.CommonConstants;
         value = "ibmmq",
         components = {"camel-jms"},
         description = "IBM MQ message broker",
-        feature = "jakarta.jms.ConnectionFactory")
+        feature = "jakarta.jms.ConnectionFactory",
+        runtimeDependencies = {
+            "quarkus:mvn:org.apache.camel.quarkus:camel-quarkus-jta",
+            "quarkus:mvn:io.quarkiverse.messaginghub:quarkus-pooled-jms"
+        })
 public class IbmMqJms extends PooledConnectionFactory {
 
     @Override
