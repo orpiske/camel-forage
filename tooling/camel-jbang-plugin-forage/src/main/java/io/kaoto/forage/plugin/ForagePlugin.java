@@ -38,7 +38,7 @@ public class ForagePlugin implements Plugin {
      * Exporter is used to add runtime dependencies for both `forage run` and `forage export`
      */
     @Override
-    public Optional<org.apache.camel.dsl.jbang.core.common.PluginExporter> getExporter() {
+    public Optional<PluginExporter> getExporter() {
         return Optional.of(new PluginExporter() {
             @Override
             public Set<String> getDependencies(org.apache.camel.dsl.jbang.core.common.RuntimeType runtimeType) {

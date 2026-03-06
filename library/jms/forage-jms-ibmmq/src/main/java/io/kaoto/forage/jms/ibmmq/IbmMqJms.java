@@ -76,7 +76,7 @@ public class IbmMqJms extends PooledConnectionFactory {
     private String[] parseBrokerUrl(String brokerUrl) {
         // Expected format: mq://host:port/channel/queueManager
         try {
-            java.net.URI uri = new java.net.URI(brokerUrl);
+            URI uri = new URI(brokerUrl);
 
             String host = uri.getHost();
             if (host == null || host.isEmpty()) {

@@ -166,7 +166,7 @@ public class CatalogGenerator {
 
         CollectedData data = collectDataFromComponents(components, configMappings, projectProperties);
 
-        associateBeansWithFactories(data, configMappings.classToConfigName, projectProperties);
+        associateBeansWithFactories(data, configMappings.classToConfigName);
         associateConfigEntriesWithFactories(data, configMappings.classToArtifactId);
 
         return new ArrayList<>(data.factoryMap.values());
@@ -327,8 +327,7 @@ public class CatalogGenerator {
     /**
      * Associates beans with their corresponding factories.
      */
-    private void associateBeansWithFactories(
-            CollectedData data, Map<String, String> classToConfigName, Properties projectProperties) {
+    private void associateBeansWithFactories(CollectedData data, Map<String, String> classToConfigName) {
         for (ForageFactory factory : data.factoryMap.values()) {
             if (factory.getComponents() == null) {
                 continue;
@@ -532,8 +531,6 @@ public class CatalogGenerator {
      * regardless of whether they are associated with a factory.
      */
     List<File> generateConfigurationCatalog(List<ForageComponent> components, File outputDirectory) throws IOException {
-        ConfigMappings configMappings = collectConfigMappings(components);
-
         List<ConfigurationModule> modules = new ArrayList<>();
 
         for (ForageComponent component : components) {
