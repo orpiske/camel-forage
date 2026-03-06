@@ -24,7 +24,7 @@ The `forage-agent-factories` module provides the `MultiAgentFactory` implementat
 <dependency>
     <groupId>io.kaoto.forage</groupId>
     <artifactId>forage-agent-factories</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -32,7 +32,7 @@ The `forage-agent-factories` module provides the `MultiAgentFactory` implementat
 
 ```java
 from("direct:chat")
-    .to("langchain4j-agent:my-agent?agentFactory=#class:io.kaoto.forage.agent.factory.MultiAgentFactory")
+    .to("langchain4j-agent:my-agent?agent=#myAgent")
     .log("Response: ${body}");
 ```
 
@@ -45,28 +45,28 @@ For a working setup, include these dependencies:
 <dependency>
     <groupId>io.kaoto.forage</groupId>
     <artifactId>forage-agent-factories</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
 </dependency>
 
 <!-- Agent implementation -->
 <dependency>
     <groupId>io.kaoto.forage</groupId>
     <artifactId>forage-agent</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
 </dependency>
 
 <!-- Model provider -->
 <dependency>
     <groupId>io.kaoto.forage</groupId>
-    <artifactId>forage-model-openai</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>forage-model-open-ai</artifactId>
+    <version>1.1-SNAPSHOT</version>
 </dependency>
 
 <!-- Memory provider (optional) -->
 <dependency>
     <groupId>io.kaoto.forage</groupId>
     <artifactId>forage-memory-message-window</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -126,6 +126,20 @@ The factories automatically configure agents with:
 - **Retrieval Augmentor**: Configured through the agent if supported
 - **Guardrails**: Configured through the agent if supported
 - **Multi-Agent Coordination**: Agent selectors and orchestration (MultiAgentFactory)
+
+### Properties File Configuration
+
+Agent configuration is specified in `forage-agent-factory.properties` (or `application.properties` for Spring Boot):
+
+```properties
+# forage-agent-factory.properties
+forage.foo.agent.model.kind=google-gemini
+forage.foo.agent.model.name=gemini-2.5-flash-lite
+forage.foo.agent.api.key=<my-api-key>
+forage.foo.agent.features=memory
+forage.foo.agent.memory.kind=message-window
+forage.foo.agent.memory.max.messages=20
+```
 
 ## Error Handling
 

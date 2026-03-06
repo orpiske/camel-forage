@@ -26,25 +26,19 @@ Add the desired modules to your project. For example, to use the default agent f
 <dependency>
     <groupId>io.kaoto.forage</groupId>
     <artifactId>forage-model-open-ai</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
 </dependency>
 <!--This component provides support for the message window chat memory -->
 <dependency>
     <groupId>io.kaoto.forage</groupId>
     <artifactId>forage-memory-message-window</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
 </dependency>
-<!--This component adds agent factories for single and multi-agent systems -->
-<dependency>
-    <groupId>io.kaoto.forage</groupId>
-    <artifactId>forage-agent-factories</artifactId>
-    <version>1.0-SNAPSHOT</version>
-</dependency>
-<!--This component adds the composable agent implementation -->
+<!--This component adds the composable agent implementation (pulls in agent factories transitively) -->
 <dependency>
     <groupId>io.kaoto.forage</groupId>
     <artifactId>forage-agent</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -54,10 +48,10 @@ Simply reference the bean class in your Camel route:
 
 ```java
 from("direct:start")
-    .to("langchain4j-agent:test-memory-agent?agentFactory=#class:io.kaoto.forage.agent.factory.MultiAgentFactory");
+    .to("langchain4j-agent:agent?agent=#ollama");
 ```
 
-The `io.kaoto.forage.agent.factory.MultiAgentFactory` class is a factory that builds AI agents automatically based on the dependencies available on the classpath and configured through properties. It supports both single-agent and multi-agent configurations.
+The `agent` parameter references a named bean configured via properties. In this example, `#ollama` refers to an Ollama model bean that is automatically discovered and configured through Forage's property-based configuration system.
 
 ## Available Modules
 
@@ -104,8 +98,7 @@ Forage provides JDBC data source factories that simplify database connectivity w
 #### Available JDBC Modules
 
 - **forage-jdbc** - Core pooled JDBC functionality
-- **forage-jdbc-factories** - Data source factory implementations
-- **forage-jdbc-postgres** - PostgreSQL data source provider
+- **forage-jdbc-postgresql** - PostgreSQL data source provider
 - **forage-jdbc-mysql** - MySQL data source provider  
 - **forage-jdbc-mariadb** - MariaDB data source provider
 - **forage-jdbc-oracle** - Oracle data source provider
@@ -119,24 +112,22 @@ Forage provides JDBC data source factories that simplify database connectivity w
 All JDBC modules support the following configuration properties with a flexible precedence hierarchy (environment variables → system properties → configuration files → defaults):
 
 **Database Connection:**
-- `jdbc.url` - JDBC connection URL (required)
-- `jdbc.username` - Database username (required)
-- `jdbc.password` - Database password (required)
+- `forage.jdbc.db.kind` - Database kind (required, e.g., `postgresql`, `mysql`)
+- `forage.jdbc.url` - JDBC connection URL (required)
+- `forage.jdbc.username` - Database username (required)
+- `forage.jdbc.password` - Database password (required)
 
 **Connection Pool Settings:**
-- `jdbc.pool.initial.size` - Initial pool size (default: 5)
-- `jdbc.pool.min.size` - Minimum pool size (default: 2)
-- `jdbc.pool.max.size` - Maximum pool size (default: 20)
-- `jdbc.pool.acquisition.timeout.seconds` - Connection acquisition timeout (default: 5)
-- `jdbc.pool.validation.timeout.seconds` - Connection validation timeout (default: 3)
-- `jdbc.pool.leak.timeout.minutes` - Connection leak detection timeout (default: 10)
-- `jdbc.pool.idle.validation.timeout.minutes` - Idle connection validation timeout (default: 3)
+- `forage.jdbc.pool.initial.size` - Initial pool size (default: 5)
+- `forage.jdbc.pool.min.size` - Minimum pool size (default: 2)
+- `forage.jdbc.pool.max.size` - Maximum pool size (default: 20)
+- `forage.jdbc.pool.acquisition.timeout.seconds` - Connection acquisition timeout (default: 5)
+- `forage.jdbc.pool.validation.timeout.seconds` - Connection validation timeout (default: 3)
+- `forage.jdbc.pool.leak.timeout.minutes` - Connection leak detection timeout (default: 10)
+- `forage.jdbc.pool.idle.validation.timeout.minutes` - Idle connection validation timeout (default: 3)
 
 **Transaction Settings:**
-- `jdbc.transaction.timeout.seconds` - Transaction timeout (default: 30)
-
-**Provider Configuration:**
-- `provider.datasource.class` - DataSource implementation class (auto-detected based on dependencies)
+- `forage.jdbc.transaction.timeout.seconds` - Transaction timeout (default: 30)
 
 #### Quick Start with PostgreSQL
 
@@ -149,13 +140,13 @@ camel infra run postgres
 ```xml
 <dependency>
     <groupId>io.kaoto.forage</groupId>
-    <artifactId>forage-jdbc-factories</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>forage-jdbc</artifactId>
+    <version>1.1-SNAPSHOT</version>
 </dependency>
 <dependency>
     <groupId>io.kaoto.forage</groupId>
-    <artifactId>forage-jdbc-postgres</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>forage-jdbc-postgresql</artifactId>
+    <version>1.1-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -168,7 +159,7 @@ public class Test extends RouteBuilder {
     @Override
     public void configure() throws Exception {
         from("timer:java?period=1000")
-                .to("sql:select * from acme?dataSourceFactory=#class:io.kaoto.forage.jdbc.factory.DefaultDataSourceFactory")
+                .to("sql:select * from acme")
                 .log("${body}");
     }
 }
@@ -177,8 +168,8 @@ public class Test extends RouteBuilder {
 4. **Run with JBang:**
 ```bash
 camel run Test.java \
-  --dep=mvn:io.kaoto.forage:forage-jdbc-factories:1.0-SNAPSHOT \
-  --dep=mvn:io.kaoto.forage:forage-jdbc-postgres:1.0-SNAPSHOT
+  --dep=mvn:io.kaoto.forage:forage-jdbc:1.1-SNAPSHOT \
+  --dep=mvn:io.kaoto.forage:forage-jdbc-postgresql:1.1-SNAPSHOT
 ```
 
 This provides a fully configured, pooled data source out-of-the-box with sensible defaults.
@@ -187,26 +178,26 @@ This provides a fully configured, pooled data source out-of-the-box with sensibl
 
 **Environment Variables:**
 ```bash
-export JDBC_URL="jdbc:postgresql://localhost:5432/mydb"
-export JDBC_USERNAME="myuser"
-export JDBC_PASSWORD="mypassword"
-export JDBC_POOL_MAX_SIZE="50"
+export FORAGE_JDBC_URL="jdbc:postgresql://localhost:5432/mydb"
+export FORAGE_JDBC_USERNAME="myuser"
+export FORAGE_JDBC_PASSWORD="mypassword"
+export FORAGE_JDBC_POOL_MAX_SIZE="50"
 ```
 
 **System Properties:**
 ```bash
--Djdbc.url=jdbc:postgresql://localhost:5432/mydb
--Djdbc.username=myuser
--Djdbc.password=mypassword
--Djdbc.pool.max.size=50
+-Dforage.jdbc.url=jdbc:postgresql://localhost:5432/mydb
+-Dforage.jdbc.username=myuser
+-Dforage.jdbc.password=mypassword
+-Dforage.jdbc.pool.max.size=50
 ```
 
 **Configuration File (forage-datasource-factory.properties):**
 ```properties
-jdbc.url=jdbc:postgresql://localhost:5432/mydb
-jdbc.username=myuser
-jdbc.password=mypassword
-jdbc.pool.max.size=50
+forage.jdbc.url=jdbc:postgresql://localhost:5432/mydb
+forage.jdbc.username=myuser
+forage.jdbc.password=mypassword
+forage.jdbc.pool.max.size=50
 ```
 
 ## Configuration
@@ -232,20 +223,20 @@ For immediate setup, here are minimal configuration examples:
 
 #### OpenAI
 ```bash
-export OPENAI_API_KEY="sk-your-api-key-here"
-export OPENAI_MODEL_NAME="gpt-4"  # Optional, defaults to gpt-3.5-turbo
+export FORAGE_OPENAI_API_KEY="sk-your-api-key-here"
+export FORAGE_OPENAI_MODEL_NAME="gpt-4"  # Optional, defaults to gpt-3.5-turbo
 ```
 
 #### Google Gemini
 ```bash
-export GOOGLE_API_KEY="your-google-api-key"
-export GOOGLE_MODEL_NAME="gemini-pro"
+export FORAGE_GOOGLE_API_KEY="your-google-api-key"
+export FORAGE_GOOGLE_MODEL_NAME="gemini-pro"
 ```
 
 #### Ollama
 ```bash
-export OLLAMA_BASE_URL="http://localhost:11434"  # Optional, this is the default
-export OLLAMA_MODEL_NAME="llama3"                # Optional, this is the default
+export FORAGE_OLLAMA_BASE_URL="http://localhost:11434"  # Optional, this is the default
+export FORAGE_OLLAMA_MODEL_NAME="llama3"                # Optional, this is the default
 ```
 
 ## Architecture
@@ -268,7 +259,7 @@ Example for a memory-less agent.
 ```java
 from("timer:ai?period=30000")
     .setBody(constant("Tell me a joke"))
-    .to("langchain4j-agent:joke-agent?agentFactory=#class:io.kaoto.forage.agent.factory.MultiAgentFactory")
+    .to("langchain4j-agent:agent?agent=#ollama")
     .log("AI Response: ${body}");
 ```
 
@@ -279,7 +270,7 @@ public class MyRoutes extends RouteBuilder {
     @Override
     public void configure() throws Exception {
         from("direct:chat")
-            .to("langchain4j-agent:chat-agent?agentFactory=#class:io.kaoto.forage.agent.factory.MultiAgentFactory")
+            .to("langchain4j-agent:agent?agent=#ollama")
             .log("Chat response: ${body}");
     }
 }

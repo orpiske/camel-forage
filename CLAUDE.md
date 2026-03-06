@@ -101,14 +101,14 @@ public interface BeanProvider<T> {
 
 **@ForageBean** - Required on all provider classes:
 ```java
-@ForageBean(value = "provider-name", component = "camel-langchain4j-agent", description = "Description")
+@ForageBean(value = "provider-name", components = {"camel-langchain4j-agent"}, description = "Description")
 public class MyProvider implements ModelProvider { ... }
 ```
 
 **@ForageFactory** - Required on all factory classes:
 ```java
-@ForageFactory(value = "factory-name", component = "camel-langchain4j-agent",
-               description = "Description", factoryType = "Agent")
+@ForageFactory(value = "factory-name", components = {"camel-langchain4j-agent"},
+               description = "Description", type = FactoryType.AGENT)
 public class MyFactory implements AgentFactory { ... }
 ```
 
@@ -168,7 +168,7 @@ Create `META-INF/services/<interface-name>` files listing implementation classes
 
 ## Naming Conventions
 
-- **Artifacts**: `forage-<category>-<technology>` (e.g., `forage-model-openai`)
+- **Artifacts**: `forage-<category>-<technology>` (e.g., `forage-model-open-ai`)
 - **Packages**: `io.kaoto.forage.<category>.<technology>`
 - **Config env vars**: `FORAGE_<TECHNOLOGY>_<PROPERTY>` (e.g., `FORAGE_OPENAI_API_KEY`)
 - **Config properties**: `forage.<technology>.<property>` (e.g., `forage.openai.api.key`)

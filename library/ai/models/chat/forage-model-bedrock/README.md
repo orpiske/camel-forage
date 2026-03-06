@@ -172,7 +172,7 @@ Bedrock models require opt-in before use:
 
 ```java
 from("direct:chat")
-    .to("langchain4j-agent:bedrock?agentFactory=#class:io.kaoto.forage.agent.factory.MultiAgentFactory")
+    .to("langchain4j-agent:bedrock?agent=#bedrock")
     .log("Response: ${body}");
 ```
 
@@ -184,11 +184,11 @@ System.setProperty("advanced.bedrock.model.id", "anthropic.claude-3-5-sonnet-202
 
 from("direct:fast-chat")
     .setHeader("agentId", constant("fast"))
-    .to("langchain4j-agent:fast?agentFactory=#class:io.kaoto.forage.agent.factory.MultiAgentFactory");
+    .to("langchain4j-agent:fast?agent=#fast");
 
 from("direct:advanced-chat")
     .setHeader("agentId", constant("advanced"))
-    .to("langchain4j-agent:advanced?agentFactory=#class:io.kaoto.forage.agent.factory.MultiAgentFactory");
+    .to("langchain4j-agent:advanced?agent=#advanced");
 ```
 
 ### Using BedrockModelId Enum

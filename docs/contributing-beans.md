@@ -72,7 +72,7 @@ Create a core component that contains the foundational interfaces:
 
 ```
 core/forage-vector-db/
-├── src/main/java/org/apache/camel/forage/core/vector/db/
+├── src/main/java/io/kaoto/forage/core/vector/db/
 │   ├── VectorDBFactory.java          # Factory interface
 │   └── VectorDBProvider.java         # Provider interface
 └── pom.xml
@@ -109,7 +109,7 @@ Create a common component with default implementations:
 
 ```
 library/vector-dbs/forage-default-vector-db-factory/
-├── src/main/java/org/apache/camel/forage/vector/db/
+├── src/main/java/io/kaoto/forage/vector/db/
 │   └── DefaultVectorDBFactory.java   # Default factory implementation
 └── pom.xml
 ```
@@ -148,7 +148,7 @@ Create specific provider implementations for each technology:
 
 ```
 library/vector-dbs/forage-milvus/
-├── src/main/java/org/apache/camel/forage/vector/db/milvus/
+├── src/main/java/io/kaoto/forage/vector/db/milvus/
 │   ├── MilvusProvider.java            # Provider implementation
 │   └── MilvusConfig.java              # Configuration class
 ├── src/main/resources/META-INF/services/
@@ -165,7 +165,7 @@ package io.kaoto.forage.vector.db.milvus;
 import io.kaoto.forage.core.vector.db.VectorDBProvider;
 import io.kaoto.forage.core.annotations.ForageBean;
 
-@ForageBean(value = "milvus", component = "camel-langchain4j-embeddings", description = "Milvus vector database provider")
+@ForageBean(value = "milvus", components = {"camel-langchain4j-embeddings"}, description = "Milvus vector database provider")
 public class MilvusProvider implements VectorDBProvider {
     
     @Override
@@ -190,38 +190,26 @@ Configuration in Forage uses a two-class pattern supporting named/prefixed confi
 ```java
 package io.kaoto.forage.vector.db.milvus;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import io.kaoto.forage.core.util.config.ConfigEntries;
-import io.kaoto.forage.core.util.config.ConfigEntry;
 import io.kaoto.forage.core.util.config.ConfigModule;
+import io.kaoto.forage.core.util.config.ConfigTag;
 
 public final class MilvusConfigEntries extends ConfigEntries {
-    public static final ConfigModule HOST = ConfigModule.of(MilvusConfig.class, "milvus.host");
-    public static final ConfigModule PORT = ConfigModule.of(MilvusConfig.class, "milvus.port");
-    public static final ConfigModule USERNAME = ConfigModule.of(MilvusConfig.class, "milvus.username");
-    public static final ConfigModule PASSWORD = ConfigModule.of(MilvusConfig.class, "milvus.password");
-
-    private static final Map<ConfigModule, ConfigEntry> CONFIG_MODULES = new HashMap<>();
+    public static final ConfigModule HOST = ConfigModule.of(
+            MilvusConfig.class, "forage.milvus.host",
+            "Milvus server host", "Host", "localhost", "string", false, ConfigTag.COMMON);
+    public static final ConfigModule PORT = ConfigModule.of(
+            MilvusConfig.class, "forage.milvus.port",
+            "Milvus server port", "Port", "19530", "integer", false, ConfigTag.COMMON);
+    public static final ConfigModule USERNAME = ConfigModule.of(
+            MilvusConfig.class, "forage.milvus.username",
+            "Username for authentication", "Username", null, "string", false, ConfigTag.COMMON);
+    public static final ConfigModule PASSWORD = ConfigModule.of(
+            MilvusConfig.class, "forage.milvus.password",
+            "Password for authentication", "Password", null, "string", true, ConfigTag.COMMON);
 
     static {
-        CONFIG_MODULES.put(HOST, ConfigEntry.fromModule(HOST, "MILVUS_HOST"));
-        CONFIG_MODULES.put(PORT, ConfigEntry.fromModule(PORT, "MILVUS_PORT"));
-        CONFIG_MODULES.put(USERNAME, ConfigEntry.fromModule(USERNAME, "MILVUS_USERNAME"));
-        CONFIG_MODULES.put(PASSWORD, ConfigEntry.fromModule(PASSWORD, "MILVUS_PASSWORD"));
-    }
-
-    public static Map<ConfigModule, ConfigEntry> entries() {
-        return Collections.unmodifiableMap(CONFIG_MODULES);
-    }
-
-    public static ConfigModule find(String prefix, String name) {
-        return find(CONFIG_MODULES, prefix, name);
-    }
-
-    public static void register(String prefix) {
-        register(CONFIG_MODULES, prefix);
+        initModules(MilvusConfigEntries.class, HOST, PORT, USERNAME, PASSWORD);
     }
 }
 ```
@@ -230,86 +218,42 @@ public final class MilvusConfigEntries extends ConfigEntries {
 ```java
 package io.kaoto.forage.vector.db.milvus;
 
+import io.kaoto.forage.core.util.config.AbstractConfig;
+
 import static io.kaoto.forage.vector.db.milvus.MilvusConfigEntries.HOST;
 import static io.kaoto.forage.vector.db.milvus.MilvusConfigEntries.PORT;
 import static io.kaoto.forage.vector.db.milvus.MilvusConfigEntries.USERNAME;
 import static io.kaoto.forage.vector.db.milvus.MilvusConfigEntries.PASSWORD;
 
-import io.kaoto.forage.core.util.config.Config;
-import io.kaoto.forage.core.util.config.ConfigModule;
-import io.kaoto.forage.core.util.config.ConfigStore;
+public class MilvusConfig extends AbstractConfig {
 
-/**
- * Configuration class for Milvus vector database integration.
- * 
- * <p>Supports both default and named configurations for multi-instance setups.
- * 
- * <p><strong>Configuration Parameters:</strong>
- * <ul>
- *   <li><strong>MILVUS_HOST</strong> - Milvus server host (default: "localhost")</li>
- *   <li><strong>MILVUS_PORT</strong> - Milvus server port (default: 19530)</li>
- *   <li><strong>MILVUS_USERNAME</strong> - Username for authentication (optional)</li>
- *   <li><strong>MILVUS_PASSWORD</strong> - Password for authentication (optional)</li>
- * </ul>
- * 
- * <p><strong>Named Configuration Example:</strong>
- * <pre>{@code
- * // Default configuration
- * MilvusConfig defaultConfig = new MilvusConfig();
- * 
- * // Named configurations
- * MilvusConfig vectorStoreConfig = new MilvusConfig("vectorstore");
- * MilvusConfig embeddingsConfig = new MilvusConfig("embeddings");
- * }</pre>
- */
-public class MilvusConfig implements Config {
-    
-    private static final String DEFAULT_HOST = "localhost";
-    private static final Integer DEFAULT_PORT = 19530;
-    private final String prefix;
-    
     public MilvusConfig() {
         this(null);
     }
-    
+
     public MilvusConfig(String prefix) {
-        this.prefix = prefix;
-        
-        MilvusConfigEntries.register(prefix);
-        ConfigStore.getInstance().add(MilvusConfig.class, this, this::register);
+        super(prefix, MilvusConfigEntries.class);
     }
-    
-    private ConfigModule resolve(String name) {
-        return MilvusConfigEntries.find(prefix, name);
-    }
-    
-    @Override
-    public void register(String name, String value) {
-        ConfigModule config = resolve(name);
-        ConfigStore.getInstance().set(config, value);
-    }
-    
+
     @Override
     public String name() {
         return "forage-vector-db-milvus";
     }
-    
+
     public String host() {
-        return ConfigStore.getInstance().get(HOST.asNamed(prefix)).orElse(DEFAULT_HOST);
+        return get(HOST).orElse(HOST.defaultValue());
     }
-    
+
     public Integer port() {
-        return ConfigStore.getInstance().get(PORT.asNamed(prefix))
-            .map(Integer::parseInt)
-            .orElse(DEFAULT_PORT);
+        return get(PORT).map(Integer::parseInt).orElse(Integer.parseInt(PORT.defaultValue()));
     }
-    
+
     public String username() {
-        return ConfigStore.getInstance().get(USERNAME.asNamed(prefix)).orElse(null);
+        return get(USERNAME).orElse(null);
     }
-    
+
     public String password() {
-        return ConfigStore.getInstance().get(PASSWORD.asNamed(prefix)).orElse(null);
+        return get(PASSWORD).orElse(null);
     }
 }
 ```
@@ -336,7 +280,7 @@ io.kaoto.forage.vector.db.milvus.MilvusProvider
     <parent>
         <groupId>io.kaoto.forage</groupId>
         <artifactId>vector-dbs</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>forage-vector-db-milvus</artifactId>
@@ -381,7 +325,7 @@ Make sure to include the specific provider on your classpath:
 <dependency>
     <groupId>io.kaoto.forage</groupId>
     <artifactId>forage-vector-db-milvus</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -391,28 +335,28 @@ Make sure to include the specific provider on your classpath:
 Configure using environment variables:
 
 ```bash
-export MILVUS_HOST="milvus.example.com"
-export MILVUS_PORT="19530"
-export MILVUS_USERNAME="admin"
-export MILVUS_PASSWORD="password123"
+export FORAGE_MILVUS_HOST="milvus.example.com"
+export FORAGE_MILVUS_PORT="19530"
+export FORAGE_MILVUS_USERNAME="admin"
+export FORAGE_MILVUS_PASSWORD="password123"
 ```
 
 Or using system properties:
 
 ```bash
--Dmilvus.host=milvus.example.com
--Dmilvus.port=19530
--Dmilvus.username=admin
--Dmilvus.password=password123
+-Dforage.milvus.host=milvus.example.com
+-Dforage.milvus.port=19530
+-Dforage.milvus.username=admin
+-Dforage.milvus.password=password123
 ```
 
 Or using configuration files (`forage-vector-db-milvus.properties`):
 
 ```properties
-host=milvus.example.com
-port=19530
-username=admin
-password=password123
+forage.milvus.host=milvus.example.com
+forage.milvus.port=19530
+forage.milvus.username=admin
+forage.milvus.password=password123
 ```
 
 #### Named/Prefixed Configuration
@@ -420,19 +364,19 @@ For multi-instance setups using named configurations:
 
 ```bash
 # Environment variables (prefix becomes uppercase)
-export MILVUS_HOST="default.milvus.com"           # Default config
-export vectorstore.milvus.host="vs.milvus.com"   # "vectorstore" config
-export embeddings.milvus.host="emb.milvus.com"   # "embeddings" config
+export FORAGE_MILVUS_HOST="default.milvus.com"           # Default config
+export forage.vectorstore.milvus.host="vs.milvus.com"   # "vectorstore" config
+export forage.embeddings.milvus.host="emb.milvus.com"   # "embeddings" config
 
 # System properties
--Dmilvus.host=default.milvus.com                  # Default config
--Dvectorstore.milvus.host=vs.milvus.com          # "vectorstore" config
--Dembeddings.milvus.host=emb.milvus.com          # "embeddings" config
+-Dforage.milvus.host=default.milvus.com                  # Default config
+-Dforage.vectorstore.milvus.host=vs.milvus.com          # "vectorstore" config
+-Dforage.embeddings.milvus.host=emb.milvus.com          # "embeddings" config
 ```
 
 In your provider code:
 ```java
-@ForageBean(value = "milvus-multi", component = "camel-langchain4j-embeddings", description = "Multi-instance Milvus vector database provider")
+@ForageBean(value = "milvus-multi", components = {"camel-langchain4j-embeddings"}, description = "Multi-instance Milvus vector database provider")
 public class MultiInstanceMilvusProvider implements VectorDBProvider {
     @Override
     public VectorDatabase create(String id) {
@@ -453,7 +397,7 @@ public class MultiInstanceMilvusProvider implements VectorDBProvider {
 **MANDATORY**: All provider classes must be annotated with `@ForageBean`:
 
 ```java
-@ForageBean(value = "unique-name", component = "supported-component", description = "What it does")
+@ForageBean(value = "unique-name", components = {"supported-component"}, description = "What it does")
 public class YourProvider implements ProviderInterface {
     // Implementation
 }
@@ -461,10 +405,10 @@ public class YourProvider implements ProviderInterface {
 
 **Annotation Parameters:**
 - `value`: Unique identifier for the bean (e.g., "milvus", "azure-openai", "message-window")
-- `component`: Supported Camel component - use standard components:
-  - "camel-langchain4j-agent" for model providers and memory providers
-  - "camel-langchain4j-embeddings" for vector database providers
+- `components`: Supported Camel components (String array)
 - `description`: Human-readable description of what the provider does
+- `feature`: Feature group (e.g., "Chat Model", "Memory") — optional
+- `configClass`: Config class for properties file association — optional
 
 **Required Import:**
 ```java
@@ -477,10 +421,10 @@ import io.kaoto.forage.core.annotations.ForageBean;
 
 ```java
 @ForageFactory(
-    value = "unique-factory-name", 
-    component = "supported-component", 
+    value = "unique-factory-name",
+    components = {"supported-component"},
     description = "What the factory creates",
-    factoryType = "CreatedObjectType")
+    type = FactoryType.AGENT)
 public class YourFactory implements FactoryInterface {
     // Implementation
 }
@@ -488,9 +432,9 @@ public class YourFactory implements FactoryInterface {
 
 The annotation parameters:
 - `value`: Unique identifier for the factory (e.g., "default-agent", "multi-agent", "redis-memory")
-- `component`: Supported Camel component (e.g., "camel-langchain4j-agent", "camel-langchain4j-embeddings")
+- `components`: Supported Camel components (String array)
 - `description`: Human-readable description of what the factory creates
-- `factoryType`: Type of objects this factory creates (e.g., "Agent", "ChatMemoryProvider", "EmbeddingStore")
+- `type`: Type of objects this factory creates (enum `FactoryType`, e.g., `FactoryType.AGENT`)
 
 **Required Import:**
 ```java
@@ -501,8 +445,8 @@ import io.kaoto.forage.core.annotations.ForageFactory;
 - Always follow the Forage two-class configuration pattern with `Config` and `ConfigEntries` classes
 - Create a `*ConfigEntries` class extending `ConfigEntries` with static fields and maps
 - Support both default and named/prefixed configurations in the main `Config` class
-- Use meaningful environment variable names with a consistent prefix (e.g., `MILVUS_*`)
-- Use dot-notation for ConfigModule names (e.g., `milvus.host`, `milvus.port`)
+- Use meaningful environment variable names with a consistent prefix (e.g., `FORAGE_MILVUS_*`)
+- Use dot-notation for ConfigModule names (e.g., `forage.milvus.host`)
 - Provide sensible defaults where appropriate
 - Document all configuration parameters comprehensively including named configuration examples
 

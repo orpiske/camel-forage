@@ -23,7 +23,7 @@ The `forage-agent` module provides a complete AI agent implementation (`SimpleAg
 <dependency>
     <groupId>io.kaoto.forage</groupId>
     <artifactId>forage-agent</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -35,13 +35,13 @@ The composable agent is automatically discovered and used when you include this 
 from("direct:chat")
     .setBody(constant("My name is Alice"))
     .setHeader(Headers.MEMORY_ID, constant(1))
-    .to("langchain4j-agent:memory-agent?agentFactory=#class:io.kaoto.forage.agent.factory.MultiAgentFactory")
+    .to("langchain4j-agent:memory-agent?agent=#ollama")
     .log("Response: ${body}");
 
 from("timer:check?delay=5000&repeatCount=1")
          .setBody(constant("What is my name?"))
         .setHeader(Headers.MEMORY_ID, constant(1))
-        .to("langchain4j-agent:test-memory-agent?agentFactory=#class:io.kaoto.forage.agent.factory.MultiAgentFactory")
+        .to("langchain4j-agent:test-memory-agent?agent=#ollama")
         .log("${body}");
 ```
 
@@ -51,11 +51,27 @@ The second route should have a response similar to `Your name is Alice.`
 
 For a complete setup, you'll also need:
 
-- A chat model provider (e.g., `forage-model-openai`, `forage-model-google-gemini`)
+- A chat model provider (e.g., `forage-model-open-ai`, `forage-model-google-gemini`)
 - A chat memory provider (e.g., `forage-memory-message-window`) - optional for memory support
 - Agent factories (`forage-agent-factories`)
 
 ## Configuration
+
+### Properties File Configuration
+
+Agent configuration is specified in `forage-agent-factory.properties` (or `application.properties` for Spring Boot):
+
+```properties
+# In application.properties or forage-agent-factory.properties
+forage.ollama.agent.model.kind=ollama
+forage.ollama.agent.model.name=granite4:3b
+forage.ollama.agent.base.url=http://localhost:11434
+forage.ollama.agent.features=memory
+forage.ollama.agent.memory.kind=message-window
+forage.ollama.agent.memory.max.messages=20
+```
+
+### Automatic Configuration
 
 The SimpleAgent is configured automatically by the agent factories using ServiceLoader discovery. Configuration includes:
 

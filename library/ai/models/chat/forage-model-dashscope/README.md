@@ -82,7 +82,7 @@ Once functional, it will be automatically discovered via ServiceLoader:
 
 ```java
 from("direct:chat")
-    .to("langchain4j-agent:my-agent?agentFactory=#class:io.kaoto.forage.agent.factory.MultiAgentFactory")
+    .to("langchain4j-agent:my-agent?agent=#myAgent")
     .log("Response: ${body}");
 ```
 

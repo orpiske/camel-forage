@@ -37,42 +37,33 @@ Flexible agent implementation that can work with or without memory based on conf
 <dependency>
     <groupId>io.kaoto.forage</groupId>
     <artifactId>forage-agent</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
 </dependency>
 ```
 
 ### 2. Add Required Dependencies
-
-**Agent factories (always required):**
-```xml
-<dependency>
-    <groupId>io.kaoto.forage</groupId>
-    <artifactId>forage-agent-factories</artifactId>
-    <version>1.0-SNAPSHOT</version>
-</dependency>
-```
 
 **Model provider (choose one):**
 ```xml
 <!-- OpenAI -->
 <dependency>
     <groupId>io.kaoto.forage</groupId>
-    <artifactId>forage-model-openai</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>forage-model-open-ai</artifactId>
+    <version>1.1-SNAPSHOT</version>
 </dependency>
 
 <!-- Google Gemini -->
 <dependency>
     <groupId>io.kaoto.forage</groupId>
     <artifactId>forage-model-google-gemini</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
 </dependency>
 
 <!-- Ollama -->
 <dependency>
     <groupId>io.kaoto.forage</groupId>
     <artifactId>forage-model-ollama</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -81,7 +72,7 @@ Flexible agent implementation that can work with or without memory based on conf
 <dependency>
     <groupId>io.kaoto.forage</groupId>
     <artifactId>forage-memory-message-window</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -162,20 +153,16 @@ All configuration classes follow the same precedence order:
 #### Multi-Instance Configuration Examples
 
 ```bash
-# Environment variables for different configurations
-export OPENAI_API_KEY="default-key"              # Default config
-export agent1.openai.api.key="agent-key"        # "agent1" config  
-export api.openai.api.key="api-key"             # "api" config
+# Environment variables
+export FORAGE_OLLAMA_BASE_URL="http://localhost:11434"
+export FORAGE_OLLAMA_MODEL_NAME="granite4:3b"
 
-export MILVUS_HOST="localhost"                   # Default config
-export rag-system.milvus.host="vector-db.internal"  # "rag-system" config
+# Named configurations (with prefix)
+export FORAGE_AGENT1_OLLAMA_BASE_URL="http://server1:11434"
 
-# System properties (alternative to environment variables)
--Dopenai.api.key=default-key                    # Default config
--Dagent1.openai.api.key=agent-key              # "agent1" config
--Dapi.openai.api.key=api-key                   # "api" config
--Dmilvus.host=localhost                         # Default config
--Drag-system.milvus.host=vector-db.internal     # "rag-system" config
+# System properties
+-Dforage.ollama.base.url=http://localhost:11434
+-Dforage.ollama.model.name=granite4:3b
 ```
 
 #### Configuration Files
@@ -183,13 +170,13 @@ export rag-system.milvus.host="vector-db.internal"  # "rag-system" config
 Each module can also be configured via properties files:
 
 ```properties
-# forage-model-openai.properties (default config)
-api-key=default-key
-model-name=gpt-4
-
-# agent1.forage-model-openai.properties (prefixed config)  
-api-key=agent-key
-model-name=gpt-3.5-turbo
+# forage-agent-factory.properties (or application.properties)
+forage.ollama.agent.model.kind=ollama
+forage.ollama.agent.model.name=granite4:3b
+forage.ollama.agent.base.url=http://localhost:11434
+forage.ollama.agent.features=memory
+forage.ollama.agent.memory.kind=message-window
+forage.ollama.agent.memory.max.messages=20
 ```
 
 #### Provider Factory Integration
@@ -219,7 +206,7 @@ public class ChatBotRoutes extends RouteBuilder {
         from("timer:conversation?period=30s")
             .setHeader("CamelLangChain4jAgent.memoryId", constant("user-123"))
             .setBody(constant("How are you today?"))
-            .to("langchain4j-agent:chatbot?agentFactory=#class:io.kaoto.forage.agent.factory.MultiAgentFactory")
+            .to("langchain4j-agent:chatbot?agent=#ollama")
             .log("Bot: ${body}");
     }
 }
@@ -232,7 +219,7 @@ public class ApiRoutes extends RouteBuilder {
     @Override
     public void configure() throws Exception {
         from("rest:post:/ask")
-            .to("langchain4j-agent:api?agentFactory=#class:io.kaoto.forage.agent.factory.MultiAgentFactory")
+            .to("langchain4j-agent:api?agent=#api")
             .log("API Response: ${body}");
     }
 }
@@ -243,7 +230,7 @@ public class ApiRoutes extends RouteBuilder {
 ```java
 from("file:questions?noop=true")
     .split(body().tokenize("\n"))
-    .to("langchain4j-agent:processor?agentFactory=#class:io.kaoto.forage.agent.factory.MultiAgentFactory")
+    .to("langchain4j-agent:processor?agent=#processor")
     .to("file:answers");
 ```
 

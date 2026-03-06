@@ -33,38 +33,23 @@ Forage provides an opinionated library of beans for Apache Camel that simplifies
 
 ### 1. Configuration Files
 
-Create configuration files for each component:
+All agent configuration goes in a single `forage-agent-factory.properties` file. Each agent is identified by a unique prefix (e.g., `foo`, `bar`) and uses the `forage.<prefix>.agent.*` property pattern.
 
 #### forage-agent-factory.properties
 ```properties
-# Define multi agents
-multi.agent.names=google,ollama
+forage.foo.agent.model.kind=google-gemini
+forage.foo.agent.model.name=gemini-2.5-flash-lite
+forage.foo.agent.api.key=<my-api-key>
+forage.foo.agent.features=memory
+forage.foo.agent.memory.kind=message-window
+forage.foo.agent.memory.max.messages=20
 
-# Google Agent Configuration
-google.provider.agent.class=io.kaoto.forage.agent.simple.SimpleAgent
-google.provider.model.factory.class=io.kaoto.forage.models.chat.google.GoogleGeminiProvider
-google.provider.features=memory
-google.provider.features.memory.factory.class=io.kaoto.forage.memory.chat.messagewindow.MessageWindowChatMemoryBeanProvider
-
-# Ollama Agent Configuration
-ollama.provider.agent.class=io.kaoto.forage.agent.memoryless.MemorylessAgent
-ollama.provider.model.factory.class=io.kaoto.forage.models.chat.ollama.OllamaProvider
-ollama.provider.features=memoryless
-ollama.provider.features.memory.factory.class=io.kaoto.forage.memory.chat.messagewindow.MessageWindowChatMemoryBeanProvider
-```
-
-#### forage-model-google-gemini.properties
-```properties
-# Google API Configuration
-google.api.key=your-google-api-key-here
-google.model.name=gemini-2.5-flash
-```
-
-#### forage-model-ollama.properties
-```properties
-# Ollama Configuration
-ollama.base.url=http://localhost:11434
-ollama.model.name=llama3.1:latest
+forage.bar.agent.model.kind=ollama
+forage.bar.agent.model.name=granite4:3b
+forage.bar.agent.base.url=http://localhost:11434
+forage.bar.agent.features=memory
+forage.bar.agent.memory.kind=message-window
+forage.bar.agent.memory.max.messages=20
 ```
 
 ### 2. Agent ID Source Configuration
@@ -75,38 +60,38 @@ The MultiAgentFactory supports different strategies for extracting agent IDs fro
 
 | Source Type | Description | Configuration Property | Additional Configuration Required |
 |-------------|-------------|----------------------|----------------------------------|
-| `route` | Extract from route ID (default) | `multi.agent.id.source=route` | None |
-| `header` | Extract from exchange header | `multi.agent.id.source=header` | `multi.agent.id.source.header=HeaderName` |
-| `property` | Extract from exchange property | `multi.agent.id.source=property` | `multi.agent.id.source.property=PropertyName` |
-| `variable` | Extract from exchange variable | `multi.agent.id.source=variable` | `multi.agent.id.source.variable=VariableName` |
+| `route` | Extract from route ID (default) | `forage.multi.agent.id.source=route` | None |
+| `header` | Extract from exchange header | `forage.multi.agent.id.source=header` | `forage.multi.agent.id.source.header=HeaderName` |
+| `property` | Extract from exchange property | `forage.multi.agent.id.source=property` | `forage.multi.agent.id.source.property=PropertyName` |
+| `variable` | Extract from exchange variable | `forage.multi.agent.id.source=variable` | `forage.multi.agent.id.source.variable=VariableName` |
 
 #### Configuration Examples
 
 **Route ID Source (Default):**
 ```properties
 # Uses the route ID to determine which agent to use
-multi.agent.id.source=route
+forage.multi.agent.id.source=route
 ```
 
 **Header Source:**
 ```properties
 # Extract agent ID from the "AgentType" header
-multi.agent.id.source=header
-multi.agent.id.source.header=AgentType
+forage.multi.agent.id.source=header
+forage.multi.agent.id.source.header=AgentType
 ```
 
 **Property Source:**
 ```properties
 # Extract agent ID from the "agent.name" exchange property
-multi.agent.id.source=property
-multi.agent.id.source.property=agent.name
+forage.multi.agent.id.source=property
+forage.multi.agent.id.source.property=agent.name
 ```
 
 **Variable Source:**
 ```properties
 # Extract agent ID from the "selectedAgent" exchange variable
-multi.agent.id.source=variable
-multi.agent.id.source.variable=selectedAgent
+forage.multi.agent.id.source=variable
+forage.multi.agent.id.source.variable=selectedAgent
 ```
 
 #### Route Examples with Different ID Sources
@@ -125,7 +110,7 @@ multi.agent.id.source.variable=selectedAgent
         - to:
             uri: langchain4j-agent:dynamic
             parameters:
-              agentFactory: "#class:io.kaoto.forage.agent.factory.MultiAgentFactory"
+              agent: "#google"
         - log: "Response from ${header.AgentType}: ${body}"
 ```
 
@@ -143,7 +128,7 @@ multi.agent.id.source.variable=selectedAgent
         - to:
             uri: langchain4j-agent:dynamic
             parameters:
-              agentFactory: "#class:io.kaoto.forage.agent.factory.MultiAgentFactory"
+              agent: "#google"
         - log: "Response from ${exchangeProperty.agent.name}: ${body}"
 ```
 
@@ -161,13 +146,24 @@ multi.agent.id.source.variable=selectedAgent
         - to:
             uri: langchain4j-agent:dynamic
             parameters:
-              agentFactory: "#class:io.kaoto.forage.agent.factory.MultiAgentFactory"
+              agent: "#google"
         - log: "Response from ${variable.selectedAgent}: ${body}"
 ```
 
 ### 3. Camel Route Configuration
 
 #### Single Agent Example (agent.camel.yaml)
+
+Uses `application.properties` for configuration:
+```properties
+forage.ollama.agent.model.kind=ollama
+forage.ollama.agent.model.name=granite4:3b
+forage.ollama.agent.base.url=http://localhost:11434
+forage.ollama.agent.features=memory
+forage.ollama.agent.memory.kind=message-window
+forage.ollama.agent.memory.max.messages=20
+```
+
 ```yaml
 - route:
     id: single-agent-route
@@ -186,7 +182,7 @@ multi.agent.id.source.variable=selectedAgent
         - to:
             uri: langchain4j-agent:test
             parameters:
-              agentFactory: "#class:io.kaoto.forage.agent.factory.MultiAgentFactory"
+              agent: '#ollama'
               tags: users
         - log: ${body}
 
@@ -206,12 +202,15 @@ multi.agent.id.source.variable=selectedAgent
 ```
 
 #### Multi-Agent Example (multi-agent.camel.yaml)
+
+Uses `forage-agent-factory.properties` for configuration (see section 1 above).
+
 ```yaml
 - route:
-    id: google-agent
+    id: foo-agent
     description: Route using Google Gemini Agent
     from:
-      uri: timer:google
+      uri: timer:foo
       parameters:
         repeatCount: "1"
       steps:
@@ -223,17 +222,17 @@ multi.agent.id.source.variable=selectedAgent
         - setBody:
             simple: give the details of user 123
         - to:
-            uri: langchain4j-agent:google-test
+            uri: langchain4j-agent:foo-test
             parameters:
-              agentFactory: "#class:io.kaoto.forage.agent.factory.MultiAgentFactory"
+              agent: "#foo"
               tags: users
-        - log: "Google Agent Response: ${body}"
+        - log: "Foo Agent Response: ${body}"
 
 - route:
-    id: ollama-agent
+    id: bar-agent
     description: Route using local Ollama Agent
     from:
-      uri: timer:ollama
+      uri: timer:bar
       parameters:
         repeatCount: "1"
       steps:
@@ -245,10 +244,10 @@ multi.agent.id.source.variable=selectedAgent
         - setBody:
             simple: What is the timezone in Brasilia?
         - to:
-            uri: langchain4j-agent:ollama-test
+            uri: langchain4j-agent:bar-test
             parameters:
-              agentFactory: "#class:io.kaoto.forage.agent.factory.MultiAgentFactory"
-        - log: "Ollama Agent Response: ${body}"
+              agent: "#bar"
+        - log: "Bar Agent Response: ${body}"
 
 # Shared tools available to all agents
 - route:
@@ -272,30 +271,26 @@ multi.agent.id.source.variable=selectedAgent
 
 1. **Camel JBang 4.14+**
 2. **JBang 0.129.0+**
-3. **API Keys**: Configure Google API key in `forage-model-google-gemini.properties`
+3. **API Keys**: Configure Google API key in `forage-agent-factory.properties`
 4. **Ollama**: For local model integration, ensure Ollama is running on localhost:11434
 
 ### Single Agent Execution
 
 ```bash
 camel run agent.camel.yaml \
-  --dep=mvn:io.kaoto.forage:forage-agent-factories:1.0-SNAPSHOT \
-  --dep=mvn:io.kaoto.forage:forage-agent:1.0-SNAPSHOT \
-  --dep=mvn:io.kaoto.forage:forage-memory-message-window:1.0-SNAPSHOT \
-  --dep=mvn:io.kaoto.forage:forage-model-google-gemini:1.0-SNAPSHOT \
-  --dep=camel-langchain4j-agent
+  --dep=mvn:io.kaoto.forage:forage-agent:1.1-SNAPSHOT \
+  --dep=mvn:io.kaoto.forage:forage-memory-message-window:1.1-SNAPSHOT \
+  --dep=mvn:io.kaoto.forage:forage-model-ollama:1.1-SNAPSHOT
 ```
 
 ### Multi-Agent Execution
 
 ```bash
 camel run multi-agent.camel.yaml \
-  --dep=mvn:io.kaoto.forage:forage-agent-factories:1.0-SNAPSHOT \
-  --dep=mvn:io.kaoto.forage:forage-agent:1.0-SNAPSHOT \
-  --dep=mvn:io.kaoto.forage:forage-memory-message-window:1.0-SNAPSHOT \
-  --dep=mvn:io.kaoto.forage:forage-model-google-gemini:1.0-SNAPSHOT \
-  --dep=mvn:io.kaoto.forage:forage-model-ollama:1.0-SNAPSHOT \
-  --dep=camel-langchain4j-agent
+  --dep=mvn:io.kaoto.forage:forage-agent:1.1-SNAPSHOT \
+  --dep=mvn:io.kaoto.forage:forage-memory-message-window:1.1-SNAPSHOT \
+  --dep=mvn:io.kaoto.forage:forage-model-google-gemini:1.1-SNAPSHOT \
+  --dep=mvn:io.kaoto.forage:forage-model-ollama:1.1-SNAPSHOT
 ```
 
 ## Kaoto Integration
@@ -330,7 +325,7 @@ When designing routes in Kaoto, ensure the following structure:
             id: to-component-id
             uri: langchain4j-agent:agent-name
             parameters:
-              agentFactory: "#class:factory.class"
+              agent: "#agent-prefix"
 ```
 
 ### Best Practices for Kaoto
@@ -369,23 +364,24 @@ When designing routes in Kaoto, ensure the following structure:
 #### **Customer Support Routing**
 ```properties
 # Route high-priority tickets to advanced AI
-multi.agent.id.source=property
-multi.agent.id.source.property=ticket.priority
+forage.multi.agent.id.source=property
+forage.multi.agent.id.source.property=ticket.priority
 
 # Configure agents
-multi.agent.names=basic,advanced
-basic.provider.model.factory.class=io.kaoto.forage.models.chat.ollama.OllamaProvider
-advanced.provider.model.factory.class=io.kaoto.forage.models.chat.google.GoogleGeminiProvider
+forage.basic.agent.model.kind=ollama
+forage.basic.agent.model.name=granite4:3b
+forage.basic.agent.base.url=http://localhost:11434
+
+forage.advanced.agent.model.kind=google-gemini
+forage.advanced.agent.model.name=gemini-2.5-flash-lite
+forage.advanced.agent.api.key=<my-api-key>
 ```
 
 #### **User Preference-Based Routing**
 ```properties
 # Let users choose their preferred AI model
-multi.agent.id.source=header
-multi.agent.id.source.header=X-Preferred-Agent
-
-# Configure agents
-multi.agent.names=google,ollama,openai
+forage.multi.agent.id.source=header
+forage.multi.agent.id.source.header=X-Preferred-Agent
 ```
 
 ## Advanced Multi-Agent Patterns
@@ -403,11 +399,11 @@ Chain agents to create sophisticated workflows:
         - to:
             uri: langchain4j-agent:analysis
             parameters:
-              agentFactory: "#class:io.kaoto.forage.agent.factory.MultiAgentFactory"
+              agent: "#analysis"
         - to:
-            uri: langchain4j-agent:synthesis  
+            uri: langchain4j-agent:synthesis
             parameters:
-              agentFactory: "#class:io.kaoto.forage.agent.factory.MultiAgentFactory"
+              agent: "#synthesis"
         - log: "Final result: ${body}"
 ```
 
@@ -429,13 +425,13 @@ Use Camel's choice component for dynamic agent selection:
                   - to:
                       uri: langchain4j-agent:advanced
                       parameters:
-                        agentFactory: "#class:io.kaoto.forage.agent.factory.MultiAgentFactory"
+                        agent: "#advanced"
             otherwise:
               steps:
                 - to:
                     uri: langchain4j-agent:simple
                     parameters:
-                      agentFactory: "#class:io.kaoto.forage.agent.factory.MultiAgentFactory"
+                      agent: "#simple"
 ```
 
 ### Memory Management
@@ -444,13 +440,14 @@ Configure different memory strategies per agent:
 
 ```properties
 # Long-term memory agent
-agent1.provider.features.memory.factory.class=io.kaoto.forage.memory.chat.redis.RedisChatMemoryFactory
+forage.agent1.agent.memory.kind=redis
 
 # Short-term memory agent
-agent2.provider.features.memory.factory.class=io.kaoto.forage.memory.chat.messagewindow.MessageWindowChatMemoryBeanProvider
+forage.agent2.agent.memory.kind=message-window
+forage.agent2.agent.memory.max.messages=20
 
 # Stateless agent
-agent3.provider.features=memoryless
+forage.agent3.agent.features=memoryless
 ```
 
 ### Guardrails
@@ -463,10 +460,10 @@ Configure guardrails in your `forage-agent-factory.properties` file:
 
 ```properties
 # Input guardrails - executed before the agent processes input
-guardrails.input.classes=com.example.ContentFilterGuardrail,com.example.RateLimitGuardrail
+forage.guardrails.input.classes=com.example.ContentFilterGuardrail,com.example.RateLimitGuardrail
 
 # Output guardrails - executed after the agent produces output
-guardrails.output.classes=com.example.PiiRedactionGuardrail,com.example.ToxicityFilterGuardrail
+forage.guardrails.output.classes=com.example.PiiRedactionGuardrail,com.example.ToxicityFilterGuardrail
 ```
 
 #### Named Agent Guardrails
@@ -474,19 +471,18 @@ guardrails.output.classes=com.example.PiiRedactionGuardrail,com.example.Toxicity
 For multi-agent configurations, use prefixed guardrails for each agent:
 
 ```properties
-# Define agents
-multi.agent.names=secure,standard
-
 # Secure agent with strict guardrails
-secure.provider.agent.class=io.kaoto.forage.agent.simple.SimpleAgent
-secure.provider.model.factory.class=io.kaoto.forage.models.chat.openai.OpenAIProvider
-secure.guardrails.input.classes=com.example.StrictContentFilter,com.example.AuthorizationGuardrail
-secure.guardrails.output.classes=com.example.PiiRedactionGuardrail,com.example.ComplianceGuardrail
+forage.secure.agent.model.kind=openai
+forage.secure.agent.model.name=gpt-4
+forage.secure.agent.api.key=<my-api-key>
+forage.secure.guardrails.input.classes=com.example.StrictContentFilter,com.example.AuthorizationGuardrail
+forage.secure.guardrails.output.classes=com.example.PiiRedactionGuardrail,com.example.ComplianceGuardrail
 
 # Standard agent with minimal guardrails
-standard.provider.agent.class=io.kaoto.forage.agent.simple.SimpleAgent
-standard.provider.model.factory.class=io.kaoto.forage.models.chat.ollama.OllamaProvider
-standard.guardrails.output.classes=com.example.BasicOutputFilter
+forage.standard.agent.model.kind=ollama
+forage.standard.agent.model.name=granite4:3b
+forage.standard.agent.base.url=http://localhost:11434
+forage.standard.guardrails.output.classes=com.example.BasicOutputFilter
 ```
 
 #### Environment Variable Configuration
@@ -495,13 +491,13 @@ Guardrails can also be configured via environment variables:
 
 ```bash
 # Single guardrail
-export GUARDRAILS_INPUT_CLASSES=com.example.ContentFilterGuardrail
+export FORAGE_GUARDRAILS_INPUT_CLASSES=com.example.ContentFilterGuardrail
 
 # Multiple guardrails (comma-separated)
-export GUARDRAILS_OUTPUT_CLASSES=com.example.PiiRedactionGuardrail,com.example.ToxicityFilterGuardrail
+export FORAGE_GUARDRAILS_OUTPUT_CLASSES=com.example.PiiRedactionGuardrail,com.example.ToxicityFilterGuardrail
 
 # Named agent guardrails (prefix with agent name in uppercase)
-export SECURE_GUARDRAILS_INPUT_CLASSES=com.example.StrictContentFilter
+export FORAGE_SECURE_GUARDRAILS_INPUT_CLASSES=com.example.StrictContentFilter
 ```
 
 ## Configuration Reference
@@ -510,29 +506,27 @@ export SECURE_GUARDRAILS_INPUT_CLASSES=com.example.StrictContentFilter
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `GOOGLE_API_KEY` | Google Gemini API key | `sk-...` |
-| `OLLAMA_BASE_URL` | Ollama server URL | `http://localhost:11434` |
-| `OLLAMA_MODEL_NAME` | Ollama model name | `llama3.1:latest` |
-| `MULTI_AGENT_NAMES` | Comma-separated agent names | `google,ollama,openai` |
-| `MULTI_AGENT_ID_SOURCE` | Agent ID extraction strategy | `route`, `header`, `property`, `variable` |
-| `MULTI_AGENT_ID_SOURCE_HEADER` | Header name for agent ID (when using header source) | `AgentType` |
-| `MULTI_AGENT_ID_SOURCE_PROPERTY` | Property name for agent ID (when using property source) | `agent.name` |
-| `MULTI_AGENT_ID_SOURCE_VARIABLE` | Variable name for agent ID (when using variable source) | `selectedAgent` |
-| `GUARDRAILS_INPUT_CLASSES` | Comma-separated input guardrail class names | `com.example.InputFilter` |
-| `GUARDRAILS_OUTPUT_CLASSES` | Comma-separated output guardrail class names | `com.example.OutputFilter` |
+| `FORAGE_GOOGLE_API_KEY` | Google Gemini API key | `sk-...` |
+| `FORAGE_OLLAMA_BASE_URL` | Ollama server URL | `http://localhost:11434` |
+| `FORAGE_OLLAMA_MODEL_NAME` | Ollama model name | `granite4:3b` |
+| `FORAGE_MULTI_AGENT_ID_SOURCE` | Agent ID extraction strategy | `route`, `header`, `property`, `variable` |
+| `FORAGE_MULTI_AGENT_ID_SOURCE_HEADER` | Header name for agent ID (when using header source) | `AgentType` |
+| `FORAGE_MULTI_AGENT_ID_SOURCE_PROPERTY` | Property name for agent ID (when using property source) | `agent.name` |
+| `FORAGE_MULTI_AGENT_ID_SOURCE_VARIABLE` | Variable name for agent ID (when using variable source) | `selectedAgent` |
+| `FORAGE_GUARDRAILS_INPUT_CLASSES` | Comma-separated input guardrail class names | `com.example.InputFilter` |
+| `FORAGE_GUARDRAILS_OUTPUT_CLASSES` | Comma-separated output guardrail class names | `com.example.OutputFilter` |
 
 ### System Properties
 
 Configure via `-D` flags:
 
 ```bash
--Dgoogle.api.key=your-key
--Dollama.base.url=http://localhost:11434
--Dmulti.agent.names=google,ollama
--Dmulti.agent.id.source=header
--Dmulti.agent.id.source.header=AgentType
--Dguardrails.input.classes=com.example.InputFilter
--Dguardrails.output.classes=com.example.OutputFilter
+-Dforage.google.api.key=your-key
+-Dforage.ollama.base.url=http://localhost:11434
+-Dforage.multi.agent.id.source=header
+-Dforage.multi.agent.id.source.header=AgentType
+-Dforage.guardrails.input.classes=com.example.InputFilter
+-Dforage.guardrails.output.classes=com.example.OutputFilter
 ```
 
 ### Named Configurations
@@ -540,12 +534,14 @@ Configure via `-D` flags:
 Support multiple instances with prefixes:
 
 ```properties
-# Default configuration
-provider.model.factory.class=io.kaoto.forage.models.chat.openai.OpenAIProvider
+# Named configurations using the kind-based pattern
+forage.google.agent.model.kind=google-gemini
+forage.google.agent.model.name=gemini-2.5-flash-lite
+forage.google.agent.api.key=<my-api-key>
 
-# Named configurations
-google.provider.model.factory.class=io.kaoto.forage.models.chat.google.GoogleGeminiProvider
-ollama.provider.model.factory.class=io.kaoto.forage.models.chat.ollama.OllamaProvider
+forage.ollama.agent.model.kind=ollama
+forage.ollama.agent.model.name=granite4:3b
+forage.ollama.agent.base.url=http://localhost:11434
 ```
 
 ## Troubleshooting
@@ -557,14 +553,14 @@ ollama.provider.model.factory.class=io.kaoto.forage.models.chat.ollama.OllamaPro
 3. **Model Availability**: Check that configured models are available and accessible
 4. **Memory Configuration**: Ensure memory providers are properly configured for stateful agents
 5. **Agent ID Source Issues**:
-   - **Unknown Agent Error**: Check that the extracted agent ID matches one of the configured agent names in `multi.agent.names`
+   - **Unknown Agent Error**: Check that the extracted agent ID matches one of the configured agent prefixes
    - **Header/Property/Variable Not Found**: Verify the header, property, or variable is set before reaching the agent endpoint
    - **Missing Source Configuration**: When using `header`, `property`, or `variable` sources, ensure the corresponding name configuration is set
-   - **Invalid Source Type**: Check that `multi.agent.id.source` is set to one of: `route`, `header`, `property`, `variable`
+   - **Invalid Source Type**: Check that `forage.multi.agent.id.source` is set to one of: `route`, `header`, `property`, `variable`
 6. **Guardrail Issues**:
    - **ClassNotFoundException**: Ensure guardrail class names are fully-qualified (e.g., `com.example.MyGuardrail`) and the classes are available on the classpath
    - **RuntimeForageException**: Check that guardrail classes can be loaded by the application's class loader; in Quarkus or Spring Boot, ensure classes are properly packaged
-   - **Guardrails Not Executing**: Verify the configuration property names are correct (`guardrails.input.classes` or `guardrails.output.classes`) and for named agents, include the prefix (e.g., `myagent.guardrails.input.classes`)
+   - **Guardrails Not Executing**: Verify the configuration property names are correct (`forage.guardrails.input.classes` or `forage.guardrails.output.classes`) and for named agents, include the prefix (e.g., `forage.myagent.guardrails.input.classes`)
 
 ### Debug Mode
 

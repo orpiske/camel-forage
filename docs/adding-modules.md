@@ -544,7 +544,7 @@ Use these existing modules as templates:
 
 | Module | Complexity | Good for |
 |--------|-----------|----------|
-| AI chat model (e.g., `forage-model-openai`) | Simple | Provider-only modules (no Spring Boot/Quarkus integration needed) |
+| AI chat model (e.g., `forage-model-open-ai`) | Simple | Provider-only modules (no Spring Boot/Quarkus integration needed) |
 | Guardrails (e.g., `forage-guardrail-input-length`) | Simple | Config + provider with minimal boilerplate |
 | JDBC (`forage-jdbc-common` + starters) | Complex | Full three-runtime support with transactions and auxiliary beans |
 | JMS (`forage-jms-common` + starters) | Medium | Three-runtime support with property translation |

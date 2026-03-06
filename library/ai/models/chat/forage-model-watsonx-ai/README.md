@@ -104,7 +104,7 @@ The provider is automatically discovered via ServiceLoader. Use it in your Camel
 
 ```java
 from("direct:chat")
-    .to("langchain4j-agent:my-agent?agentFactory=#class:io.kaoto.forage.agent.factory.MultiAgentFactory")
+    .to("langchain4j-agent:my-agent?agent=#myAgent")
     .log("Response: ${body}");
 ```
 
@@ -178,7 +178,7 @@ export WATSONXAI_PROJECT_ID="your-project-id"
 
 ```java
 from("direct:watsonx-chat")
-    .to("langchain4j-agent:watsonx-agent?agentFactory=#class:io.kaoto.forage.agent.factory.MultiAgentFactory")
+    .to("langchain4j-agent:watsonx-agent?agent=#watsonxAgent")
     .log("Watsonx.ai Response: ${body}");
 ```
 
