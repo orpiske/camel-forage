@@ -107,6 +107,7 @@ public class ForageDataSourceAutoConfiguration {
     @Bean("dataSource")
     @ConditionalOnMissingBean(name = "dataSource")
     @Conditional(SingleDataSourceProviderCondition.class)
+    @ConditionalOnProperty(prefix = "forage.jdbc", name = "db.kind")
     public DataSource forageDefaultDataSource() {
         List<ServiceLoader.Provider<DataSourceProvider>> providers =
                 ServiceLoader.load(DataSourceProvider.class).stream().toList();

@@ -1,10 +1,7 @@
 package io.kaoto.forage.quarkus.jdbc.deployment;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.apache.camel.processor.aggregate.jdbc.JdbcAggregationRepository;
 import org.apache.camel.processor.idempotent.jdbc.JdbcMessageIdRepository;
 import org.apache.camel.quarkus.core.deployment.spi.CamelContextBuildItem;
@@ -25,8 +22,6 @@ import io.quarkus.deployment.annotations.Record;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.runtime.RuntimeValue;
 
-import org.junit.platform.commons.util.StringUtils;
-
 @ForageFactory(
         value = "DataSource (Quarkus)",
         components = {"camel-sql", "camel-jdbc"},
@@ -35,7 +30,10 @@ import org.junit.platform.commons.util.StringUtils;
         autowired = true,
         configClass = DataSourceFactoryConfig.class,
         variant = FactoryVariant.QUARKUS,
-        runtimeDependencies = {"mvn:org.apache.camel.quarkus:camel-quarkus-sql"})
+        runtimeDependencies = {
+            "mvn:org.apache.camel.quarkus:camel-quarkus-sql",
+            "mvn:org.apache.camel.quarkus:camel-quarkus-jdbc"
+        })
 public class ForageJdbcProcessor {
 
     private static final Logger LOG = Logger.getLogger(ForageJdbcProcessor.class);
@@ -54,15 +52,23 @@ public class ForageJdbcProcessor {
     @BuildStep
     void discoverDataSources(BuildProducer<ForageDataSourceBuildItem> dataSources) {
         DataSourceFactoryConfig defaultConfig = DESCRIPTOR.createConfig(null);
-        Set<String> prefixes = ConfigStore.getInstance()
+        Set<String> namedPrefixes = ConfigStore.getInstance()
                 .readPrefixes(defaultConfig, ConfigHelper.getNamedPropertyRegexp(DESCRIPTOR.modulePrefix()));
 
-        Map<String, DataSourceFactoryConfig> configs = prefixes.isEmpty()
-                ? Collections.singletonMap(DESCRIPTOR.defaultBeanName(), DESCRIPTOR.createConfig(null))
-                : prefixes.stream().collect(Collectors.toMap(n -> n, DESCRIPTOR::createConfig));
-
-        for (Map.Entry<String, DataSourceFactoryConfig> entry : configs.entrySet()) {
-            dataSources.produce(new ForageDataSourceBuildItem(entry.getKey(), entry.getValue()));
+        if (!namedPrefixes.isEmpty()) {
+            for (String prefix : namedPrefixes) {
+                dataSources.produce(new ForageDataSourceBuildItem(prefix, prefix, DESCRIPTOR.createConfig(prefix)));
+            }
+        } else {
+            // Check if default (unprefixed) properties exist before producing a build item
+            Set<String> defaultPrefixes = ConfigStore.getInstance()
+                    .readPrefixes(defaultConfig, ConfigHelper.getDefaultPropertyRegexp(DESCRIPTOR.modulePrefix()));
+            if (!defaultPrefixes.isEmpty()) {
+                dataSources.produce(new ForageDataSourceBuildItem(
+                        DESCRIPTOR.defaultBeanName(), null, DESCRIPTOR.createConfig(null)));
+            } else {
+                LOG.debug("No Forage JDBC configuration found, skipping DataSource discovery");
+            }
         }
     }
 
@@ -80,11 +86,12 @@ public class ForageJdbcProcessor {
 
         for (ForageDataSourceBuildItem ds : dataSources) {
             String name = ds.getName();
+            String prefix = ds.getPrefix();
             DataSourceFactoryConfig dsConfig = ds.getConfig();
 
-            if (StringUtils.isNotBlank(dsConfig.aggregationRepositoryName())) {
+            if (isNotBlank(dsConfig.aggregationRepositoryName())) {
                 RuntimeValue<JdbcAggregationRepository> aggRepo =
-                        recorder.createAggregationRepository(name, context.getCamelContext(), dsConfig);
+                        recorder.createAggregationRepository(name, prefix, context.getCamelContext());
                 if (aggRepo != null) {
                     beans.produce(new CamelRuntimeBeanBuildItem(
                             dsConfig.aggregationRepositoryName(), JdbcAggregationRepository.class.getName(), aggRepo));
@@ -97,9 +104,9 @@ public class ForageJdbcProcessor {
             }
 
             if (dsConfig.enableIdempotentRepository()) {
-                if (StringUtils.isNotBlank(dsConfig.idempotentRepositoryTableName())) {
+                if (isNotBlank(dsConfig.idempotentRepositoryTableName())) {
                     RuntimeValue<JdbcMessageIdRepository> idRepo =
-                            recorder.createIdempotentRepository(name, context.getCamelContext(), dsConfig);
+                            recorder.createIdempotentRepository(name, prefix, context.getCamelContext());
                     if (idRepo != null) {
                         beans.produce(new CamelRuntimeBeanBuildItem(
                                 dsConfig.idempotentRepositoryTableName(),
@@ -116,13 +123,17 @@ public class ForageJdbcProcessor {
         }
     }
 
+    private static boolean isNotBlank(String s) {
+        return s != null && !s.isBlank();
+    }
+
     private static void logMissingMandatoryProperty(String keyword, DataSourceFactoryConfig config, String warnMsg) {
         ConfigHelper.getGetterMethods(DataSourceFactoryConfig.class).stream()
                 .filter(m -> m.getName().toLowerCase().contains(keyword))
                 .forEach(m -> {
                     try {
                         Object value = m.invoke(config);
-                        if (value != null && StringUtils.isNotBlank(value.toString())) {
+                        if (value != null && isNotBlank(value.toString())) {
                             LOG.warn(warnMsg.formatted(m.getName()));
                         }
                     } catch (Exception e) {

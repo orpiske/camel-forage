@@ -9,6 +9,8 @@ import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
 import io.kaoto.forage.core.util.config.ConfigHelper;
+import io.kaoto.forage.core.util.config.ConfigStore;
+import io.kaoto.forage.jdbc.common.DataSourceFactoryConfig;
 import io.kaoto.forage.jdbc.common.JdbcModuleDescriptor;
 import io.kaoto.forage.springboot.common.ForageSpringBootModuleAdapter;
 import io.kaoto.forage.springboot.common.SpringPropertyHelper;
@@ -78,7 +80,14 @@ class ForageJdbcBeanRegistrar implements ImportBeanDefinitionRegistrar, org.spri
     }
 
     private Set<String> discoverPrefixes(JdbcModuleDescriptor descriptor) {
-        return SpringPropertyHelper.discoverPrefixes(
+        Set<String> prefixes = SpringPropertyHelper.discoverPrefixes(
                 environment, ConfigHelper.getNamedPropertyRegexp(descriptor.modulePrefix()));
+        if (!prefixes.isEmpty()) {
+            return prefixes;
+        }
+        // Also check ConfigStore (covers forage-*.properties files not loaded into Spring Environment)
+        DataSourceFactoryConfig defaultConfig = descriptor.createConfig(null);
+        return ConfigStore.getInstance()
+                .readPrefixes(defaultConfig, ConfigHelper.getNamedPropertyRegexp(descriptor.modulePrefix()));
     }
 }

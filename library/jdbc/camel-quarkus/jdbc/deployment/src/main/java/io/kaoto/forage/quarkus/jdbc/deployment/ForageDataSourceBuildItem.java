@@ -15,15 +15,25 @@ import io.quarkus.builder.item.MultiBuildItem;
 public final class ForageDataSourceBuildItem extends MultiBuildItem {
 
     private final String name;
+    private final String prefix;
     private final DataSourceFactoryConfig config;
 
-    public ForageDataSourceBuildItem(String name, DataSourceFactoryConfig config) {
+    public ForageDataSourceBuildItem(String name, String prefix, DataSourceFactoryConfig config) {
         this.name = name;
+        this.prefix = prefix;
         this.config = config;
     }
 
     public String getName() {
         return name;
+    }
+
+    /**
+     * Returns the configuration prefix used to create the config, or null for default (unprefixed) config.
+     * This value is safe to pass to Quarkus recorders (it is a simple String).
+     */
+    public String getPrefix() {
+        return prefix;
     }
 
     public DataSourceFactoryConfig getConfig() {

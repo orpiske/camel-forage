@@ -52,9 +52,20 @@ public class ForageJmsProcessor {
         Set<String> named = ConfigStore.getInstance()
                 .readPrefixes(defaultConfig, ConfigHelper.getNamedPropertyRegexp(DESCRIPTOR.modulePrefix()));
 
-        Map<String, ConnectionFactoryConfig> configs = named.isEmpty()
-                ? Collections.singletonMap((String) null, defaultConfig)
-                : named.stream().collect(Collectors.toMap(n -> n, DESCRIPTOR::createConfig));
+        Map<String, ConnectionFactoryConfig> configs;
+        if (!named.isEmpty()) {
+            configs = named.stream().collect(Collectors.toMap(n -> n, DESCRIPTOR::createConfig));
+        } else {
+            // Check if default (unprefixed) properties exist before creating a default config
+            Set<String> defaultPrefixes = ConfigStore.getInstance()
+                    .readPrefixes(defaultConfig, ConfigHelper.getDefaultPropertyRegexp(DESCRIPTOR.modulePrefix()));
+            if (!defaultPrefixes.isEmpty()) {
+                configs = Collections.singletonMap((String) null, defaultConfig);
+            } else {
+                LOG.debug("No Forage JMS configuration found, skipping ConnectionFactory discovery");
+                return;
+            }
+        }
 
         for (Map.Entry<String, ConnectionFactoryConfig> entry : configs.entrySet()) {
             if ("ibmmq".equals(entry.getValue().jmsKind())) {

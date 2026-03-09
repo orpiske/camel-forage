@@ -29,8 +29,9 @@ public class ForageJdbcRecorder {
     private static final Logger LOG = Logger.getLogger(ForageJdbcRecorder.class);
 
     public RuntimeValue<JdbcAggregationRepository> createAggregationRepository(
-            String dsName, RuntimeValue<CamelContext> camelContext, DataSourceFactoryConfig config) {
+            String dsName, String prefix, RuntimeValue<CamelContext> camelContext) {
 
+        DataSourceFactoryConfig config = new DataSourceFactoryConfig(prefix);
         CamelContext context = camelContext.getValue();
         DataSource agroalDataSource = context.getRegistry().lookupByNameAndType(dsName, DataSource.class);
         JdbcAggregationRepository ar = createAggregationRepository(config, agroalDataSource);
@@ -41,8 +42,9 @@ public class ForageJdbcRecorder {
     }
 
     public RuntimeValue<JdbcMessageIdRepository> createIdempotentRepository(
-            String dsName, RuntimeValue<CamelContext> camelContext, DataSourceFactoryConfig config) {
+            String dsName, String prefix, RuntimeValue<CamelContext> camelContext) {
 
+        DataSourceFactoryConfig config = new DataSourceFactoryConfig(prefix);
         CamelContext context = camelContext.getValue();
         DataSource agroalDataSource = context.getRegistry().lookupByNameAndType(dsName, DataSource.class);
         JdbcMessageIdRepository ir = createIdempotentRepository(config, agroalDataSource);

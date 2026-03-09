@@ -52,6 +52,17 @@ public interface ForageModuleDescriptor<C extends Config, P extends BeanProvider
     Class<?> primaryBeanClass();
 
     /**
+     * Additional alias names for the default bean (e.g., {@code "jmsConnectionFactory"}).
+     * These are registered alongside the default bean to prevent framework auto-configs
+     * from creating redundant beans.
+     *
+     * @return list of alias names; empty list by default
+     */
+    default List<String> defaultBeanAliases() {
+        return Collections.emptyList();
+    }
+
+    /**
      * Translates forage properties into runtime-native properties (for Quarkus).
      *
      * <p>When {@code prefix} is {@code null}, the descriptor should use its own default

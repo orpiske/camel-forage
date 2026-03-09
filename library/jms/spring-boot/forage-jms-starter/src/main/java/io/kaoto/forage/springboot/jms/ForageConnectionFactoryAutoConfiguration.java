@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.ServiceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.jms.artemis.ArtemisAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -37,6 +39,7 @@ import io.kaoto.forage.springboot.common.ForageSpringBootModuleAdapter;
         configClass = ConnectionFactoryConfig.class,
         variant = FactoryVariant.SPRING_BOOT)
 @Configuration
+@AutoConfigureBefore(ArtemisAutoConfiguration.class)
 public class ForageConnectionFactoryAutoConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(ForageConnectionFactoryAutoConfiguration.class);
@@ -68,23 +71,36 @@ public class ForageConnectionFactoryAutoConfiguration {
     }
 
     /**
-     * Fallback ConnectionFactory bean created when exactly one ConnectionFactoryProvider
-     * is on the classpath and no named/prefixed configurations are found.
+     * Fallback ConnectionFactory bean created when no named/prefixed configurations are found
+     * and default (unprefixed) JMS properties exist. Uses {@code forage.jms.kind} to select
+     * the matching provider when multiple providers are on the classpath.
      */
     @Bean("jmsConnectionFactory")
     @ConditionalOnMissingBean(name = "jmsConnectionFactory")
+    @ConditionalOnProperty(prefix = "forage.jms", name = "kind")
     public ConnectionFactory forageDefaultConnectionFactory() {
+        ConnectionFactoryConfig config = new ConnectionFactoryConfig();
+        String kind = config.jmsKind();
+        String providerClassName =
+                io.kaoto.forage.jms.common.ConnectionFactoryCommonExportHelper.transformJmsKindIntoProviderClass(kind);
+
         List<ServiceLoader.Provider<ConnectionFactoryProvider>> providers =
                 ServiceLoader.load(ConnectionFactoryProvider.class).stream().toList();
-        if (providers.size() == 1) {
-            log.info(
-                    "Creating default ConnectionFactory using single provider: {}",
-                    providers.get(0).type().getName());
-            ConnectionFactory connectionFactory = providers.get(0).get().create(null);
-            log.info("Registered default ConnectionFactory bean");
-            return connectionFactory;
+
+        for (ServiceLoader.Provider<ConnectionFactoryProvider> provider : providers) {
+            if (provider.type().getName().equals(providerClassName)) {
+                log.info("Creating default ConnectionFactory using provider: {}", providerClassName);
+                ConnectionFactory connectionFactory = provider.get().create(null);
+                log.info("Registered default ConnectionFactory bean");
+                return connectionFactory;
+            }
         }
-        throw new IllegalStateException(
-                "Expected exactly one ConnectionFactoryProvider on the classpath, but found " + providers.size());
+
+        String available = providers.stream()
+                .map(p -> p.type().getName())
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("none");
+        throw new IllegalStateException("No ConnectionFactoryProvider found for kind '" + kind + "' (expected "
+                + providerClassName + "). Available providers: " + available);
     }
 }

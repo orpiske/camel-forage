@@ -3,6 +3,7 @@ package io.kaoto.forage.jms.common;
 import jakarta.jms.ConnectionFactory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 import org.apache.camel.tooling.model.Strings;
@@ -43,6 +44,11 @@ public class JmsModuleDescriptor implements ForageModuleDescriptor<ConnectionFac
     }
 
     @Override
+    public List<String> defaultBeanAliases() {
+        return List.of("jmsConnectionFactory");
+    }
+
+    @Override
     public Class<?> primaryBeanClass() {
         return ConnectionFactory.class;
     }
@@ -61,9 +67,13 @@ public class JmsModuleDescriptor implements ForageModuleDescriptor<ConnectionFac
             String property = "quarkus.artemis.";
             if (!Strings.isNullOrEmpty(named)) {
                 property += "\"" + named + "\".";
+                // Disable the default (unnamed) configuration when only named configs are
+                // used, preventing "url is not set" / "devservices is activated" errors
+                addIfNotEmpty(props, "quarkus.artemis.enabled", "false");
+                addIfNotEmpty(props, "quarkus.artemis.devservices.enabled", "false");
+            } else {
+                addIfNotEmpty(props, "quarkus.artemis.enabled", "true");
             }
-
-            addIfNotEmpty(props, "quarkus.artemis.enabled", "true");
             addIfNotEmpty(props, property + "password", config.password());
             addIfNotEmpty(props, property + "username", config.username());
             addIfNotEmpty(props, property + "url", config.brokerUrl());

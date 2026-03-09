@@ -17,6 +17,7 @@ import io.kaoto.forage.core.common.ForageModuleDescriptor;
 import io.kaoto.forage.core.common.ServiceLoaderHelper;
 import io.kaoto.forage.core.util.config.Config;
 import io.kaoto.forage.core.util.config.ConfigHelper;
+import io.kaoto.forage.core.util.config.ConfigStore;
 
 /**
  * Generic Spring Boot adapter that consumes any {@link ForageModuleDescriptor} to dynamically
@@ -64,17 +65,55 @@ public class ForageSpringBootModuleAdapter<C extends Config, P extends BeanProvi
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-        // No-op — all work is done in postProcessBeanDefinitionRegistry
+        // Replace conflicting alias beans registered by framework auto-configs
+        // (e.g., Spring Boot's ArtemisAutoConfiguration creates a CachingConnectionFactory
+        // as "jmsConnectionFactory" that wraps Forage's already-pooled ConnectionFactory).
+        // postProcessBeanFactory runs AFTER all auto-config bean definitions are registered,
+        // so this is the reliable point to replace them.
+        if (beanFactory instanceof BeanDefinitionRegistry registry) {
+            String defaultName = descriptor.defaultBeanName();
+            if (registry.containsBeanDefinition(defaultName)) {
+                for (String alias : descriptor.defaultBeanAliases()) {
+                    if (registry.containsBeanDefinition(alias)) {
+                        registry.removeBeanDefinition(alias);
+                        LOG.info("Removed conflicting {} bean definition: {}", descriptor.modulePrefix(), alias);
+                    }
+                    GenericBeanDefinition aliasDef = new GenericBeanDefinition();
+                    aliasDef.setBeanClass(descriptor.primaryBeanClass());
+                    aliasDef.setInstanceSupplier(() -> beanFactory.getBean(defaultName));
+                    registry.registerBeanDefinition(alias, aliasDef);
+                    LOG.info(
+                            "Registered {} alias bean definition: {} -> {}",
+                            descriptor.modulePrefix(),
+                            alias,
+                            defaultName);
+                }
+            }
+        }
     }
 
     private boolean hasDefaultProperties() {
-        return SpringPropertyHelper.hasProperties(
-                environment, ConfigHelper.getDefaultPropertyRegexp(descriptor.modulePrefix()));
+        if (SpringPropertyHelper.hasProperties(
+                environment, ConfigHelper.getDefaultPropertyRegexp(descriptor.modulePrefix()))) {
+            return true;
+        }
+        // Also check ConfigStore (covers forage-*.properties files not loaded into Spring Environment)
+        C defaultConfig = descriptor.createConfig(null);
+        return !ConfigStore.getInstance()
+                .readPrefixes(defaultConfig, ConfigHelper.getDefaultPropertyRegexp(descriptor.modulePrefix()))
+                .isEmpty();
     }
 
     private Set<String> discoverPrefixes() {
-        return SpringPropertyHelper.discoverPrefixes(
+        Set<String> prefixes = SpringPropertyHelper.discoverPrefixes(
                 environment, ConfigHelper.getNamedPropertyRegexp(descriptor.modulePrefix()));
+        if (!prefixes.isEmpty()) {
+            return prefixes;
+        }
+        // Also check ConfigStore (covers forage-*.properties files not loaded into Spring Environment)
+        C defaultConfig = descriptor.createConfig(null);
+        return ConfigStore.getInstance()
+                .readPrefixes(defaultConfig, ConfigHelper.getNamedPropertyRegexp(descriptor.modulePrefix()));
     }
 
     private void registerBeans(BeanDefinitionRegistry registry, Set<String> prefixes) {
@@ -85,12 +124,9 @@ public class ForageSpringBootModuleAdapter<C extends Config, P extends BeanProvi
                 registerPrimaryBean(registry, name, isFirst);
             } else {
                 LOG.debug("Bean '{}' already defined, skipping primary registration", name);
-                // Still register auxiliary beans even if the primary bean was already
-                // registered (e.g., by ForageJdbcBeanRegistrar during config processing)
-                if (isFirst) {
-                    registerAuxiliaryBeans(registry, name);
-                }
             }
+            // Register auxiliary beans for every prefix that has them configured
+            registerAuxiliaryBeans(registry, name);
             isFirst = false;
         }
     }
@@ -109,8 +145,6 @@ public class ForageSpringBootModuleAdapter<C extends Config, P extends BeanProvi
             defaultDef.setInstanceSupplier(() -> createPrimaryBean(name));
             registry.registerBeanDefinition(defaultName, defaultDef);
             LOG.info("Registered default {} bean definition using: {}", descriptor.modulePrefix(), name);
-
-            registerAuxiliaryBeans(registry, name);
         }
     }
 
