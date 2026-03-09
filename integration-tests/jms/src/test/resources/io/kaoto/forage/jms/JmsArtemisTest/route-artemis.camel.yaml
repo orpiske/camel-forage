@@ -39,6 +39,7 @@
         destinationName: input.queue
         destinationType: queue
         transacted: "true"
+        cacheLevelName: CACHE_NONE
       steps:
         - transacted:
             id: xa-transaction
