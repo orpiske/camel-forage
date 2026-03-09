@@ -7,7 +7,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import io.kaoto.forage.catalog.model.ConditionalBeanGroup;
 import io.kaoto.forage.catalog.model.ConfigEntry;
 import io.kaoto.forage.catalog.reader.ForageCatalogReader;
@@ -20,7 +21,7 @@ import io.kaoto.forage.core.common.RuntimeType;
  */
 public class CatalogDrivenExportCustomizer implements ExportCustomizer {
 
-    private static final Logger LOG = Logger.getLogger(CatalogDrivenExportCustomizer.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(CatalogDrivenExportCustomizer.class);
 
     private Map<String, Map<String, List<String>>> scannedProperties;
     private Boolean enabled;
@@ -101,8 +102,8 @@ public class CatalogDrivenExportCustomizer implements ExportCustomizer {
             }
         }
 
-        LOG.fine(() -> "Resolved " + dependencies.size() + " dependencies for runtime " + runtime);
-        dependencies.forEach(dep -> LOG.fine(() -> "  Dependency: " + dep));
+        LOG.debug("Resolved {} dependencies for runtime {}", dependencies.size(), runtime);
+        dependencies.forEach(dep -> LOG.debug("  Dependency: {}", dep));
 
         return dependencies;
     }
@@ -114,7 +115,7 @@ public class CatalogDrivenExportCustomizer implements ExportCustomizer {
                 ForageCatalogReader catalog = ForageCatalogReader.getInstance();
                 scannedProperties = ForagePropertyScanner.scanProperties(workingDir, catalog);
             } catch (IOException e) {
-                LOG.warning("Failed to scan for forage properties: " + e.getMessage());
+                LOG.warn("Failed to scan for forage properties: {}", e.getMessage());
                 scannedProperties = Map.of();
             }
         }
@@ -146,9 +147,23 @@ public class CatalogDrivenExportCustomizer implements ExportCustomizer {
      * E.g., "forage.jdbc.db.kind" with factoryTypeKey "jdbc" -> "db.kind"
      */
     private static String extractPropertySuffix(String entryName, String factoryTypeKey) {
+        if (entryName == null) {
+            return null;
+        }
+        // Try with the factoryTypeKey first (e.g., "forage.jdbc." for jdbc factory)
         String prefix = "forage." + factoryTypeKey + ".";
-        if (entryName != null && entryName.startsWith(prefix)) {
+        if (entryName.startsWith(prefix)) {
             return entryName.substring(prefix.length());
+        }
+        // Fallback: extract the suffix using the entry's own prefix segment
+        // This handles cases where the factoryTypeKey differs from the config entry prefix
+        // (e.g., agent factory has key "multi" but bean-name entries use "forage.agent.*")
+        if (entryName.startsWith("forage.")) {
+            String remaining = entryName.substring("forage.".length());
+            int dotIndex = remaining.indexOf('.');
+            if (dotIndex > 0) {
+                return remaining.substring(dotIndex + 1);
+            }
         }
         return null;
     }

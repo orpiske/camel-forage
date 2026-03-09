@@ -96,15 +96,18 @@ public final class AgentCreator {
             ForageAgentConfiguration agentConfiguration = new ForageAgentConfiguration();
             agentConfiguration.withChatModel(chatModel).withChatMemoryProvider(chatMemoryProvider);
 
-            EmbeddingModel embeddingModel = createEmbeddingModel(config, modelKind, name, classLoader);
-            EmbeddingStore<TextSegment> embeddingStore =
-                    createEmbeddingStore(config, modelKind, name, classLoader, embeddingModel);
+            // Only create embedding/RAG pipeline when embedding properties are configured
+            if (config.hasEmbeddingConfig()) {
+                EmbeddingModel embeddingModel = createEmbeddingModel(config, modelKind, name, classLoader);
+                EmbeddingStore<TextSegment> embeddingStore =
+                        createEmbeddingStore(config, modelKind, name, classLoader, embeddingModel);
 
-            RetrievalAugmentor retrievalAugmentor =
-                    createRetrievalAugmentor(config, modelKind, name, classLoader, embeddingModel, embeddingStore);
+                RetrievalAugmentor retrievalAugmentor =
+                        createRetrievalAugmentor(config, modelKind, name, classLoader, embeddingModel, embeddingStore);
 
-            if (retrievalAugmentor != null) {
-                agentConfiguration.withRetrievalAugmentor(retrievalAugmentor);
+                if (retrievalAugmentor != null) {
+                    agentConfiguration.withRetrievalAugmentor(retrievalAugmentor);
+                }
             }
 
             List<InputGuardrail> inputGuardrails = loadInputGuardrails(name, classLoader);
@@ -158,19 +161,24 @@ public final class AgentCreator {
                 String providerPrefix = getProviderConfigPrefix(modelKind);
                 String prefix = DEFAULT_AGENT.equals(agentName) ? null : agentName;
 
-                setSystemPropertyIfNotNull(prefix, providerPrefix, "api.key", config.apiKey());
-                setSystemPropertyIfNotNull(prefix, providerPrefix, "model.name", config.modelName());
-                setSystemPropertyIfNotNull(prefix, providerPrefix, "base.url", config.baseUrl());
-                setSystemPropertyIfNotNull(prefix, providerPrefix, "temperature", config.temperature());
-                setSystemPropertyIfNotNull(prefix, providerPrefix, "max.tokens", config.maxTokens());
-                setSystemPropertyIfNotNull(prefix, providerPrefix, "top.p", config.topP());
-                setSystemPropertyIfNotNull(prefix, providerPrefix, "top.k", config.topK());
-                setSystemPropertyIfNotNull(prefix, providerPrefix, "endpoint", config.endpoint());
-                setSystemPropertyIfNotNull(prefix, providerPrefix, "deployment.name", config.deploymentName());
-                setSystemPropertyIfNotNull(prefix, providerPrefix, "log.requests", config.logRequests());
-                setSystemPropertyIfNotNull(prefix, providerPrefix, "log.responses", config.logResponses());
+                List<String> setKeys = new ArrayList<>();
+                setSystemPropertyIfNotNull(setKeys, prefix, providerPrefix, "api.key", config.apiKey());
+                setSystemPropertyIfNotNull(setKeys, prefix, providerPrefix, "model.name", config.modelName());
+                setSystemPropertyIfNotNull(setKeys, prefix, providerPrefix, "base.url", config.baseUrl());
+                setSystemPropertyIfNotNull(setKeys, prefix, providerPrefix, "temperature", config.temperature());
+                setSystemPropertyIfNotNull(setKeys, prefix, providerPrefix, "max.tokens", config.maxTokens());
+                setSystemPropertyIfNotNull(setKeys, prefix, providerPrefix, "top.p", config.topP());
+                setSystemPropertyIfNotNull(setKeys, prefix, providerPrefix, "top.k", config.topK());
+                setSystemPropertyIfNotNull(setKeys, prefix, providerPrefix, "endpoint", config.endpoint());
+                setSystemPropertyIfNotNull(setKeys, prefix, providerPrefix, "deployment.name", config.deploymentName());
+                setSystemPropertyIfNotNull(setKeys, prefix, providerPrefix, "log.requests", config.logRequests());
+                setSystemPropertyIfNotNull(setKeys, prefix, providerPrefix, "log.responses", config.logResponses());
 
-                return modelProvider.create(prefix);
+                try {
+                    return modelProvider.create(prefix);
+                } finally {
+                    clearSystemProperties(setKeys);
+                }
             }
         }
 
@@ -192,15 +200,21 @@ public final class AgentCreator {
                 String providerPrefix = getProviderConfigPrefix(modelKind);
                 String prefix = DEFAULT_AGENT.equals(agentName) ? null : agentName;
 
-                setSystemPropertyIfNotNull(prefix, providerPrefix, "embedding.model.name", config.embeddingModelName());
+                List<String> setKeys = new ArrayList<>();
                 setSystemPropertyIfNotNull(
-                        prefix, providerPrefix, "embedding.model.timeout", config.embeddingModelTimeout());
+                        setKeys, prefix, providerPrefix, "embedding.model.name", config.embeddingModelName());
                 setSystemPropertyIfNotNull(
-                        prefix, providerPrefix, "embedding.max.retries", config.embeddingModelMaxRetries());
+                        setKeys, prefix, providerPrefix, "embedding.model.timeout", config.embeddingModelTimeout());
                 setSystemPropertyIfNotNull(
-                        prefix, providerPrefix, "embedding.base.url", config.embeddingModelBaseUrl());
+                        setKeys, prefix, providerPrefix, "embedding.max.retries", config.embeddingModelMaxRetries());
+                setSystemPropertyIfNotNull(
+                        setKeys, prefix, providerPrefix, "embedding.base.url", config.embeddingModelBaseUrl());
 
-                return modelProvider.create(prefix);
+                try {
+                    return modelProvider.create(prefix);
+                } finally {
+                    clearSystemProperties(setKeys);
+                }
             }
         }
 
@@ -221,17 +235,21 @@ public final class AgentCreator {
             String providerPrefix = getProviderConfigPrefix(modelKind);
             String prefix = DEFAULT_AGENT.equals(agentName) ? null : agentName;
 
-            setSystemPropertyIfNotNull(null, providerPrefix, "in.memory.store.file.source", config.fileSource());
+            List<String> setKeys = new ArrayList<>();
+            setSystemPropertyIfNotNull(setKeys, prefix, "in.memory.store", "file.source", config.fileSource());
+            setSystemPropertyIfNotNull(setKeys, prefix, "in.memory.store", "max.size", config.embeddingStoreMaxSize());
             setSystemPropertyIfNotNull(
-                    null, providerPrefix, "in.memory.store.max.size", config.embeddingStoreMaxSize());
-            setSystemPropertyIfNotNull(
-                    null, providerPrefix, "in.memory.store.overlap.size", config.embeddingStoreOverlapSize());
+                    setKeys, prefix, "in.memory.store", "overlap.size", config.embeddingStoreOverlapSize());
 
             if (storeProvider instanceof EmbeddingModelAware modelAware) {
                 modelAware.withEmbeddingModel(model);
             }
 
-            return storeProvider.create(prefix);
+            try {
+                return storeProvider.create(prefix);
+            } finally {
+                clearSystemProperties(setKeys);
+            }
         }
 
         LOG.debug("No embedding store model provider found for kind: {}", modelKind);
@@ -257,8 +275,9 @@ public final class AgentCreator {
             String providerPrefix = getProviderConfigPrefix(modelKind);
             String prefix = DEFAULT_AGENT.equals(agentName) ? null : agentName;
 
-            setSystemPropertyIfNotNull(null, providerPrefix, "rag.max.results", config.defaultRagMaxResults());
-            setSystemPropertyIfNotNull(null, providerPrefix, "rag.min.score", config.defaultRagMinScore());
+            List<String> setKeys = new ArrayList<>();
+            setSystemPropertyIfNotNull(setKeys, prefix, "rag", "max.results", config.defaultRagMaxResults());
+            setSystemPropertyIfNotNull(setKeys, prefix, "rag", "min.score", config.defaultRagMinScore());
 
             if (retrievalAugmentorProvider instanceof EmbeddingModelAware modelAware) {
                 modelAware.withEmbeddingModel(embeddingModel);
@@ -267,7 +286,11 @@ public final class AgentCreator {
                 storeAware.withEmbeddingStore(embeddingStore);
             }
 
-            return retrievalAugmentorProvider.create(prefix);
+            try {
+                return retrievalAugmentorProvider.create(prefix);
+            } finally {
+                clearSystemProperties(setKeys);
+            }
         }
 
         LOG.debug("No retrieval augmentor provider found for kind: {}", modelKind);
@@ -370,13 +393,22 @@ public final class AgentCreator {
                 .build();
     }
 
-    static void setSystemPropertyIfNotNull(String prefix, String providerPrefix, String key, Object value) {
+    static void setSystemPropertyIfNotNull(
+            List<String> setKeys, String prefix, String providerPrefix, String key, Object value) {
         if (value != null) {
             String fullKey = prefix != null
                     ? "forage." + prefix + "." + providerPrefix + "." + key
                     : "forage." + providerPrefix + "." + key;
             System.setProperty(fullKey, String.valueOf(value));
+            setKeys.add(fullKey);
             LOG.trace("Set system property: {}={}", fullKey, value);
+        }
+    }
+
+    private static void clearSystemProperties(List<String> keys) {
+        for (String key : keys) {
+            System.clearProperty(key);
+            LOG.trace("Cleared system property: {}", key);
         }
     }
 

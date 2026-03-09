@@ -165,6 +165,11 @@ public class AgentConfig extends AbstractConfig {
 
     // EmbeddingStore
 
+    public boolean hasEmbeddingConfig() {
+        return get(EMBEDDING_MODEL_MODEL_NAME).isPresent()
+                || get(EMBEDDING_STORE_FILE_SOURCE).isPresent();
+    }
+
     public String fileSource() {
         return get(EMBEDDING_STORE_FILE_SOURCE).orElse(null);
     }

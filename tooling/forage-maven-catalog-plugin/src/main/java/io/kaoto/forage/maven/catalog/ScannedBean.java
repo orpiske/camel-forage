@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import io.kaoto.forage.catalog.model.ForageBean;
 
 /**
@@ -11,6 +13,8 @@ import io.kaoto.forage.catalog.model.ForageBean;
  * Contains both the serializable ForageBean model and scanning-specific metadata.
  */
 public class ScannedBean {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ScannedBean.class);
 
     private final ForageBean bean;
 
@@ -127,6 +131,8 @@ public class ScannedBean {
                 String variant = dep.substring(0, colonIndex);
                 String gav = dep.substring(colonIndex + 1);
                 result.computeIfAbsent(variant, k -> new ArrayList<>()).add(gav);
+            } else {
+                LOG.warn("Malformed variant:gav entry, expected 'variant:gav' format but got: {}", dep);
             }
         }
         return result.isEmpty() ? null : result;

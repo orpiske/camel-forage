@@ -124,10 +124,20 @@ public final class ForageCatalogReader {
                 }
             }
 
-            // If no prefix property found, try to derive the factory type key from any config entry
+            // If no prefix property found, try to derive the factory type key from a bean-name
+            // config entry first (these represent the canonical property prefix), then fall back
+            // to the first config entry
             if (factoryTypeKey == null && configEntries != null && !configEntries.isEmpty()) {
-                factoryTypeKey = extractFactoryTypeKeyFromPropertyName(
-                        configEntries.get(0).getName());
+                for (ConfigEntry entry : configEntries) {
+                    if ("bean-name".equals(entry.getType())) {
+                        factoryTypeKey = extractFactoryTypeKeyFromPropertyName(entry.getName());
+                        break;
+                    }
+                }
+                if (factoryTypeKey == null) {
+                    factoryTypeKey = extractFactoryTypeKeyFromPropertyName(
+                            configEntries.get(0).getName());
+                }
             }
 
             if (factoryTypeKey != null) {
