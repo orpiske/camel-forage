@@ -32,8 +32,8 @@ import io.kaoto.forage.core.util.config.ConfigStore;
  * </ul>
  *
  * @see ConditionalOnForageProperty
- * @see ConfigModule
- * @see ConfigStore
+ * @see io.kaoto.forage.core.util.config.ConfigModule
+ * @see io.kaoto.forage.core.util.config.ConfigStore
  */
 @Deprecated(since = "1.1", forRemoval = true)
 public class ForagePropertyCondition extends SpringBootCondition {

@@ -84,8 +84,8 @@ import static io.kaoto.forage.memory.chat.infinispan.InfinispanConfigEntries.USE
  * infinispan.pool.max-wait=5000
  * </pre>
  *
- * @see Config
- * @see ConfigStore
+ * @see io.kaoto.forage.core.util.config.Config
+ * @see io.kaoto.forage.core.util.config.ConfigStore
  * @see PersistentInfinispanStore
  * @since 1.0
  */

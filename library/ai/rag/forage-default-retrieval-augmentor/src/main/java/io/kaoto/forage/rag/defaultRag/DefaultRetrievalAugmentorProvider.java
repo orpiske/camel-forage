@@ -41,9 +41,9 @@ import dev.langchain4j.store.embedding.EmbeddingStore;
  * RetrievalAugmentor rag = provider.newModel();
  * }</pre>
  *
- * @see Config
- * @see ConfigStore
- * @see ConfigModule
+ * @see io.kaoto.forage.core.util.config.Config
+ * @see io.kaoto.forage.core.util.config.ConfigStore
+ * @see io.kaoto.forage.core.util.config.ConfigModule
  * @since 1.0
  */
 @ForageBean(

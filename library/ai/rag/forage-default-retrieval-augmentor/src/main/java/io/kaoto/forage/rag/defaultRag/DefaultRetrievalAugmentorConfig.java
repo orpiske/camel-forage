@@ -23,9 +23,9 @@ import static io.kaoto.forage.rag.defaultRag.DefaultRetrievalAugmentorConfigEntr
  *   <li><strong>MIN_SCORE</strong> - The minimum relevance score for the returned Contents. Contents scoring below #minScore are excluded from the results.</li>
  * </ul>
  *
- * @see Config
- * @see ConfigStore
- * @see ConfigModule
+ * @see io.kaoto.forage.core.util.config.Config
+ * @see io.kaoto.forage.core.util.config.ConfigStore
+ * @see io.kaoto.forage.core.util.config.ConfigModule
  * @since 1.0
  */
 public class DefaultRetrievalAugmentorConfig extends AbstractConfig {

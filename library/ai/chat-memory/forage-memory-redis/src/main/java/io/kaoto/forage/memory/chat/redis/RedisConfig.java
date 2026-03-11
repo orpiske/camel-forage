@@ -80,8 +80,8 @@ import static io.kaoto.forage.memory.chat.redis.RedisConfigEntries.TIMEOUT;
  * redis.pool.max-wait-millis=3000
  * </pre>
  *
- * @see Config
- * @see ConfigStore
+ * @see io.kaoto.forage.core.util.config.Config
+ * @see io.kaoto.forage.core.util.config.ConfigStore
  * @see PersistentRedisStore
  * @since 1.0
  */

@@ -29,9 +29,9 @@ import static io.kaoto.forage.models.embeddings.ollama.OllamaEmbeddingConfigEntr
  *   <li><strong>OLLAMA_LOG_RESPONSES</strong> - Enable response logging, true/false (no default)</li>
  * </ul>
  *
- * @see Config
- * @see ConfigStore
- * @see ConfigModule
+ * @see io.kaoto.forage.core.util.config.Config
+ * @see io.kaoto.forage.core.util.config.ConfigStore
+ * @see io.kaoto.forage.core.util.config.ConfigModule
  * @since 1.0
  */
 public class OllamaEmbedddingConfig extends AbstractConfig {
