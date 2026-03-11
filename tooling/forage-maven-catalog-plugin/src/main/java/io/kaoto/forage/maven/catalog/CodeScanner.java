@@ -8,12 +8,17 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 import org.apache.maven.artifact.Artifact;
@@ -42,6 +47,8 @@ import com.github.javaparser.ast.nodeTypes.NodeWithName;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 
 public class CodeScanner {
+    private static final Set<String> SKIP_DIRS = Set.of("target", ".git", "node_modules", ".idea", ".vscode");
+
     private final Log log;
     private final Map<String, Path> sourceDirectoryCache = new ConcurrentHashMap<>();
     private final JavaParser parser;
@@ -102,12 +109,17 @@ public class CodeScanner {
             log.debug("Scan error details: " + e.getMessage(), e);
         }
 
-        log.debug("Single-pass scan completed for " + artifact.getArtifactId() + ": "
-                + result.getBeans().size()
-                + " beans, " + result.getFactories().size() + " factories, "
-                + result.getConfigProperties().size() + " config properties, "
-                + result.getConfigClasses().size()
-                + " config classes");
+        if (!result.getBeans().isEmpty()
+                || !result.getFactories().isEmpty()
+                || !result.getConfigClasses().isEmpty()) {
+            log.info("Scanned " + artifact.getArtifactId() + ": "
+                    + result.getBeans().size()
+                    + " beans, " + result.getFactories().size() + " factories, "
+                    + result.getConfigProperties().size() + " config properties, "
+                    + result.getConfigClasses().size() + " config classes");
+        } else {
+            log.debug("Scanned " + artifact.getArtifactId() + ": no annotations found");
+        }
 
         return result;
     }
@@ -174,67 +186,94 @@ public class CodeScanner {
 
     /**
      * Finds the source directory for the given artifact within the project structure.
-     * Uses caching to avoid redundant directory resolution.
-     * Performs a single directory walk for both exact match and POM search (performance optimization).
+     * Uses a pre-built directory map (populated on first call) to avoid repeated tree walks.
      */
     private Path findSourceDirectory(Artifact artifact, Path rootDir) {
         String artifactId = artifact.getArtifactId();
 
-        // Check cache first
-        if (sourceDirectoryCache.containsKey(artifactId)) {
-            return sourceDirectoryCache.get(artifactId);
+        // Build directory map on first call
+        if (sourceDirectoryCache.isEmpty()) {
+            buildDirectoryMap(rootDir);
         }
 
-        Path projectBase = rootDir;
-        log.debug("Project base directory: " + projectBase);
-        log.debug("Looking for source directory for artifact: " + artifactId);
-
-        // Single walk: collect all paths, then search for exact match or POM match
-        Path result = null;
-        try (Stream<Path> paths = Files.walk(projectBase)) {
-            List<Path> candidates = paths.toList();
-
-            // First try exact directory name match
-            result = candidates.stream()
-                    .filter(path -> Files.isDirectory(path) && path.endsWith(artifactId))
-                    .findFirst()
-                    .orElseGet(() -> {
-                        // If exact match fails, try to find pom.xml files with matching artifactId
-                        log.debug("No exact directory match for " + artifactId + ", trying POM search");
-                        return candidates.stream()
-                                .filter(path -> path.getFileName().toString().equals("pom.xml"))
-                                .filter(pomPath -> {
-                                    boolean matches = isModuleArtifactId(pomPath, artifactId);
-                                    if (matches) {
-                                        log.debug("Found POM match for " + artifactId + " at: " + pomPath);
-                                    }
-                                    return matches;
-                                })
-                                .map(Path::getParent)
-                                .findFirst()
-                                .orElse(null);
-                    });
-        } catch (IOException e) {
-            log.error("Error walking directory tree: " + projectBase, e);
-            sourceDirectoryCache.put(artifactId, null);
-            return null;
+        Path result = sourceDirectoryCache.get(artifactId);
+        if (result == null) {
+            log.info("No source directory found for artifact: " + artifactId);
         }
-
-        if (result != null) {
-            log.debug("Resolved source directory for " + artifactId + ": " + result);
-        } else {
-            log.warn("Could not find source directory for artifact: " + artifactId);
-        }
-
-        sourceDirectoryCache.put(artifactId, result);
         return result;
     }
 
     /**
-     * Checks if the given POM file defines the artifactId as the module's own artifactId,
-     * not as a dependency. Uses proper XML parsing to avoid issues with comments and whitespace.
+     * Walks the project tree once and builds a map of artifactId -> module directory.
+     * Skips .git, target, and other non-source directories for performance.
+     * Uses POM-based matching: finds pom.xml files and extracts their artifactId.
      */
-    private boolean isModuleArtifactId(Path pomPath, String artifactId) {
+    private void buildDirectoryMap(Path rootDir) {
+        log.info("Building source directory map from: " + rootDir);
+
+        Map<String, Path> pomBasedMap = new HashMap<>();
+        List<Path> directories = new ArrayList<>();
+
+        try {
+            Files.walkFileTree(rootDir, new SimpleFileVisitor<>() {
+                @Override
+                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+                    String dirName = dir.getFileName().toString();
+                    if (SKIP_DIRS.contains(dirName)) {
+                        return FileVisitResult.SKIP_SUBTREE;
+                    }
+                    directories.add(dir);
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                    if (file.getFileName().toString().equals("pom.xml")) {
+                        String aid = extractArtifactIdFromPom(file);
+                        if (aid != null) {
+                            pomBasedMap.put(aid, file.getParent());
+                        }
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFileFailed(Path file, IOException exc) {
+                    log.debug("Failed to visit: " + file + " (" + exc.getMessage() + ")");
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            log.error("Error walking directory tree: " + rootDir, e);
+        }
+
+        // Build the cache: prefer POM-based match (most reliable), fall back to directory name match
+        for (Path dir : directories) {
+            String dirName = dir.getFileName().toString();
+            if (!sourceDirectoryCache.containsKey(dirName) && !pomBasedMap.containsKey(dirName)) {
+                // Store directory name match as fallback (only if no POM match exists)
+                sourceDirectoryCache.put(dirName, dir);
+            }
+        }
+        // POM-based matches override directory name matches
+        sourceDirectoryCache.putAll(pomBasedMap);
+
+        log.info("Source directory map built with " + sourceDirectoryCache.size() + " entries (from "
+                + pomBasedMap.size() + " POM files and " + directories.size() + " directories)");
+    }
+
+    /**
+     * Extracts the artifactId from a pom.xml file.
+     * Returns null if the POM cannot be parsed or has no artifactId.
+     */
+    private String extractArtifactIdFromPom(Path pomPath) {
+        return isModuleArtifactId(pomPath) ? getArtifactIdFromPom(pomPath) : null;
+    }
+
+    /**
+     * Gets the artifactId from a pom.xml file's direct child element.
+     */
+    private String getArtifactIdFromPom(Path pomPath) {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
@@ -244,26 +283,28 @@ public class CodeScanner {
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document doc = builder.parse(pomPath.toFile());
 
-            // Get the root project element
             Element root = doc.getDocumentElement();
             if (!"project".equals(root.getTagName())) {
-                return false;
+                return null;
             }
 
-            // Find direct child artifactId element (not inside dependencies, parent, etc.)
             NodeList children = root.getChildNodes();
             for (int i = 0; i < children.getLength(); i++) {
                 if (children.item(i) instanceof Element child && "artifactId".equals(child.getTagName())) {
-                    String foundArtifactId = child.getTextContent().trim();
-                    return artifactId.equals(foundArtifactId);
+                    return child.getTextContent().trim();
                 }
             }
-
-            return false;
         } catch (Exception e) {
             log.debug("Failed to parse POM file: " + pomPath);
-            return false;
         }
+        return null;
+    }
+
+    /**
+     * Checks if the given POM file is a valid Maven project POM (has a project root and artifactId).
+     */
+    private boolean isModuleArtifactId(Path pomPath) {
+        return getArtifactIdFromPom(pomPath) != null;
     }
 
     /**
